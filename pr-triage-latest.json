@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-04-11T06:35:08Z",
-  "run_id": "24276761053",
+  "run_date": "2026-04-11T12:25:04Z",
+  "run_id": "24282403499",
   "fork_prs": 0,
-  "agent_prs_found": 5,
-  "agent_prs_excluded": 5,
-  "notes": "5 open Copilot-authored PRs found, all same-repo branches (not forks). Excluded per fork-only triage policy.",
+  "agent_prs_found": 8,
+  "agent_prs_excluded": 8,
+  "notes": "8 open Copilot-authored PRs found, all same-repo branches (not forks). Excluded per fork-only triage policy.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -17,67 +17,20 @@
     "by_action": {}
   },
   "prs_examined": [
-    {
-      "number": 25764,
-      "title": "perf: fix CompileSimpleWorkflow regression by reusing cached git root",
-      "author": "Copilot",
-      "draft": false,
-      "created_at": "2026-04-11T05:56:12Z",
-      "updated_at": "2026-04-11T06:23:42Z",
-      "labels": [],
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork"
-    },
-    {
-      "number": 25763,
-      "title": "perf: pre-compile regex patterns in hot validation paths",
-      "author": "Copilot",
-      "draft": false,
-      "created_at": "2026-04-11T05:55:55Z",
-      "updated_at": "2026-04-11T06:20:27Z",
-      "labels": [],
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork"
-    },
-    {
-      "number": 25752,
-      "title": "Bump CLI versions: Claude Code 2.1.101, Copilot 1.0.24, Codex 0.120.0",
-      "author": "Copilot",
-      "draft": false,
-      "created_at": "2026-04-11T04:24:06Z",
-      "updated_at": "2026-04-11T05:25:22Z",
-      "labels": ["lgtm"],
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork"
-    },
-    {
-      "number": 25747,
-      "title": "Allow secrets in step-level env: bindings under strict mode",
-      "author": "Copilot",
-      "draft": false,
-      "created_at": "2026-04-11T03:29:33Z",
-      "updated_at": "2026-04-11T05:25:19Z",
-      "labels": [],
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork"
-    },
-    {
-      "number": 25729,
-      "title": "Forward OIDC env vars to MCP Gateway docker command",
-      "author": "Copilot",
-      "draft": false,
-      "created_at": "2026-04-11T01:03:15Z",
-      "updated_at": "2026-04-11T05:25:21Z",
-      "labels": ["needs-work"],
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork"
-    }
+    {"number": 25795, "title": "Extract shared `buildInputSchema` helper to deduplicate input-schema generation", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 25792, "title": "Refactor: remove semver.go wrappers, extract gateway_logs_render.go, consolidate", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 25789, "title": "Rename codemod_plugins.go functions to include ToDependencies suffix", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 25786, "title": "fix: improve upload_artifact error diagnostics and workflow staging instructions", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 25785, "title": "Add unit tests for OIDC env var forwarding to MCP gateway docker command", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 25779, "title": "Allow secrets in step-level env: bindings under strict mode", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 25776, "title": "Add `allow-workflows` field for GitHub App `workflows:write` permission on safe-outputs", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 25772, "title": "feat: add --no-ask-user flag to copilot agentic engine for fully autonomous runs", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"}
   ],
   "previous_run": {
-    "run_id": "24270829953",
-    "run_date": "2026-04-11T00:55:33Z",
+    "run_id": "24276761053",
+    "run_date": "2026-04-11T06:35:08Z",
     "fork_prs": 0,
-    "agent_prs_found": 2,
-    "agent_prs_excluded": 2
+    "agent_prs_found": 5,
+    "agent_prs_excluded": 5
   }
 }
