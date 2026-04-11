@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-04-11T12:25:04Z",
-  "run_id": "24282403499",
+  "run_date": "2026-04-11T18:22:25Z",
+  "run_id": "24288675202",
   "fork_prs": 0,
-  "agent_prs_found": 8,
-  "agent_prs_excluded": 8,
-  "notes": "8 open Copilot-authored PRs found, all same-repo branches (not forks). Excluded per fork-only triage policy.",
+  "agent_prs_found": 2,
+  "agent_prs_excluded": 2,
+  "notes": "2 open Copilot-authored PRs found (#25830, #25827), both same-repo branches (not forks). Excluded per fork-only triage policy.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -17,20 +17,32 @@
     "by_action": {}
   },
   "prs_examined": [
-    {"number": 25795, "title": "Extract shared `buildInputSchema` helper to deduplicate input-schema generation", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
-    {"number": 25792, "title": "Refactor: remove semver.go wrappers, extract gateway_logs_render.go, consolidate", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
-    {"number": 25789, "title": "Rename codemod_plugins.go functions to include ToDependencies suffix", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
-    {"number": 25786, "title": "fix: improve upload_artifact error diagnostics and workflow staging instructions", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
-    {"number": 25785, "title": "Add unit tests for OIDC env var forwarding to MCP gateway docker command", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
-    {"number": 25779, "title": "Allow secrets in step-level env: bindings under strict mode", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
-    {"number": 25776, "title": "Add `allow-workflows` field for GitHub App `workflows:write` permission on safe-outputs", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
-    {"number": 25772, "title": "feat: add --no-ask-user flag to copilot agentic engine for fully autonomous runs", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"}
+    {
+      "number": 25830,
+      "title": "feat: add OpenCode engine integration (re-apply PR #18403)",
+      "head_repo": "github/gh-aw",
+      "base_repo": "github/gh-aw",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork",
+      "draft": false,
+      "created_at": "2026-04-11T16:04:49Z"
+    },
+    {
+      "number": 25827,
+      "title": "Add AWF Sandbox Specification v1.0.0",
+      "head_repo": "github/gh-aw",
+      "base_repo": "github/gh-aw",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork",
+      "draft": true,
+      "created_at": "2026-04-11T15:26:07Z"
+    }
   ],
   "previous_run": {
-    "run_id": "24276761053",
-    "run_date": "2026-04-11T06:35:08Z",
+    "run_id": "24282403499",
+    "run_date": "2026-04-11T12:25:04Z",
     "fork_prs": 0,
-    "agent_prs_found": 5,
-    "agent_prs_excluded": 5
+    "agent_prs_found": 8,
+    "agent_prs_excluded": 8
   }
 }
