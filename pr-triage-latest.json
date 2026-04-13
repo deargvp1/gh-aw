@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-04-13T12:40:03Z",
-  "run_id": "24343771676",
+  "run_date": "2026-04-13T18:40:56Z",
+  "run_id": "24360452914",
   "fork_prs": 0,
   "agent_prs_found": 7,
-  "agent_prs_excluded": 6,
-  "notes": "6 known open agent-authored same-repo PRs from previous run (#25989, #25984, #25982, #25948, #25928, #25830). 1 new PR found via search (#26009 - glossary docs update by github-actions[bot]). API rate limit hit during full PR list retrieval (reset ~12:53 UTC). All known PRs are same-repo branches (not forks). No fork PRs to triage per policy.",
+  "agent_prs_excluded": 7,
+  "notes": "7 open agent-authored same-repo PRs found (#26076, #26075, #26074, #26060, #26037, #25928, #25830). All are same-repo branches (not forks). No fork PRs to triage per policy.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -18,59 +18,54 @@
   },
   "prs_examined": [
     {
-      "number": 26009,
-      "title": "[docs] Update glossary - weekly full scan",
-      "head_repo": "github/gh-aw",
-      "base_repo": "github/gh-aw",
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork",
-      "author": "github-actions[bot]",
-      "labels": ["documentation", "glossary"],
-      "created_at": "2026-04-13T10:52:39Z"
-    },
-    {
-      "number": 25989,
-      "title": "[code-simplifier] refactor: extract hasValidPrefix boolean in send_otlp_span.cjs",
-      "head_repo": "github/gh-aw",
-      "base_repo": "github/gh-aw",
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork",
-      "author": "github-actions[bot]",
-      "labels": ["automation", "code-quality", "refactoring"],
-      "created_at": "2026-04-13T05:00:00Z"
-    },
-    {
-      "number": 25984,
-      "title": "chore: update drain3 default log pattern weights",
-      "head_repo": "github/gh-aw",
-      "base_repo": "github/gh-aw",
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork",
-      "author": "github-actions[bot]",
-      "labels": ["lgtm", "needs-work"],
-      "created_at": "2026-04-13T04:00:00Z"
-    },
-    {
-      "number": 25982,
-      "title": "[jsweep] Clean apply_safe_outputs_replay.cjs",
-      "head_repo": "github/gh-aw",
-      "base_repo": "github/gh-aw",
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork",
-      "author": "github-actions[bot]",
-      "labels": ["automation", "unbloat", "lgtm"],
-      "created_at": "2026-04-13T03:00:00Z"
-    },
-    {
-      "number": 25948,
-      "title": "feat: add `integrity-reactions` feature flag for MCPG reactions",
+      "number": 26076,
+      "title": "Update instructions to use upload-artifact with skip-archive instead of upload-asset",
       "head_repo": "github/gh-aw",
       "base_repo": "github/gh-aw",
       "same_repo": true,
       "excluded_reason": "same-repo branch, not a fork",
       "author": "Copilot",
-      "labels": ["lgtm"],
-      "created_at": "2026-04-12T23:41:44Z"
+      "created_at": "2026-04-13T17:54:54Z"
+    },
+    {
+      "number": 26075,
+      "title": "Migrate chart image uploads to upload-artifact with skip-archive in shell scripts",
+      "head_repo": "github/gh-aw",
+      "base_repo": "github/gh-aw",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork",
+      "author": "Copilot",
+      "created_at": "2026-04-13T17:48:37Z"
+    },
+    {
+      "number": 26074,
+      "title": "Skip Docker image validation when Docker is unavailable",
+      "head_repo": "github/gh-aw",
+      "base_repo": "github/gh-aw",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork",
+      "author": "Copilot",
+      "created_at": "2026-04-13T17:48:04Z"
+    },
+    {
+      "number": 26060,
+      "title": "Add --gemini-api-target to AWF proxy for Gemini API routing",
+      "head_repo": "github/gh-aw",
+      "base_repo": "github/gh-aw",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork",
+      "author": "Copilot",
+      "created_at": "2026-04-13T15:42:30Z"
+    },
+    {
+      "number": 26037,
+      "title": "Fix `gh pr checkout` failing with GH_HOST mismatch in issue_comment workflows",
+      "head_repo": "github/gh-aw",
+      "base_repo": "github/gh-aw",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork",
+      "author": "Copilot",
+      "created_at": "2026-04-13T13:26:14Z"
     },
     {
       "number": 25928,
@@ -80,7 +75,6 @@
       "same_repo": true,
       "excluded_reason": "same-repo branch, not a fork",
       "author": "Copilot",
-      "labels": ["smoke-claude", "smoke-copilot", "needs-review"],
       "created_at": "2026-04-12T18:48:24Z"
     },
     {
@@ -91,15 +85,14 @@
       "same_repo": true,
       "excluded_reason": "same-repo branch, not a fork",
       "author": "Copilot",
-      "labels": ["lgtm"],
       "created_at": "2026-04-11T16:04:49Z"
     }
   ],
   "previous_run": {
-    "run_id": "24330139507",
-    "run_date": "2026-04-13T07:02:41Z",
+    "run_id": "24343771676",
+    "run_date": "2026-04-13T12:40:03Z",
     "fork_prs": 0,
-    "agent_prs_found": 6,
+    "agent_prs_found": 7,
     "agent_prs_excluded": 6
   }
 }
