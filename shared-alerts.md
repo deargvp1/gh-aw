@@ -1,36 +1,40 @@
-# Shared Alerts — 2026-04-11T12:00Z
+# Shared Alerts — 2026-04-13T04:47Z
 
 ## P2 (High)
-- **Smoke Claude engine crash** (NEW, #25727, Apr 11 00:44 UTC): Claude engine exitCode 1, no output. Single failure — monitor for recurrence. Was previously healthy.
-- **Daily Rendering Scripts Verifier false positive** (NEW, issue created Apr 11): `validate_prompt_placeholders.sh` incorrectly flags literal `__GH_AW_TRUE__`/`__GH_AW_FALSE__` in render_template test inputs. Blocks daily rendering validation. Fix in workflow or validator needed.
-- **Design Decision Gate broken** (#25548): Empty prompt when --print flag used. Architecture decisions blocked. Fix documented, awaiting PR.
-- **Documentation Unbloat zero-output** (ongoing): Claude workflow ~$55/week, 0 safe outputs. Agent runs but never calls output tools.
-- **Smoke Gemini failing**: 100% failure (Gemini CLI 0.37.0 compat). No tracking issue visible.
-- **Daily Issues Report recurring failure** (#25265, #25503): Copilot agent killed (orphan process). Copilot v1.0.20 related.
+- **Smoke Claude schedule failure** (ongoing, #25727): Still failing on daily schedule, but PASSES on PR-triggered runs. Environment-specific issue — monitor. Was new Apr 11.
+- **Smoke Cross-Repo PR Create/Update** (#25221, #25217, Apr 8): Both still failing. Persistent — no fix yet.
+- **Documentation Unbloat inconsistent** (ongoing): Claude workflow ~$55/week, inconsistent output — 50% success today vs. 0 previously.
+- **Daily Semgrep Scan** (new fail Apr 13): 0/1 success today — needs investigation.
+- **GitHub Remote MCP Auth Test** (persistent): 100% failure — #24829 closed not_planned, test still failing.
+- **Daily Issues Report recurring failure** (#25265, #25503): Copilot agent crash pattern.
 
 ## P3 (Watch)
-- **Contribution Check report_incomplete**: Every run. Permission/network issue.
-- **GitHub Remote MCP Auth Test**: 100% failure. #24829 closed not_planned but test still failing.
-- **Daily Firewall Logs safe_outputs failure** (#25456): Process Safe Outputs step fails (likely report_incomplete), artifact 287 bytes.
-- **Workflow Normalizer deduplication gap**: Created 3 identical issues in 24h (still monitoring).
+- **Smoke Gemini** (#25216): 100% failure (Gemini CLI 0.37.0 compat). Open issue.
+- **Daily Firewall Logs** (#25456): safe_outputs process failure.
 
 ## Copilot Version Status
-- v1.0.20 PINNED (stable since Apr 10 repin)
-- v1.0.24 bump PR #25752: CLOSED as draft Apr 11 09:33 — NO NEW BUMP DEPLOYED
-- --no-ask-user flag PR #25772: OPEN (Copilot engine improvement)
+- v1.0.21 ACTIVE (current in production)
+- Issue #25978: CLI bump tracking (Copilot 1.0.24, Claude Code 2.1.104, Codex 0.120.0, MCP Gateway v0.2.18) — open, not yet PRed
 
-## Recent Fixes / Changes
-- Apr 10: v1.0.20 re-pinned after v1.0.22 regression fully stabilized
-- Apr 11 09:17: PR #25772 opened (--no-ask-user for Copilot engine)
+## Recoveries / Fixes (Apr 12-13)
+- ✅ Smoke Copilot: RECOVERED — passing scheduled runs
+- ✅ Contribution Check: Now passing (was report_incomplete)
+- ✅ 20 PRs merged by Copilot bot (OTel, security, workflow fixes)
+- ✅ Fixed detection squid crash, multiple agent assignments, push_repo_memory gating
+
+## Note on Stale Shared Alert
+- "#25548 DDG (Design Decision Gate)" reference in previous alerts is INCORRECT
+- Issue #25548 is actually "feat: collect Docker operational logs on failure for AWF diagnostics" (enhancement)
+- Design Decision Gate issue tracking has a different number — needs reconciliation
 
 ## Ecosystem State
-- 187 compiled workflows. Health: ~73/100 (↓2 from 75). Score dipped: Smoke Claude crash + Rendering Scripts false positive.
+- ~187 compiled workflows. Health: ~74/100 (↑1 from 73 Apr 11)
 - Engine split: ~124 copilot, ~41 claude, ~18 codex, ~4 others
-- v1.0.20 currently pinned as stable Copilot version
-- Claude/Codex engines: mostly resilient (Smoke Claude 1 new failure today)
+- v1.0.21 currently active
 
-## Orchestrator Summaries (Apr 11)
-- Workflow Health (Apr 11 12:00): Score 73/100 ↓2. New: Smoke Claude crash, Rendering Scripts false positive.
-- Agent Performance (Apr 11 04:31): Q:70↑5 E:60↓6. Recovery trend continuing.
+## Orchestrator Summaries (Apr 13)
+- Agent Performance (Apr 13 04:47): Q:73↑3 E:65↑5. Smoke Copilot recovered. Smoke Claude still failing on schedule.
+- Workflow Health (Apr 11 12:00): Score 73/100 (last known)
+- Campaign Manager (last known: Mar 16): P0/#20315 resolved likely
 
-Last updated: 2026-04-11T12:00Z by workflow-health-manager
+Last updated: 2026-04-13T04:47Z by agent-performance-analyzer
