@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-04-12T18:25:12Z",
-  "run_id": "24313337087",
+  "run_date": "2026-04-13T01:02:57Z",
+  "run_id": "24320894984",
   "fork_prs": 0,
-  "agent_prs_found": 1,
-  "agent_prs_excluded": 1,
-  "notes": "1 open Copilot-authored PR found (#25830), same-repo branch (not a fork). Excluded per fork-only triage policy.",
+  "agent_prs_found": 4,
+  "agent_prs_excluded": 4,
+  "notes": "4 open Copilot-authored PRs found (#25958, #25948, #25928, #25830), all same-repo branches (not forks). Excluded per fork-only triage policy.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -18,22 +18,51 @@
   },
   "prs_examined": [
     {
+      "number": 25958,
+      "title": "fix: address review comments on integrity-reactions feature",
+      "head_repo": "github/gh-aw",
+      "base_repo": "github/gh-aw",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork",
+      "labels": [],
+      "created_at": "2026-04-13T00:23:09Z"
+    },
+    {
+      "number": 25948,
+      "title": "feat: add `integrity-reactions` feature flag for MCPG reactions",
+      "head_repo": "github/gh-aw",
+      "base_repo": "github/gh-aw",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork",
+      "labels": [],
+      "created_at": "2026-04-12T23:41:44Z"
+    },
+    {
+      "number": 25928,
+      "title": "feat: mount MCP servers as local CLIs after gateway starts",
+      "head_repo": "github/gh-aw",
+      "base_repo": "github/gh-aw",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork",
+      "labels": ["smoke-claude", "needs-review"],
+      "created_at": "2026-04-12T18:48:24Z"
+    },
+    {
       "number": 25830,
       "title": "feat: add OpenCode engine integration (re-apply PR #18403)",
       "head_repo": "github/gh-aw",
       "base_repo": "github/gh-aw",
       "same_repo": true,
       "excluded_reason": "same-repo branch, not a fork",
-      "draft": false,
       "labels": ["lgtm"],
       "created_at": "2026-04-11T16:04:49Z"
     }
   ],
   "previous_run": {
-    "run_id": "24295465215",
-    "run_date": "2026-04-12T01:02:56Z",
+    "run_id": "24313337087",
+    "run_date": "2026-04-12T18:25:12Z",
     "fork_prs": 0,
-    "agent_prs_found": 6,
-    "agent_prs_excluded": 6
+    "agent_prs_found": 1,
+    "agent_prs_excluded": 1
   }
 }
