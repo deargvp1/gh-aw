@@ -64,5 +64,15 @@
     "runs_audited": 2,
     "recommendations_count": 4,
     "estimated_savings_per_run": 1300000
+  },
+  {
+    "date": "2026-04-14",
+    "workflow_name": "Auto-Triage Issues",
+    "workflow_file": "auto-triage-issues",
+    "total_tokens_analyzed": 1320994,
+    "runs_audited": 2,
+    "recommendations_count": 4,
+    "estimated_savings_per_run": 300000,
+    "notes": "Root causes: (1) list_issues fetches 120-125KB all-issues payload before using search_issues no:label. (2) 59-60 ghost search_repositories calls all fail with unknown tool. (3) bash parsing failures (python3/node not allowed). (4) Model overkill for label classification."
   }
 ]
