@@ -280,10 +280,10 @@ echo ""
 echo "Test 10: Verify 'latest' version functionality"
 
 # Check for "latest" as default version
-if grep -q "using 'latest'" "$PROJECT_ROOT/install-gh-aw.sh"; then
-    echo "  ✓ PASS: Script uses 'latest' as default version"
+if grep -q "latest stable" "$PROJECT_ROOT/install-gh-aw.sh"; then
+    echo "  ✓ PASS: Script uses 'latest stable' as default version"
 else
-    echo "  ✗ FAIL: Script does not use 'latest' as default version"
+    echo "  ✗ FAIL: Script does not use 'latest stable' as default version"
     exit 1
 fi
 

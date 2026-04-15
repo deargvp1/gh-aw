@@ -2,15 +2,15 @@
 
 # Script to download and install gh-aw binary for the current OS and architecture
 # Supports: Linux, macOS (Darwin), FreeBSD, Windows (Git Bash/MSYS/Cygwin)
-# If no version is specified, it will use "latest"
+# If no version is specified, it will install the latest stable release.
 # Checksum validation is enabled by default to protect against tampering.
 # 
-# Usage: ./install.sh [version] [options]
+# Usage: ./install-gh-aw.sh [version] [options]
 #
 # Examples:
-#   ./install.sh                           # Install latest version
-#   ./install.sh v1.0.0                    # Install specific version
-#   ./install.sh v1.0.0 --skip-checksum    # Install without checksum validation
+#   ./install-gh-aw.sh                           # Install latest stable version
+#   ./install-gh-aw.sh v1.0.0                    # Install specific version
+#   ./install-gh-aw.sh v1.0.0 --skip-checksum    # Install without checksum validation
 #
 # Options:
 #   --skip-checksum                   Skip checksum verification
@@ -167,7 +167,7 @@ print_info "Platform: $PLATFORM"
 REPO="github/gh-aw"
 
 if [ -z "$VERSION" ]; then
-    print_info "No version specified, using 'latest'..."
+    print_info "No version specified, using latest stable release..."
     VERSION="latest"
 else
     print_info "Using specified version: $VERSION"
