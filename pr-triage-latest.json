@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-04-15T06:52:18Z",
-  "run_id": "24440656370",
+  "run_date": "2026-04-15T12:38:02Z",
+  "run_id": "24454841966",
   "fork_prs": 0,
-  "agent_prs_found": 9,
-  "agent_prs_excluded": 9,
-  "notes": "9 open agent-created PRs found (all same-repo branches, not forks). Per policy, only fork PRs are triaged. No fork PRs to triage.",
+  "agent_prs_found": 19,
+  "agent_prs_excluded": 19,
+  "notes": "19 open agent-created PRs found (all same-repo branches, not forks). Per policy, only fork PRs are triaged. No fork PRs to triage.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -17,93 +17,31 @@
     "by_action": {}
   },
   "prs_examined": [
-    {
-      "number": 26384,
-      "title": "[code-simplifier] refactor: eliminate runGHWithSpinner duplication",
-      "head_repo": "github/gh-aw",
-      "base_repo": "github/gh-aw",
-      "user": "github-actions[bot]",
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork"
-    },
-    {
-      "number": 26383,
-      "title": "feat: add structured payload channel to safe-output types",
-      "head_repo": "github/gh-aw",
-      "base_repo": "github/gh-aw",
-      "user": "Copilot",
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork"
-    },
-    {
-      "number": 26382,
-      "title": "[WIP] Add auto-generation of agentics-maintenance.yml",
-      "head_repo": "github/gh-aw",
-      "base_repo": "github/gh-aw",
-      "user": "Copilot",
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork"
-    },
-    {
-      "number": 26381,
-      "title": "fix(audit): exclude `-` placeholder from blocked domains",
-      "head_repo": "github/gh-aw",
-      "base_repo": "github/gh-aw",
-      "user": "Copilot",
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork"
-    },
-    {
-      "number": 26380,
-      "title": "Preserve .github and .agents from base branch after PR checkout",
-      "head_repo": "github/gh-aw",
-      "base_repo": "github/gh-aw",
-      "user": "Copilot",
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork"
-    },
-    {
-      "number": 26377,
-      "title": "fix: pass GITHUB_REPOSITORY as --repo in MCP logs and audit tools",
-      "head_repo": "github/gh-aw",
-      "base_repo": "github/gh-aw",
-      "user": "Copilot",
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork"
-    },
-    {
-      "number": 26338,
-      "title": "Add structured payload channel to safe-output types",
-      "head_repo": "github/gh-aw",
-      "base_repo": "github/gh-aw",
-      "user": "Copilot",
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork"
-    },
-    {
-      "number": 25928,
-      "title": "feat: mount MCP servers as local CLIs after gateway starts",
-      "head_repo": "github/gh-aw",
-      "base_repo": "github/gh-aw",
-      "user": "Copilot",
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork"
-    },
-    {
-      "number": 25830,
-      "title": "feat: add OpenCode engine integration (re-apply PR #18403)",
-      "head_repo": "github/gh-aw",
-      "base_repo": "github/gh-aw",
-      "user": "Copilot",
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork"
-    }
+    {"number": 26418, "title": "[dead-code] chore: remove dead functions — 1 function removed", "user": "github-actions[bot]", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 26415, "title": "refactor: eliminate duplicate spinner/exec logic in github_cli_action", "user": "Copilot", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 26404, "title": "[docs] Consolidate developer specs: maintenance tone scan v6", "user": "github-actions[bot]", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 26401, "title": "[community] Update community contributions in README", "user": "github-actions[bot]", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 26400, "title": "[instructions] Sync github-agentic-workflows.md with v0.68.3", "user": "github-actions[bot]", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 26399, "title": "[docs] Update documentation for features merged April 15, 2026", "user": "github-actions[bot]", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 26396, "title": "[spec-enforcer] Enforce specifications for repoutil, semverutil, and others", "user": "github-actions[bot]", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 26395, "title": "[spec-extractor] docs(constants): update package specifications", "user": "github-actions[bot]", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 26394, "title": "[docs] Update glossary - daily scan", "user": "github-actions[bot]", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 26385, "title": "perf: fix BenchmarkCompileComplexWorkflow regression by skipping lock rewrite", "user": "Copilot", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 26384, "title": "[code-simplifier] refactor: eliminate runGHWithSpinner duplication", "user": "github-actions[bot]", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 26383, "title": "feat: add structured payload channel to safe-output types", "user": "Copilot", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 26382, "title": "feat: auto-generate side-repo maintenance workflow for SideRepo", "user": "Copilot", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 26381, "title": "fix(audit): exclude `-` placeholder from blocked domains and add tests", "user": "Copilot", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 26380, "title": "Preserve .github and .agents from base branch after PR checkout", "user": "Copilot", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 26377, "title": "fix: pass GITHUB_REPOSITORY as --repo in MCP logs and audit tools", "user": "Copilot", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 26338, "title": "Add structured payload channel to safe-output types", "user": "Copilot", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 25928, "title": "feat: mount MCP servers as local CLIs after gateway starts", "user": "Copilot", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"},
+    {"number": 25830, "title": "feat: add OpenCode engine integration (re-apply PR #18403)", "user": "Copilot", "same_repo": true, "excluded_reason": "same-repo branch, not a fork"}
   ],
   "previous_run": {
-    "run_id": "24430844222",
-    "run_date": "2026-04-15T01:02:35Z",
+    "run_id": "24440656370",
+    "run_date": "2026-04-15T06:52:18Z",
     "fork_prs": 0,
-    "agent_prs_found": 10,
-    "agent_prs_excluded": 10
+    "agent_prs_found": 9,
+    "agent_prs_excluded": 9
   }
 }
