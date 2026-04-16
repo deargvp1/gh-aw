@@ -10,16 +10,6 @@ import (
 
 var safeOutputsMaxValidationLog = newValidationLogger("safe_outputs_max")
 
-// isInvalidMaxValue returns true if n is not a valid max field value.
-// Valid values are positive integers (n > 0) or -1 (unlimited).
-// Invalid values are 0 and negative integers except -1.
-func isInvalidMaxValue(n int) bool {
-	if n == -1 {
-		return false // -1 = unlimited, explicitly allowed by spec
-	}
-	return n <= 0
-}
-
 // maxInvalidErrSuffix is the common suffix of max validation error messages.
 const maxInvalidErrSuffix = "\n\nThe max field controls how many times this safe output can be triggered.\nProvide a positive integer (e.g., max: 1 or max: 5) or -1 for unlimited"
 

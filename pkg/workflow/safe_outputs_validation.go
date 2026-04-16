@@ -179,23 +179,6 @@ func validateTargetValue(configName, target string) error {
 	)
 }
 
-// isGitHubExpression checks if a string is a valid GitHub Actions expression
-// A valid expression must have properly balanced ${{ and }} markers
-func isGitHubExpression(s string) bool {
-	// Must contain both opening and closing markers
-	if !strings.Contains(s, "${{") || !strings.Contains(s, "}}") {
-		return false
-	}
-
-	// Basic validation: opening marker must come before closing marker
-	openIndex := strings.Index(s, "${{")
-	closeIndex := strings.Index(s, "}}")
-
-	// The closing marker must come after the opening marker
-	// and there must be something between them
-	return openIndex >= 0 && closeIndex > openIndex+3
-}
-
 var safeOutputsAllowWorkflowsValidationLog = newValidationLogger("safe_outputs_allow_workflows")
 
 // validateSafeOutputsAllowWorkflows validates that allow-workflows: true requires

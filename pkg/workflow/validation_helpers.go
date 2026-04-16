@@ -81,6 +81,32 @@ func validateIntRange(value, min, max int, fieldName string) error {
 	return nil
 }
 
+// isGitHubExpression checks if a string is a valid GitHub Actions expression.
+// A valid expression must have properly balanced ${{ and }} markers.
+func isGitHubExpression(s string) bool {
+	// Must contain both opening and closing markers
+	if !strings.Contains(s, "${{") || !strings.Contains(s, "}}") {
+		return false
+	}
+
+	// Basic validation: opening marker must come before closing marker
+	openIndex := strings.Index(s, "${{")
+	closeIndex := strings.Index(s, "}}")
+
+	// The closing marker must come after the opening marker
+	// and there must be something between them
+	return openIndex >= 0 && closeIndex > openIndex+3
+}
+
+// isInvalidMaxValue reports whether n is an invalid max field value.
+// Valid values are positive integers (n > 0) or -1 (unlimited).
+func isInvalidMaxValue(n int) bool {
+	if n == -1 {
+		return false // -1 = unlimited, explicitly allowed by spec
+	}
+	return n <= 0
+}
+
 // validateMountStringFormat parses a mount string and validates its basic format.
 // Expected format: "source:destination:mode" where mode is "ro" or "rw".
 // Returns (source, dest, mode, nil) on success, or ("", "", "", error) on failure.
