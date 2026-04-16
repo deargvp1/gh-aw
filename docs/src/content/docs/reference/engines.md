@@ -24,7 +24,7 @@ Copilot CLI is the default — `engine:` can be omitted when using Copilot. See 
 
 OpenCode is configured as a custom engine entry, not a built-in engine ID. Define it in an imported engine definition file, then reference it by name in workflow frontmatter.
 
-```aw wrap
+```aw
 imports:
   - ./.github/workflows/shared/opencode.md  # defines engine.id: opencode
 
