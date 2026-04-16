@@ -9,7 +9,8 @@ permissions:
   issues: read
   pull-requests: read
 tracker-id: daily-otel-instrumentation-advisor
-engine: claude
+engine:
+  id: claude
 mcp-servers:
   sentry:
     url: "https://mcp.sentry.dev/mcp/gh-aw-test.sentry.io/gh-aw/"

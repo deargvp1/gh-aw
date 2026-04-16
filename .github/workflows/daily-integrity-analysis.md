@@ -13,7 +13,8 @@ permissions:
   discussions: read
 
 tracker-id: daily-integrity-analysis
-engine: copilot
+engine:
+  id: codex
 
 steps:
   - name: Install gh-aw CLI

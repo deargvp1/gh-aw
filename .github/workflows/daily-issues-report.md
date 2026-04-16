@@ -7,7 +7,8 @@ permissions:
   issues: read
   pull-requests: read
   discussions: read
-engine: copilot
+engine:
+  id: codex
 runs-on: aw-gpu-runner-T4
 strict: true
 tracker-id: daily-issues-report

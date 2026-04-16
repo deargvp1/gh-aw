@@ -8,7 +8,8 @@ permissions:
   issues: read
   pull-requests: read
 tracker-id: daily-code-metrics
-engine: claude
+engine:
+  id: claude
 tools:
   mount-as-clis: true
   repo-memory:

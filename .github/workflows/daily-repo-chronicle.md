@@ -10,7 +10,8 @@ permissions:
   pull-requests: read
   discussions: read
 tracker-id: daily-repo-chronicle
-engine: copilot
+engine:
+  id: copilot
 
 timeout-minutes: 45
 
