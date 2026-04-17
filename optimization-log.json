@@ -27,7 +27,7 @@
     "runs_audited": 2,
     "recommendations_count": 4,
     "estimated_savings_per_run": 8300000,
-    "notes": "Root cause: gh aw compile * pattern blocks /tmp/ absolute paths. 2/2 runs show identical 129-131 turn failure \u2192 source code fallback. Fix tool pattern to allow /tmp/*.md paths."
+    "notes": "Root cause: gh aw compile * pattern blocks /tmp/ absolute paths. 2/2 runs show identical 129-131 turn failure → source code fallback. Fix tool pattern to allow /tmp/*.md paths."
   },
   {
     "date": "2026-04-07",
@@ -55,7 +55,7 @@
     "runs_audited": 11,
     "recommendations_count": 4,
     "estimated_savings_per_run": 2000000,
-    "notes": "45% failure rate across 11 runs. Runaway 103-turn failed run consumed 9.1M tokens (75% of daily total). Primary lever: reduce timeout-minutes 15\u219210 + remove Serena import (unused Go LSP for .md optimization). No max-turns available for Copilot engine."
+    "notes": "45% failure rate across 11 runs. Runaway 103-turn failed run consumed 9.1M tokens (75% of daily total). Primary lever: reduce timeout-minutes 15→10 + remove Serena import (unused Go LSP for .md optimization). No max-turns available for Copilot engine."
   },
   {
     "date": "2026-04-13",
@@ -90,5 +90,13 @@
     "runs_audited": 2,
     "recommendations_count": 5,
     "estimated_savings_per_run": 1800000
+  },
+  {
+    "date": "2026-04-17",
+    "workflow_name": "Daily Compiler Quality Check",
+    "total_tokens_analyzed": 23050690,
+    "runs_audited": 7,
+    "recommendations_count": 5,
+    "estimated_savings_per_run": 350000
   }
 ]
