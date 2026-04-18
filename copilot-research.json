@@ -1,36 +1,40 @@
 {
-  "timestamp": "2026-04-17T21:07:29Z",
-  "workflow_run_id": "24586698669",
-  "total_workflows": 269,
-  "copilot_workflows": 85,
-  "claude_workflows": 46,
-  "codex_workflows": 8,
+  "timestamp": "2026-04-18T21:04:01Z",
+  "workflow_run_id": "24613840109",
+  "previous_run_id": "24586698669",
+  "previous_timestamp": "2026-04-17T21:07:29Z",
+  "total_md_workflows": 195,
+  "copilot_explicit_workflows": 86,
   "feature_adoption": {
-    "tools_section": 84,
-    "github_mcp_toolsets": 53,
-    "network_config": 41,
-    "cache_memory": 18,
-    "sandbox_awf": 11,
-    "engine_agent": 11,
-    "bare_mode": 7,
-    "model_override": 9,
-    "max_continuations": 2,
-    "engine_args": 0,
-    "engine_env": 0
+    "timeout_minutes": {"count": 83, "pct": "97%", "trend": "+"},
+    "safe_outputs": {"count": 70, "pct": "81%", "trend": "="},
+    "github_mcp": {"count": 54, "pct": "63%", "trend": "+"},
+    "network_config": {"count": 41, "pct": "48%", "trend": "="},
+    "cache_memory": {"count": 26, "pct": "30%", "trend": "+"},
+    "agent_custom": {"count": 13, "pct": "15%", "trend": "+"},
+    "sandbox": {"count": 11, "pct": "13%", "trend": "="},
+    "version_pinning": {"count": 0, "pct": "0%", "trend": "="},
+    "bare_mode": {"count": 7, "pct": "8%", "trend": "="},
+    "model_override": {"count": 10, "pct": "12%", "trend": "+"},
+    "repo_memory": {"count": 19, "pct": "22%", "trend": "+"},
+    "playwright": {"count": 5, "pct": "6%", "trend": "="},
+    "max_continuations": {"count": 3, "pct": "3.5%", "trend": "+"},
+    "custom_args": {"count": 3, "pct": "3.5%", "trend": "+"},
+    "mcp_scripts": {"count": 1, "pct": "1%", "trend": "="},
+    "engine_env": {"count": 1, "pct": "1%", "trend": "+"},
+    "api_target": {"count": 0, "pct": "0%", "trend": "="},
+    "block_domains": {"count": 0, "pct": "0%", "trend": "="},
+    "token_weights": {"count": 0, "pct": "0%", "trend": "="}
   },
-  "unused_agent_files": [
-    "create-safe-output-type",
-    "custom-engine-implementation",
-    "grumpy-reviewer",
-    "interactive-agent-designer",
-    "w3c-specification-writer"
+  "persistent_gaps": [
+    "engine.version: 0% (5-day gap)",
+    "engine.api-target: 0% (5-day gap)",
+    "token-weights: 0% (5-day gap)",
+    "block-domains: 0% (5-day gap)"
   ],
-  "key_opportunities": [
-    "max-continuations used by only 2/85 workflows",
-    "37.6% lack GitHub MCP toolsets",
-    "5 agent files unused",
-    "engine.args/env never used",
-    "Only 11% use model overrides",
-    "48% lack network config - security concern"
+  "improvements": [
+    "cache-memory: 21% to 30%",
+    "max-continuations: 2 to 3 workflows",
+    "custom_args: 0% to 3.5%"
   ]
 }
