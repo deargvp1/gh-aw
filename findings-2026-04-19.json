@@ -1,0 +1,27 @@
+{
+  "date": "2026-04-19",
+  "files_analyzed": {
+    "documentation": ["docs/src/content/docs/reference/tools.md", "docs/src/content/docs/troubleshooting/common-issues.md"],
+    "cli": ["pkg/cli/logs_command.go", "pkg/cli/fix_command.go"],
+    "messages": [".github/workflows/breaking-change-checker.md"],
+    "validation": ["pkg/workflow/engine_validation.go"]
+  },
+  "overall_quality": "mostly-professional",
+  "quality_highlights": [
+    "engine_validation.go: Exemplary error messages — each auth strategy has tailored guidance with example YAML, docs URL, and context-appropriate explanations. The oauth-client-credentials section is especially thorough.",
+    "common-issues.md: Exceptional depth — covers every major failure category with cause/solution structure, code blocks, and cross-links. The Playwright error section (Cannot find module 'playwright') with before/after examples is a model troubleshooting entry.",
+    "logs_command.go and fix_command.go: Both commands have comprehensive Long descriptions with organized sections, concrete examples in multiple patterns, and explain both dry-run and write modes clearly."
+  ],
+  "single_file_improvements": [
+    {
+      "file": ".github/workflows/breaking-change-checker.md",
+      "priority": "high",
+      "issue": "Line 35: run-failure message uses 🔬 microscope emoji (same as run-started) and says 'Analysis interrupted!' which sounds like an in-progress state rather than a failure. Should use ❌ and unambiguously signal failure. The trailing '...' ellipsis implies continuation rather than termination."
+    },
+    {
+      "file": "docs/src/content/docs/reference/tools.md",
+      "priority": "medium",
+      "issue": "Lines 50-53: The bash `:*` wildcard syntax is undocumented. The inline comment says 'use with caution' but neither the comment nor the following prose explains what the colon prefix means or why it bypasses the command sandbox. Enterprise users configuring security-sensitive workflows need to understand the distinction."
+    }
+  ]
+}
