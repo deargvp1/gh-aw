@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-04-20T07:03:42Z",
-  "run_id": "24653028961",
+  "run_date": "2026-04-20T12:42:11Z",
+  "run_id": "24667022369",
   "fork_prs": 0,
-  "agent_prs_found": 5,
-  "agent_prs_excluded": 5,
-  "notes": "5 open PRs found (3 by Copilot, 2 by github-actions[bot]). All are same-repo branches, not forks. Per policy, only fork PRs are triaged. No fork PRs to triage.",
+  "agent_prs_found": 10,
+  "agent_prs_excluded": 10,
+  "notes": "10 open PRs found (5 by Copilot, 4 by github-actions[bot], 1 by github-actions[bot]). All are same-repo branches, not forks. Per policy, only fork PRs are triaged. No fork PRs to triage.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -18,8 +18,43 @@
   },
   "prs_examined": [
     {
+      "number": 27334,
+      "title": "[dead-code] chore: remove dead functions \u2014 5 functions removed",
+      "author": "github-actions[bot]",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork"
+    },
+    {
+      "number": 27327,
+      "title": "Improve parser utility test coverage for not-found detection, expression",
+      "author": "Copilot",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork"
+    },
+    {
+      "number": 27325,
+      "title": "Refactor workflow helpers: consolidate string-slice parsing and extract",
+      "author": "Copilot",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork"
+    },
+    {
+      "number": 27305,
+      "title": "[spec-enforcer] Enforce specifications for tty, types, workflow",
+      "author": "github-actions[bot]",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork"
+    },
+    {
+      "number": 27284,
+      "title": "Reduce validation pipeline overhead and make BenchmarkValidation meaningful",
+      "author": "Copilot",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork"
+    },
+    {
       "number": 27281,
-      "title": "[code-simplifier] simplify: extract update_branch via destructuring in update_pull_request.cjs",
+      "title": "[code-simplifier] simplify: extract update_branch via destructuring",
       "author": "github-actions[bot]",
       "same_repo": true,
       "excluded_reason": "same-repo branch, not a fork"
@@ -54,10 +89,10 @@
     }
   ],
   "previous_run": {
-    "run_id": "24643638745",
-    "run_date": "2026-04-20T01:03:40Z",
+    "run_id": "24653028961",
+    "run_date": "2026-04-20T07:03:42Z",
     "fork_prs": 0,
-    "agent_prs_found": 3,
-    "agent_prs_excluded": 3
+    "agent_prs_found": 5,
+    "agent_prs_excluded": 5
   }
 }
