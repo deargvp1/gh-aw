@@ -39,7 +39,15 @@
       "recommendation": "Keep and automate",
       "description": "Detect anomalous gate re-trigger events by identifying time windows with >4 concurrent gate runs for a single branch. A 'gate storm' occurs when twice the expected gate count fires in the same minute.",
       "finding": "update-safe-patch had 8 concurrent gates at 11:22 (double trigger) across 5 gate rounds total. This reveals a systemic reliability gap in the gate trigger mechanism, distinct from the gate content issues."
+    },
+    {
+      "name": "Multi-Branch Parallelism Analysis",
+      "date_tested": "2026-04-20",
+      "effectiveness": "Medium",
+      "recommendation": "Keep and expand",
+      "description": "Measure interference between concurrently-running Copilot branches by comparing gate concurrency levels, session overlap windows, and per-branch success rates when multiple branches are active simultaneously.",
+      "finding": "Two Copilot branches ran in full overlap (08:43-09:01, 17.3min and 14.6min spans) with 45 combined gate sessions. Both succeeded independently. No cross-branch interference detected. fix-windows attracted 6 reviewer types (incl. Security Review) vs add-latex 5 — OS-level/binary changes trigger additional security review gates automatically."
     }
   ],
-  "last_updated": "2026-04-17"
+  "last_updated": "2026-04-20"
 }
