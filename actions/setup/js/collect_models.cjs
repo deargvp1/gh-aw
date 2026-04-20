@@ -3,8 +3,6 @@
 
 const fs = require("fs");
 const path = require("path");
-const http = require("http");
-const https = require("https");
 
 const REQUEST_TIMEOUT_MS = 15000;
 const MAX_MODELS_DISPLAY = 100;
@@ -22,34 +20,20 @@ function normalizeURL(host, route) {
   return url;
 }
 
-function requestJSON(url, headers) {
-  const client = url.protocol === "http:" ? http : https;
-  return new Promise((resolve, reject) => {
-    const req = client.request(
-      url,
-      {
-        method: "GET",
-        headers,
-        timeout: REQUEST_TIMEOUT_MS,
-      },
-      res => {
-        let body = "";
-        res.on("data", chunk => {
-          body += chunk;
-        });
-        res.on("end", () => {
-          resolve({ statusCode: res.statusCode || 0, body });
-        });
-      }
-    );
-
-    req.on("error", reject);
-    req.on("timeout", () => {
-      req.destroy();
-      reject(new Error("request timeout"));
+async function requestJSON(url, headers) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(new Error("request timeout")), REQUEST_TIMEOUT_MS);
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers,
+      signal: controller.signal,
     });
-    req.end();
-  });
+    const body = await response.text();
+    return { statusCode: response.status, body };
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 function extractModels(payload) {
