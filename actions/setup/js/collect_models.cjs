@@ -22,15 +22,20 @@ function normalizeURL(host, route) {
 
 async function requestJSON(url, headers) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(new Error("request timeout")), REQUEST_TIMEOUT_MS);
+  let timedOut = false;
+  const timeoutId = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, REQUEST_TIMEOUT_MS);
   try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers,
-      signal: controller.signal,
-    });
+    const response = await fetch(url, { method: "GET", headers, signal: controller.signal });
     const body = await response.text();
     return { statusCode: response.status, body };
+  } catch (error) {
+    if (timedOut && error instanceof Error && error.name === "AbortError") {
+      throw new Error("request timeout");
+    }
+    throw error;
   } finally {
     clearTimeout(timeoutId);
   }
