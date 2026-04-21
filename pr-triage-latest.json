@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-04-20T18:34:30Z",
-  "run_id": "24683599103",
+  "run_date": "2026-04-21T01:02:38Z",
+  "run_id": "24698473910",
   "fork_prs": 0,
-  "agent_prs_found": 2,
-  "agent_prs_excluded": 2,
-  "notes": "2 open PRs found (both by Copilot). Both are same-repo branches, not forks. Per policy, only fork PRs are triaged. No fork PRs to triage.",
+  "agent_prs_found": 3,
+  "agent_prs_excluded": 3,
+  "notes": "3 open PRs found (all by Copilot). All are same-repo branches, not forks. Per policy, only fork PRs are triaged. No fork PRs to triage.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -18,25 +18,32 @@
   },
   "prs_examined": [
     {
-      "number": 27406,
-      "title": "Remove duplicate Token Usage rendering from MCP Gateway step summary",
+      "number": 27467,
+      "title": "Add agentic workflow spec for implementing `comment-memory` support",
       "author": "Copilot",
       "same_repo": true,
       "excluded_reason": "same-repo branch, not a fork"
     },
     {
-      "number": 27398,
-      "title": "Reduce CI Optimization Coach token footprint across split CI workflows by trimming prompt surface and front-loading deterministic analysis",
+      "number": 27466,
+      "title": "Add experimental OpenCode engine support and reassign LLM gateway ports",
+      "author": "Copilot",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork"
+    },
+    {
+      "number": 27453,
+      "title": "Add configurable agentic engine driver script support",
       "author": "Copilot",
       "same_repo": true,
       "excluded_reason": "same-repo branch, not a fork"
     }
   ],
   "previous_run": {
-    "run_id": "24667022369",
-    "run_date": "2026-04-20T12:42:11Z",
+    "run_id": "24683599103",
+    "run_date": "2026-04-20T18:34:30Z",
     "fork_prs": 0,
-    "agent_prs_found": 10,
-    "agent_prs_excluded": 10
+    "agent_prs_found": 2,
+    "agent_prs_excluded": 2
   }
 }
