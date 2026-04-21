@@ -1607,12 +1607,6 @@ engine:
   # (optional)
   command: "example-value"
 
-  # Custom Node.js driver script filename for an agentic engine. This replaces the
-  # engine's built-in driver wrapper (when the engine supports one) and must end
-  # with .js, .cjs, or .mjs.
-  # (optional)
-  driver: "example-value"
-
   # Custom environment variables to pass to the AI engine, including secret
   # overrides (e.g., OPENAI_API_KEY: ${{ secrets.CUSTOM_KEY }})
   # (optional)
@@ -5594,12 +5588,6 @@ safe-outputs:
   # Actions expressions.
   # (optional)
   concurrency-group: "example-value"
-
-  # Explicit additional custom workflow jobs that the consolidated safe_outputs job
-  # should depend on.
-  # (optional)
-  needs: []
-    # Array of strings
 
   # Override the GitHub deployment environment for the safe-outputs job. When set,
   # this environment is used instead of the top-level environment: field. When not
