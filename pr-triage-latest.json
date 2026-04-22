@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-04-21T18:37:13Z",
-  "run_id": "24739811702",
+  "run_date": "2026-04-22T00:59:24Z",
+  "run_id": "24754499067",
   "fork_prs": 0,
-  "agent_prs_found": 4,
-  "agent_prs_excluded": 4,
-  "notes": "4 open agent PRs found. All are same-repo branches, not forks. Per policy, only fork PRs are triaged. No fork PRs to triage.",
+  "agent_prs_found": 3,
+  "agent_prs_excluded": 3,
+  "notes": "3 open agent PRs found. All are same-repo branches, not forks. Per policy, only fork PRs are triaged. No fork PRs to triage.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -18,39 +18,32 @@
   },
   "prs_examined": [
     {
-      "number": 27645,
-      "title": "[WIP] Fix failing GitHub Actions workflow Integration: Workflow Tools & MCP",
+      "number": 27722,
+      "title": "[WIP] Bump MCPG to v0.2.30 and AWF firewall to v0.25.28",
       "author": "Copilot",
       "same_repo": true,
       "excluded_reason": "same-repo branch, not a fork"
     },
     {
-      "number": 27644,
-      "title": "[WIP] Fix failing GitHub Actions workflow for CLI Compile &...",
+      "number": 27708,
+      "title": "Update OpenCode/Crush universal LLM consumer backend handling",
       "author": "Copilot",
       "same_repo": true,
       "excluded_reason": "same-repo branch, not a fork"
     },
     {
-      "number": 27642,
-      "title": "Fix CGO test regressions caused by default comment-memory",
-      "author": "Copilot",
-      "same_repo": true,
-      "excluded_reason": "same-repo branch, not a fork"
-    },
-    {
-      "number": 27640,
-      "title": "Update smoke-ci to use comment-memory and write a haiku",
+      "number": 27707,
+      "title": "Refactor cli-proxy feature into tools.github.mode (gh-proxy) with codemod migration",
       "author": "Copilot",
       "same_repo": true,
       "excluded_reason": "same-repo branch, not a fork"
     }
   ],
   "previous_run": {
-    "run_id": "24722745709",
-    "run_date": "2026-04-21T12:39:01Z",
+    "run_id": "24739811702",
+    "run_date": "2026-04-21T18:37:13Z",
     "fork_prs": 0,
-    "agent_prs_found": 26,
-    "agent_prs_excluded": 26
+    "agent_prs_found": 4,
+    "agent_prs_excluded": 4
   }
 }
