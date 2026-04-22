@@ -116,5 +116,15 @@
     "recommendations_count": 4,
     "estimated_savings_per_run": 1265000,
     "notes": "Single run (55 turns vs target 30). agentic_fraction=0.50, read_only actuation. Primary lever: bash pre-step to run deadcode+filter cache saves ~15 turns. Also remove pull_requests toolset and reduce timeout 30\u219220min."
+  },
+  {
+    "date": "2026-04-22",
+    "workflow_name": "Smoke CI",
+    "workflow_file": "smoke-ci",
+    "total_tokens_analyzed": 2869490,
+    "runs_audited": 14,
+    "recommendations_count": 4,
+    "estimated_savings_per_run": 233295,
+    "notes": "64% cancellation rate (9/14 runs); all 14 runs from push-to-main trigger on single day. 1.17M tokens wasted on cancelled runs (40%). Primary fix: add paths filter to push trigger. Also: remove reaction/status-comment triggers, cap cache-memory haiku scan to last 10 files."
   }
 ]
