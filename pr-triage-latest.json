@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-04-22T06:53:46Z",
-  "run_id": "24764612643",
+  "run_date": "2026-04-22T12:40:19.970454Z",
+  "run_id": "24778600293",
   "fork_prs": 0,
-  "agent_prs_found": 2,
-  "agent_prs_excluded": 2,
-  "notes": "2 open agent PRs found. Both are same-repo branches, not forks. Per policy, only fork PRs are triaged. No fork PRs to triage.",
+  "agent_prs_found": 11,
+  "agent_prs_excluded": 11,
+  "notes": "11 open agent PRs found. All are same-repo branches, not forks. Per policy, only fork PRs are triaged. No fork PRs to triage.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -18,25 +18,88 @@
   },
   "prs_examined": [
     {
+      "number": 27818,
+      "title": "[dead-code] chore: remove dead functions \u2014 1 function removed",
+      "author": "github-actions[bot]",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork"
+    },
+    {
+      "number": 27809,
+      "title": "Rename `notifyResolutionFailure` to `dispatchResolutionFailure`",
+      "author": "Copilot",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork"
+    },
+    {
+      "number": 27807,
+      "title": "[docs] Developer docs consolidation v6.8",
+      "author": "github-actions[bot]",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork"
+    },
+    {
+      "number": 27805,
+      "title": "[community] Update community contributions in README",
+      "author": "github-actions[bot]",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork"
+    },
+    {
+      "number": 27803,
+      "title": "[instructions] Sync github-agentic-workflows.md with v0.68.3",
+      "author": "github-actions[bot]",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork"
+    },
+    {
+      "number": 27798,
+      "title": "[spec-enforcer] Enforce specifications for actionpins, agentdrain, cli",
+      "author": "github-actions[bot]",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork"
+    },
+    {
+      "number": 27797,
+      "title": "[docs] docs: Update glossary - daily scan 2026-04-22",
+      "author": "github-actions[bot]",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork"
+    },
+    {
+      "number": 27796,
+      "title": "[spec-extractor] Update package specifications for agentdrain, cli, co",
+      "author": "github-actions[bot]",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork"
+    },
+    {
+      "number": 27792,
+      "title": "[architecture] Update architecture diagram - 2026-04-22",
+      "author": "github-actions[bot]",
+      "same_repo": true,
+      "excluded_reason": "same-repo branch, not a fork"
+    },
+    {
       "number": 27784,
-      "title": "[code-simplifier] refactor: extract lookupContainerPin helper to eliminate duplicate cache logic",
+      "title": "[code-simplifier] refactor: extract lookupContainerPin helper",
       "author": "github-actions[bot]",
       "same_repo": true,
       "excluded_reason": "same-repo branch, not a fork"
     },
     {
       "number": 27783,
-      "title": "Accept deprecated `max_tokens` for MCP `audit`/`compile` and remove console output suppression flag",
+      "title": "Accept deprecated `max_tokens` for MCP `audit`/`compile`",
       "author": "Copilot",
       "same_repo": true,
       "excluded_reason": "same-repo branch, not a fork"
     }
   ],
   "previous_run": {
-    "run_id": "24754499067",
-    "run_date": "2026-04-22T00:59:24Z",
+    "run_id": "24764612643",
+    "run_date": "2026-04-22T06:53:46Z",
     "fork_prs": 0,
-    "agent_prs_found": 3,
-    "agent_prs_excluded": 3
+    "agent_prs_found": 2,
+    "agent_prs_excluded": 2
   }
 }
