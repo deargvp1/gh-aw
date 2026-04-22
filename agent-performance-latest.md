@@ -1,41 +1,46 @@
-# Agent Performance - 2026-04-21
-Run: §24704272587 | Q:72↓1 E:68↓2
+# Agent Performance — 2026-04-22
+Run: §24760397710 | Q:71↓1 E:67↓1
 
-## Ecosystem Overview (Apr 19-21)
-- Overall quality: 72/100 (stable), effectiveness: 68/100 (↓-2)
-- 25 unique workflows observed, 31 runs (18 completed)
-- Codex P0 day 4 (#27127 OPEN)
-- Assessment flags today: resource_heavy(3), partially_reducible(4), poor_agentic_control(1), overkill(2), model_downgrade(1)
+## Ecosystem Overview (Apr 21-22)
+- Overall quality: 71/100 (↓-1), effectiveness: 67/100 (↓-1)
+- 18 workflows, 29 runs in 48h
+- Root cause of many failures: stale lock files after PR #27711 merged (needs `make recompile`)
 
 ## Top Performers
-1. **[aw] Failure Investigator (6h)** (Q:90 E:88) - #27469 (DDG max_turns RCA) + #27412 (AI Moderator chatgpt.com) — excellent structured reports
-2. **Smoke CI** (Q:87 E:90) - 4 runs, reliable, no flags
-3. **Test Quality Sentinel** (Q:82 E:85) - 4 turns, clean, no flags
-4. **CLI Version Checker** (Q:78 E:80) - Updated 3 CLI tools (#27484) ✅; flagged resource_heavy (26T, $0.82)
-5. **Design Decision Gate** (Q:78 E:78) - Today success (4T, $0.37); structural max_turns=5 issue for ADR path (#27470)
+1. **[aw] Failure Investigator (6h)** (Q:92 E:88) - #27729 (Codex 401 RCA: stale lock files) - excellent structured analysis
+2. **Smoke CI** (Q:88 E:92) - 3 runs, all success, 5-8T, consistent
+3. **CLI Version Checker** (Q:85 E:82) - #27760 (4 tools updated: Claude, Copilot 1.0.21→1.0.34, Codex, GitHub MCP), still 42T
+4. **Test Quality Sentinel** (Q:85 E:88) - 4 runs all success, 4-12T, stable
+5. **Auto-Triage / Issue Monster** (Q:80 E:82) - 3T, lightweight, reliable
+
+## Improved This Run 📈
+- **GitHub Remote MCP Authentication Test**: SUCCESS ✅ (was Q:40 E:0 yesterday) — resolved!
+- **Agent Persona Explorer**: 16T (down from 42T yesterday) — improving
 
 ## Watch / Needs Improvement
-- **Documentation Unbloat** (Q:48 E:52) - 58T, $2.46, 0 safe outputs. Worst cost-to-output ratio.
-- **Agent Persona Explorer** (Q:52 E:58) - 42T, 2.2M tokens, 95% data-gathering, 1 safe output
-- **AI Moderator** (Q:10 E:5) - Codex P0 day 4 + chatgpt.com firewall block (2 failure modes now)
-- **GitHub Remote MCP Auth Test** (Q:40 E:0) - persistent auth failure
+- **AI Moderator** (Q:10 E:5) - Codex 401 (stale lock files) + chatgpt.com firewall — P1 ongoing
+- **Design Decision Gate** (Q:62 E:48) - 50% failure today (2/4 runs); NEW failure mode: push bundle failure (#27756) + existing max_turns=5 (#27470)
+- **Documentation Unbloat** (Q:48 E:52) - 56T, ROI unclear, #27600 recommendation pending
+- **Smoke Codex/Gemini/Crush** (Q:20 E:10) - all failing (Codex=stale locks, Gemini/Crush=new engines)
+- **Smoke Copilot** (ongoing P1 #27028)
+- **Smoke Claude** (39T+ still running, outcome TBD)
 
 ## New Findings Today
-1. Design Decision Gate max_turns=5 structurally insufficient for ADR path (needs 6+) → #27470 NEW
-2. AI Moderator: chatgpt.com blocked by firewall, separate from 401 auth → #27412
-3. Documentation Unbloat: $2.46/run with 0 tangible outputs — needs outcome gate
-4. CLI Version Checker created clean PR #27484 with 3 tool updates ✅
+1. Safe outputs "session not found" at 37min (#27755 from @dsyme) — previously thought threshold was ~1h — NEW P1 infrastructure issue
+2. Design Decision Gate: NEW push bundle failure (#27756) in addition to max_turns=5 issue (#27470)
+3. Failure Investigator RCA #27729: identified PR #27711 stale lock files as root cause of Codex 401 loop ✅
+4. Smoke OpenCode: SUCCESS ✅ — new engine working
+5. GitHub Remote MCP Auth Test: RESOLVED ✅
 
 ## P0/P1 Active
-- P0: Codex 401 auth (#27127, day 4) — escalation needed
-- P1: Design Decision Gate max_turns=5 → #27470
-- P1: AI Moderator chatgpt.com firewall → #27412
-- P1: node not found on GPU runner (ongoing from Apr 20)
-- P1: Rate limit exhaustion 23:44 UTC (ongoing)
-- P1: Smoke Claude #27030, Smoke Copilot #27028 (ongoing)
+- P1: Stale lock files (#27724 + #27731) — fix: `make recompile`
+- P1: Safe outputs session not found at 37min (#27755) — infrastructure
+- P1: Design Decision Gate push bundle failure (#27756)
+- P1: Design Decision Gate max_turns=5 (#27470)
+- P1: Smoke Copilot (#27028, ongoing)
 
 ## Issues/Actions This Run
 - Discussion created (performance report)
-- No new improvement issues (all tracked)
+- No new improvement issues (all tracked in existing issues)
 
-Last updated: 2026-04-21T04:45Z by agent-performance-manager
+Last updated: 2026-04-22T04:37Z by agent-performance-manager
