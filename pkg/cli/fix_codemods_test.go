@@ -140,7 +140,7 @@ func TestGetAllCodemods_InExpectedOrder(t *testing.T) {
 		"app-to-github-app",
 		"github-app-app-id-to-client-id",
 		"safe-inputs-to-mcp-scripts",
-		"plugins-to-dependencies",
+		"plugins-to-shared-import",
 		"serena-tools-to-shared-import",
 		"workflow-run-branches-default",
 		"dependabot-toolset-permissions",

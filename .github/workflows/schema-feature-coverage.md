@@ -139,7 +139,6 @@ demo file for fields that are **actually uncovered** (count = 0 in Step 2).
 | `infer` | `false` | Deprecated boolean (kept for compatibility) |
 | `labels` | `["automation", "demo"]` | Array of workflow label strings |
 | `metadata` | `{author: "schema-coverage", version: "1.0.0"}` | Custom key-value pairs |
-| `plugins` | `["github/example-plugin"]` | Experimental — note in PR body |
 | `post-steps` | `[{name: "Post-step", run: "echo done"}]` | Array of GitHub Actions steps |
 | `private` | `true` | Boolean — marks workflow as non-shareable |
 | `run-name` | `"Schema Demo #${{ github.run_number }}"` | Custom run name string |

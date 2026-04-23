@@ -51,7 +51,7 @@ func GetAllCodemods() []Codemod {
 		getGitHubAppCodemod(),                         // Rename deprecated 'app' to 'github-app'
 		getGitHubAppClientIDCodemod(),                 // Rename deprecated github-app.app-id to github-app.client-id
 		getSafeInputsToMCPScriptsCodemod(),            // Rename safe-inputs to mcp-scripts
-		getPluginsToDependenciesCodemod(),             // Migrate plugins to dependencies (plugins removed in favour of APM)
+		getPluginsToSharedImportCodemod(),             // Migrate removed plugins to shared/copilot-plugins.md import
 		getSerenaToSharedImportCodemod(),              // Migrate removed tools.serena to shared/mcp/serena.md import
 		getWorkflowRunBranchesCodemod(),               // Add default branches to bare on.workflow_run trigger
 		getDependabotPermissionsCodemod(),             // Add vulnerability-alerts: read when dependabot toolset is used

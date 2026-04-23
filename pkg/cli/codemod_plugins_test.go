@@ -3,24 +3,25 @@
 package cli
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetPluginsToDependenciesCodemod(t *testing.T) {
-	codemod := getPluginsToDependenciesCodemod()
+func TestGetPluginsToSharedImportCodemod(t *testing.T) {
+	codemod := getPluginsToSharedImportCodemod()
 
-	assert.Equal(t, "plugins-to-dependencies", codemod.ID)
-	assert.Equal(t, "Migrate plugins to dependencies", codemod.Name)
+	assert.Equal(t, "plugins-to-shared-import", codemod.ID)
+	assert.Equal(t, "Migrate plugins to shared Copilot plugins import", codemod.Name)
 	assert.NotEmpty(t, codemod.Description)
 	assert.Equal(t, "1.0.0", codemod.IntroducedIn)
 	require.NotNil(t, codemod.Apply)
 }
 
-func TestPluginsToDependenciesCodemod_NoPlugins(t *testing.T) {
-	codemod := getPluginsToDependenciesCodemod()
+func TestPluginsToSharedImportCodemod_NoPlugins(t *testing.T) {
+	codemod := getPluginsToSharedImportCodemod()
 
 	content := `---
 on: workflow_dispatch
@@ -41,8 +42,8 @@ engine: copilot
 	assert.Equal(t, content, result, "Content should not be modified")
 }
 
-func TestPluginsToDependenciesCodemod_ArrayFormat(t *testing.T) {
-	codemod := getPluginsToDependenciesCodemod()
+func TestPluginsToSharedImportCodemod_ArrayFormat(t *testing.T) {
+	codemod := getPluginsToSharedImportCodemod()
 
 	content := `---
 on:
@@ -68,14 +69,14 @@ plugins:
 
 	require.NoError(t, err)
 	assert.True(t, applied, "Codemod should have been applied")
-	assert.NotContains(t, result, "plugins:", "plugins key should be removed")
-	assert.Contains(t, result, "dependencies:", "dependencies key should be present")
-	assert.Contains(t, result, "- github/test-plugin", "first plugin should be preserved")
-	assert.Contains(t, result, "- acme/custom-tools", "second plugin should be preserved")
+	assert.NotContains(t, result, "\nplugins:", "top-level plugins key should be removed")
+	assert.Contains(t, result, "imports:", "imports key should be present")
+	assert.Contains(t, result, "- uses: shared/copilot-plugins.md", "shared workflow import should be present")
+	assert.Contains(t, result, "plugins: [\"github/test-plugin\", \"acme/custom-tools\"]", "plugin list should be preserved")
 }
 
-func TestPluginsToDependenciesCodemod_ObjectFormat(t *testing.T) {
-	codemod := getPluginsToDependenciesCodemod()
+func TestPluginsToSharedImportCodemod_ObjectFormat(t *testing.T) {
+	codemod := getPluginsToSharedImportCodemod()
 
 	content := `---
 on:
@@ -106,41 +107,51 @@ plugins:
 
 	require.NoError(t, err)
 	assert.True(t, applied, "Codemod should have been applied")
-	assert.NotContains(t, result, "plugins:", "plugins key should be removed")
-	assert.Contains(t, result, "dependencies:", "dependencies key should be present")
-	assert.Contains(t, result, "github/test-plugin", "first plugin should be preserved")
-	assert.Contains(t, result, "acme/custom-tools", "second plugin should be preserved")
-	assert.Contains(t, result, "github-token:", "github-token should be preserved")
-	assert.Contains(t, result, "packages:", "repos should be renamed to packages")
-	assert.NotContains(t, result, "repos:", "repos sub-key should be renamed")
+	assert.NotContains(t, result, "\nplugins:", "top-level plugins key should be removed")
+	assert.Contains(t, result, "imports:", "imports key should be present")
+	assert.Contains(t, result, "- uses: shared/copilot-plugins.md", "shared workflow import should be present")
+	assert.Contains(t, result, "plugins: [\"github/test-plugin\", \"acme/custom-tools\"]", "repos list should map to plugins input")
+	assert.Contains(t, result, "github-token: ${{ secrets.MY_TOKEN }}", "github-token should be preserved")
 }
 
-func TestPluginsToDependenciesCodemod_SkipsWhenDepsExist(t *testing.T) {
-	codemod := getPluginsToDependenciesCodemod()
+func TestPluginsToSharedImportCodemod_RemovesPluginsWhenImportAlreadyExists(t *testing.T) {
+	codemod := getPluginsToSharedImportCodemod()
 
 	content := `---
-on: workflow_dispatch
+engine: copilot
+imports:
+  - uses: shared/copilot-plugins.md
+    with:
+      plugins: ["github/test-plugin"]
 plugins:
   - github/test-plugin
-dependencies:
-  - microsoft/apm-sample-package
----`
+---
+
+# Test workflow`
 
 	frontmatter := map[string]any{
-		"on":           "workflow_dispatch",
-		"plugins":      []any{"github/test-plugin"},
-		"dependencies": []any{"microsoft/apm-sample-package"},
+		"engine": "copilot",
+		"imports": []any{
+			map[string]any{
+				"uses": "shared/copilot-plugins.md",
+				"with": map[string]any{
+					"plugins": []any{"github/test-plugin"},
+				},
+			},
+		},
+		"plugins": []any{"github/test-plugin"},
 	}
 
 	result, applied, err := codemod.Apply(content, frontmatter)
 
 	require.NoError(t, err)
-	assert.False(t, applied, "Codemod should be skipped when dependencies already exist")
-	assert.Equal(t, content, result, "Content should not be modified")
+	assert.True(t, applied, "Codemod should have been applied")
+	assert.NotContains(t, result, "\nplugins:", "plugins field should be removed")
+	assert.Equal(t, 1, strings.Count(result, "shared/copilot-plugins.md"), "Codemod should not add duplicate imports")
 }
 
-func TestPluginsToDependenciesCodemod_PreservesMarkdownBody(t *testing.T) {
-	codemod := getPluginsToDependenciesCodemod()
+func TestPluginsToSharedImportCodemod_PreservesMarkdownBody(t *testing.T) {
+	codemod := getPluginsToSharedImportCodemod()
 
 	content := `---
 engine: copilot
