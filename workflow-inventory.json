@@ -1,0 +1,3828 @@
+{
+  "total_workflows": 172,
+  "domain_counts": {
+    "quality": 49,
+    "reporting": 27,
+    "docs": 26,
+    "security": 24,
+    "ci": 20,
+    "issues": 10,
+    "prs": 7,
+    "other": 4,
+    "ai": 3,
+    "research": 2
+  },
+  "workflows": [
+    {
+      "id": "ace-editor",
+      "name": "ACE Editor Session",
+      "description": "Generates an ACE editor session link when invoked with /ace command on pull request comments",
+      "domain": "other",
+      "engine": "copilot",
+      "triggers": [
+        "pull_request",
+        "slash_command",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/ace-editor.md"
+    },
+    {
+      "id": "agent-performance-analyzer",
+      "name": "agent-performance-analyzer",
+      "description": "Meta-orchestrator that analyzes AI agent performance, quality, and effectiveness across the repository",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "discussion",
+        "issues"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/agent-performance-analyzer.md"
+    },
+    {
+      "id": "agent-persona-explorer",
+      "name": "agent-persona-explorer",
+      "description": "Explores agentic-workflows custom agent behavior by generating software personas and analyzing responses to common autom",
+      "domain": "ci",
+      "engine": "copilot",
+      "triggers": [
+        "discussion",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search",
+        "uses_memory",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/agent-persona-explorer.md"
+    },
+    {
+      "id": "agentic-observability-kit",
+      "name": "agentic-observability-kit",
+      "description": "Drop-in observability and portfolio review",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/agentic-observability-kit.md"
+    },
+    {
+      "id": "agentic-optimization-kit",
+      "name": "agentic-optimization-kit",
+      "description": "Weekly consolidated kit combining token audit, optimization targeting, and agentic observability into one actionable rep",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "discussion",
+        "schedule",
+        "workflow_dispatch",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/agentic-optimization-kit.md"
+    },
+    {
+      "id": "ai-moderator",
+      "name": "ai-moderator",
+      "description": "ai-moderator",
+      "domain": "other",
+      "engine": "codex",
+      "triggers": [
+        "pull_request",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "uses_github_mcp",
+        "adds_labels"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/ai-moderator.md"
+    },
+    {
+      "id": "api-consumption-report",
+      "name": "api-consumption-report",
+      "description": "Daily report on GitHub REST API consumption by agentic workflows \u2014 with trending charts and quota analysis",
+      "domain": "reporting",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/api-consumption-report.md"
+    },
+    {
+      "id": "approach-validator",
+      "name": "Approach Validator",
+      "description": "Validates proposed technical approaches before implementation begins using a sequential multi-agent panel of Devil's Adv",
+      "domain": "prs",
+      "engine": "claude",
+      "triggers": [
+        "status",
+        "pull_request",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp",
+        "adds_labels"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/approach-validator.md"
+    },
+    {
+      "id": "archie",
+      "name": "Archie",
+      "description": "Generates Mermaid diagrams to visualize issue and pull request relationships when invoked with the /archie command",
+      "domain": "issues",
+      "engine": "  id: copilot\n  agent: adr-writer",
+      "triggers": [
+        "status",
+        "pull_request",
+        "slash_command",
+        "issues"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/archie.md"
+    },
+    {
+      "id": "architecture-guardian",
+      "name": "Architecture Guardian",
+      "description": "Daily analysis of commits from the last 24 hours to detect code structure violations in Go and JavaScript files, such as",
+      "domain": "other",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "runs_bash"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/architecture-guardian.md"
+    },
+    {
+      "id": "artifacts-summary",
+      "name": "artifacts-summary",
+      "description": "Generates a comprehensive summary of GitHub Actions artifacts usage across all workflows in the repository",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/artifacts-summary.md"
+    },
+    {
+      "id": "audit-workflows",
+      "name": "audit-workflows",
+      "description": "Daily audit of all agentic workflow runs from the last 24 hours to identify issues, missing tools, errors, and improveme",
+      "domain": "security",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/audit-workflows.md"
+    },
+    {
+      "id": "auto-triage-issues",
+      "name": "Auto-Triage Issues",
+      "description": "Automatically labels new and existing unlabeled issues to improve discoverability and triage efficiency",
+      "domain": "ci",
+      "engine": "  id: copilot\n  model: gpt-5-mini",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "runs_bash",
+        "uses_github_mcp",
+        "adds_labels",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/auto-triage-issues.md"
+    },
+    {
+      "id": "aw-failure-investigator",
+      "name": "aw-failure-investigator",
+      "description": "Investigates [aw] failures from the last 6 hours, correlates with open agentic-workflows issues, closes fixed issues, an",
+      "domain": "ci",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/aw-failure-investigator.md"
+    },
+    {
+      "id": "blog-auditor",
+      "name": "blog-auditor",
+      "description": "Verifies that the GitHub Next Agentic Workflows blog page is accessible and contains expected content",
+      "domain": "security",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/blog-auditor.md"
+    },
+    {
+      "id": "bot-detection",
+      "name": "bot-detection",
+      "description": "Investigates suspicious repository activity and maintains a single triage issue",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "issues",
+        "schedule",
+        "push",
+        "pull_request",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/bot-detection.md"
+    },
+    {
+      "id": "brave",
+      "name": "brave",
+      "description": "Performs web searches using Brave search engine when invoked with /brave command in issues or PRs",
+      "domain": "issues",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "slash_command",
+        "issues"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/brave.md"
+    },
+    {
+      "id": "breaking-change-checker",
+      "name": "breaking-change-checker",
+      "description": "Daily analysis of recent commits and merged PRs for breaking CLI changes",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/breaking-change-checker.md"
+    },
+    {
+      "id": "changeset",
+      "name": "Changeset Generator",
+      "description": "Automatically creates changeset files when PRs are labeled with 'changeset' or 'smoke' to document changes for release n",
+      "domain": "docs",
+      "engine": "  id: codex\n  model: gpt-5.1-codex-mini",
+      "triggers": [
+        "pull_request",
+        "push",
+        "workflow_dispatch",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/changeset.md"
+    },
+    {
+      "id": "ci-coach",
+      "name": "ci-coach",
+      "description": "Daily CI optimization coach that analyzes workflow runs for efficiency improvements and cost reduction opportunities",
+      "domain": "ci",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "pull_request",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/ci-coach.md"
+    },
+    {
+      "id": "ci-doctor",
+      "name": "ci-doctor",
+      "description": "Investigates failed CI workflows to identify root causes and patterns, creating issues with diagnostic information; also",
+      "domain": "quality",
+      "engine": "claude",
+      "triggers": [
+        "status",
+        "pull_request",
+        "issues"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search",
+        "uses_memory",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/ci-doctor.md"
+    },
+    {
+      "id": "claude-code-user-docs-review",
+      "name": "Claude Code User Documentation Review",
+      "description": "Reviews project documentation from the perspective of a Claude Code user who does not use GitHub Copilot or Copilot CLI",
+      "domain": "docs",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/claude-code-user-docs-review.md"
+    },
+    {
+      "id": "cli-consistency-checker",
+      "name": "cli-consistency-checker",
+      "description": "Inspects the gh-aw CLI to identify inconsistencies, typos, bugs, or documentation gaps by running commands and analyzing",
+      "domain": "docs",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search",
+        "runs_bash"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/cli-consistency-checker.md"
+    },
+    {
+      "id": "cli-version-checker",
+      "name": "cli-version-checker",
+      "description": "Monitors and updates agentic CLI tools (Claude Code, GitHub Copilot CLI, OpenAI Codex, GitHub MCP Server, Playwright MCP",
+      "domain": "ai",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search",
+        "uses_memory",
+        "runs_bash"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/cli-version-checker.md"
+    },
+    {
+      "id": "cloclo",
+      "name": "cloclo",
+      "description": "cloclo",
+      "domain": "other",
+      "engine": "  id: claude\n  max-turns: 100",
+      "triggers": [
+        "status",
+        "slash_command",
+        "issues",
+        "discussion"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/cloclo.md"
+    },
+    {
+      "id": "code-scanning-fixer",
+      "name": "Code Scanning Fixer",
+      "description": "Automatically fixes code scanning alerts by creating pull requests with remediation",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "pull_request",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_prs",
+        "uses_memory",
+        "uses_github_mcp",
+        "adds_labels",
+        "security_scan"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/code-scanning-fixer.md"
+    },
+    {
+      "id": "code-simplifier",
+      "name": "Code Simplifier",
+      "description": "Analyzes recently modified code and creates pull requests with simplifications that improve clarity, consistency, and ma",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/code-simplifier.md"
+    },
+    {
+      "id": "codex-github-remote-mcp-test",
+      "name": "codex-github-remote-mcp-test",
+      "description": "Test Codex engine with GitHub remote MCP server",
+      "domain": "quality",
+      "engine": "codex",
+      "triggers": [
+        "workflow_dispatch",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/codex-github-remote-mcp-test.md"
+    },
+    {
+      "id": "commit-changes-analyzer",
+      "name": "Commit Changes Analyzer",
+      "description": "Analyzes and provides a comprehensive developer-focused report of all changes in the repository since a specified commit",
+      "domain": "docs",
+      "engine": "  id: claude\n  max-turns: 100",
+      "triggers": [
+        "workflow_dispatch",
+        "discussion",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/commit-changes-analyzer.md"
+    },
+    {
+      "id": "constraint-solving-potd",
+      "name": "constraint-solving-potd",
+      "description": "constraint-solving-potd",
+      "domain": "research",
+      "engine": "  id: copilot\n  bare: true",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "uses_memory",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/constraint-solving-potd.md"
+    },
+    {
+      "id": "contribution-check",
+      "name": "Contribution Check",
+      "description": "Contribution Check",
+      "domain": "prs",
+      "engine": "  id: copilot\n  agent: contribution-checker",
+      "triggers": [
+        "schedule",
+        "pull_request",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp",
+        "adds_labels"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/contribution-check.md"
+    },
+    {
+      "id": "copilot-agent-analysis",
+      "name": "Copilot Agent PR Analysis",
+      "description": "Analyzes GitHub Copilot coding agent usage patterns in pull requests to provide insights on agent effectiveness and beha",
+      "domain": "quality",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/copilot-agent-analysis.md"
+    },
+    {
+      "id": "copilot-cli-deep-research",
+      "name": "copilot-cli-deep-research",
+      "description": "Deep research analyzing Copilot CLI current state, available features, and missed optimization opportunities",
+      "domain": "ai",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/copilot-cli-deep-research.md"
+    },
+    {
+      "id": "copilot-opt",
+      "name": "Copilot Opt",
+      "description": "Analyze Copilot sessions from the last 14 days and create three optimization issues with evidence-backed recommendations",
+      "domain": "issues",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/copilot-opt.md"
+    },
+    {
+      "id": "copilot-pr-merged-report",
+      "name": "Daily Copilot PR Merged Report",
+      "description": "Generates a daily report analyzing Copilot pull requests merged in the last 24 hours, tracking code generation, tests, a",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/copilot-pr-merged-report.md"
+    },
+    {
+      "id": "copilot-pr-nlp-analysis",
+      "name": "Copilot PR Conversation NLP Analysis",
+      "description": "Performs natural language processing analysis on Copilot PR conversations to extract insights and patterns from user int",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/copilot-pr-nlp-analysis.md"
+    },
+    {
+      "id": "copilot-pr-prompt-analysis",
+      "name": "Copilot PR Prompt Pattern Analysis",
+      "description": "Analyzes prompt patterns used in Copilot PR interactions to identify common usage patterns and optimization opportunitie",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/copilot-pr-prompt-analysis.md"
+    },
+    {
+      "id": "copilot-session-insights",
+      "name": "Copilot Session Insights",
+      "description": "Analyzes GitHub Copilot coding agent sessions to provide detailed insights on usage patterns, success rates, and perform",
+      "domain": "quality",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/copilot-session-insights.md"
+    },
+    {
+      "id": "copilot-token-audit",
+      "name": "copilot-token-audit",
+      "description": "Daily audit of Copilot token usage across all agentic workflows with historical trend tracking",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/copilot-token-audit.md"
+    },
+    {
+      "id": "copilot-token-optimizer",
+      "name": "copilot-token-optimizer",
+      "description": "Daily optimizer that identifies a high-token-usage Copilot workflow, audits its runs, and recommends efficiency improvem",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/copilot-token-optimizer.md"
+    },
+    {
+      "id": "craft",
+      "name": "craft",
+      "description": "Generates new agentic workflow markdown files based on user requests when invoked with /craft command",
+      "domain": "docs",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "slash_command",
+        "push",
+        "issues"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/craft.md"
+    },
+    {
+      "id": "daily-architecture-diagram",
+      "name": "daily-architecture-diagram",
+      "description": "Generates a daily high-level ASCII architecture diagram of the repository, using cache-memory to focus only on what chan",
+      "domain": "ci",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-architecture-diagram.md"
+    },
+    {
+      "id": "daily-assign-issue-to-user",
+      "name": "daily-assign-issue-to-user",
+      "description": "daily-assign-issue-to-user",
+      "domain": "issues",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "pull_request",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-assign-issue-to-user.md"
+    },
+    {
+      "id": "daily-astrostylelite-markdown-spellcheck",
+      "name": "daily-astrostylelite-markdown-spellcheck",
+      "description": "Runs daily American English spellcheck for AstroStyleLite docs content and opens a safe PR only when findings exist",
+      "domain": "docs",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_prs",
+        "runs_bash"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-astrostylelite-markdown-spellcheck.md"
+    },
+    {
+      "id": "daily-aw-cross-repo-compile-check",
+      "name": "Daily AW Cross-Repo Compile Check",
+      "description": "Daily Claude workflow that finds popular repositories using gh-aw lock files, compiles/upgrades them, caches results, an",
+      "domain": "reporting",
+      "engine": "  id: claude\n  max-turns: 140",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-aw-cross-repo-compile-check.md"
+    },
+    {
+      "id": "daily-choice-test",
+      "name": "daily-choice-test",
+      "description": "Daily test workflow using Claude with custom safe-output job containing choice inputs",
+      "domain": "quality",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-choice-test.md"
+    },
+    {
+      "id": "daily-cli-performance",
+      "name": "daily-cli-performance",
+      "description": "Daily CLI Performance - Runs benchmarks, tracks performance trends, and reports regressions",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-cli-performance.md"
+    },
+    {
+      "id": "daily-cli-tools-tester",
+      "name": "daily-cli-tools-tester",
+      "description": "Daily exploratory testing of audit, logs, and compile tools in gh-aw CLI",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-cli-tools-tester.md"
+    },
+    {
+      "id": "daily-code-metrics",
+      "name": "daily-code-metrics",
+      "description": "Tracks and visualizes daily code metrics and trends to monitor repository health and development patterns",
+      "domain": "quality",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-code-metrics.md"
+    },
+    {
+      "id": "daily-community-attribution",
+      "name": "Daily Community Attribution Updater",
+      "description": "Maintains a live community contributions section in README.md and an all-time Community Contributors wiki page by attrib",
+      "domain": "docs",
+      "engine": "  id: copilot\n  model: claude-haiku-4-5",
+      "triggers": [
+        "schedule",
+        "pull_request",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-community-attribution.md"
+    },
+    {
+      "id": "daily-compiler-quality",
+      "name": "Daily Compiler Quality Check",
+      "description": "Analyzes compiler code daily to assess if it meets human-written quality standards, creates discussion reports, and uses",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-compiler-quality.md"
+    },
+    {
+      "id": "daily-doc-healer",
+      "name": "Daily Documentation Healer",
+      "description": "Self-healing companion to the Daily Documentation Updater that detects documentation gaps missed by DDUw and proposes co",
+      "domain": "docs",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-doc-healer.md"
+    },
+    {
+      "id": "daily-doc-updater",
+      "name": "Daily Documentation Updater",
+      "description": "Automatically reviews and updates documentation to ensure accuracy and completeness",
+      "domain": "docs",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-doc-updater.md"
+    },
+    {
+      "id": "daily-fact",
+      "name": "daily-fact",
+      "description": "Posts a daily poetic verse about the gh-aw project to a discussion thread",
+      "domain": "reporting",
+      "engine": "  id: codex\n  model: gpt-5.1-codex-mini\n  bare: true",
+      "triggers": [
+        "status",
+        "discussion",
+        "schedule",
+        "workflow_dispatch",
+        "issues"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-fact.md"
+    },
+    {
+      "id": "daily-file-diet",
+      "name": "Daily File Diet",
+      "description": "Analyzes the largest Go source file daily and creates an issue to refactor it into smaller files if it exceeds the healt",
+      "domain": "quality",
+      "engine": "  id: copilot\n  agent: \"developer.instructions\"",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-file-diet.md"
+    },
+    {
+      "id": "daily-firewall-report",
+      "name": "daily-firewall-report",
+      "description": "Collects and reports on firewall log events to monitor network security and access patterns",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion",
+        "security_scan"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-firewall-report.md"
+    },
+    {
+      "id": "daily-function-namer",
+      "name": "Daily Go Function Namer",
+      "description": "Analyzes one entire Go package per day using Serena to extract function names and suggest renames that improve agent dis",
+      "domain": "prs",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-function-namer.md"
+    },
+    {
+      "id": "daily-hippo-learn",
+      "name": "Daily Hippo Learn",
+      "description": "Runs hippo-memory's learn and sleep commands daily to extract lessons from git commits, consolidate the memory store, an",
+      "domain": "prs",
+      "engine": "  id: copilot\n  bare: true",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-hippo-learn.md"
+    },
+    {
+      "id": "daily-integrity-analysis",
+      "name": "daily-integrity-analysis",
+      "description": "Daily analysis of DIFC integrity-filtered events with statistical charts and actionable tuning recommendations",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-integrity-analysis.md"
+    },
+    {
+      "id": "daily-issues-report",
+      "name": "daily-issues-report",
+      "description": "Daily report analyzing repository issues with clustering, metrics, and trend charts",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "discussion",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-issues-report.md"
+    },
+    {
+      "id": "daily-malicious-code-scan",
+      "name": "daily-malicious-code-scan",
+      "description": "Daily security scan that reviews code changes from the last 3 days for suspicious patterns indicating malicious agentic ",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "security_scan"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-malicious-code-scan.md"
+    },
+    {
+      "id": "daily-mcp-concurrency-analysis",
+      "name": "Daily MCP Tool Concurrency Analysis",
+      "description": "Performs deep-dive concurrency analysis on each safe-outputs MCP server tool to ensure thread-safety and detect race con",
+      "domain": "ai",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-mcp-concurrency-analysis.md"
+    },
+    {
+      "id": "daily-multi-device-docs-tester",
+      "name": "Multi-Device Docs Tester",
+      "description": "Tests documentation site functionality and responsive design across multiple device form factors",
+      "domain": "quality",
+      "engine": "  id: claude\n  max-turns: 80  # 10 devices \u00d7 ~5 turns each + setup/report overhead",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-multi-device-docs-tester.md"
+    },
+    {
+      "id": "daily-news",
+      "name": "daily-news",
+      "description": "Generates a daily news digest of repository activity including issues, PRs, discussions, and workflow runs",
+      "domain": "reporting",
+      "engine": "  id: copilot\n  bare: true",
+      "triggers": [
+        "discussion",
+        "schedule",
+        "workflow_dispatch",
+        "pull_request",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search",
+        "runs_bash",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-news.md"
+    },
+    {
+      "id": "daily-observability-report",
+      "name": "daily-observability-report",
+      "description": "Daily observability report analyzing logging and telemetry coverage for AWF firewall and MCP Gateway across workflow run",
+      "domain": "security",
+      "engine": "codex",
+      "triggers": [
+        "discussion",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-observability-report.md"
+    },
+    {
+      "id": "daily-otel-instrumentation-advisor",
+      "name": "Daily OTel Instrumentation Advisor",
+      "description": "Daily DevOps analysis of OpenTelemetry instrumentation in JavaScript code \u2014 identifies the single most impactful improve",
+      "domain": "reporting",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-otel-instrumentation-advisor.md"
+    },
+    {
+      "id": "daily-performance-summary",
+      "name": "daily-performance-summary",
+      "description": "Daily project performance summary (90-day window) with trend charts using mcp-scripts",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-performance-summary.md"
+    },
+    {
+      "id": "daily-regulatory",
+      "name": "daily-regulatory",
+      "description": "Daily regulatory workflow that monitors and cross-checks other daily report agents' outputs for data consistency and ano",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-regulatory.md"
+    },
+    {
+      "id": "daily-rendering-scripts-verifier",
+      "name": "Daily Rendering Scripts Verifier",
+      "description": "Daily verification that the engine-specific log parser and rendering scripts correctly handle real agentic workflow outp",
+      "domain": "docs",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "pull_request",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-rendering-scripts-verifier.md"
+    },
+    {
+      "id": "daily-repo-chronicle",
+      "name": "daily-repo-chronicle",
+      "description": "Creates a narrative chronicle of daily repository activity including commits, PRs, issues, and discussions",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-repo-chronicle.md"
+    },
+    {
+      "id": "daily-safe-output-integrator",
+      "name": "Daily Safe Output Integrator",
+      "description": "Daily workflow that inspects test workflows in pkg/cli/workflows for safe-output coverage, detects missing safe-output t",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp",
+        "adds_labels",
+        "posts_discussion",
+        "security_scan"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-safe-output-integrator.md"
+    },
+    {
+      "id": "daily-safe-output-optimizer",
+      "name": "Daily Safe Output Tool Optimizer",
+      "description": "Analyzes gateway logs for errored safe output tool calls and creates issues to improve tool descriptions",
+      "domain": "issues",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-safe-output-optimizer.md"
+    },
+    {
+      "id": "daily-safe-outputs-conformance",
+      "name": "daily-safe-outputs-conformance",
+      "description": "Daily automated conformance check for Safe Outputs specification implementation, analyzing critical/high/medium/low issu",
+      "domain": "docs",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-safe-outputs-conformance.md"
+    },
+    {
+      "id": "daily-secrets-analysis",
+      "name": "daily-secrets-analysis",
+      "description": "Daily analysis of secret usage patterns across all compiled lock.yml workflow files",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-secrets-analysis.md"
+    },
+    {
+      "id": "daily-security-red-team",
+      "name": "daily-security-red-team",
+      "description": "Daily deep red teaming security scan of actions/setup/js and actions/setup/sh directories, looking for backdoors, secret",
+      "domain": "security",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "uses_memory",
+        "uses_github_mcp",
+        "security_scan"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-security-red-team.md"
+    },
+    {
+      "id": "daily-semgrep-scan",
+      "name": "Daily Semgrep Scan",
+      "description": "Daily Semgrep security scan for SQL injection and other vulnerabilities",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "security_scan"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-semgrep-scan.md"
+    },
+    {
+      "id": "daily-skill-optimizer",
+      "name": "Daily Skill Optimizer Improvements",
+      "description": "Runs fastxyz/skill-optimizer daily, packages results as an artifact, and creates one issue with 3 improvements",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "issues",
+        "schedule",
+        "push",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-skill-optimizer.md"
+    },
+    {
+      "id": "daily-syntax-error-quality",
+      "name": "Daily Syntax Error Quality Check",
+      "description": "Tests compiler error message quality by introducing syntax errors in workflows, evaluating error clarity, and suggesting",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-syntax-error-quality.md"
+    },
+    {
+      "id": "daily-team-evolution-insights",
+      "name": "daily-team-evolution-insights",
+      "description": "Daily analysis of repository changes to extract insights about team evolution and working patterns",
+      "domain": "quality",
+      "engine": "claude",
+      "triggers": [
+        "discussion",
+        "schedule",
+        "workflow_dispatch",
+        "pull_request",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-team-evolution-insights.md"
+    },
+    {
+      "id": "daily-team-status",
+      "name": "daily-team-status",
+      "description": "|",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-team-status.md"
+    },
+    {
+      "id": "daily-testify-uber-super-expert",
+      "name": "Daily Testify Uber Super Expert",
+      "description": "Daily expert that analyzes one test file and creates an issue with testify-based improvements",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-testify-uber-super-expert.md"
+    },
+    {
+      "id": "daily-token-consumption-report",
+      "name": "daily-token-consumption-report",
+      "description": "Daily report of token consumption across all agentic workflows using OTel telemetry stored in Sentry",
+      "domain": "reporting",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues"
+      ],
+      "capabilities": [
+        "reads_issues",
+        "reads_prs",
+        "runs_bash"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-token-consumption-report.md"
+    },
+    {
+      "id": "daily-workflow-updater",
+      "name": "Daily Workflow Updater",
+      "description": "Automatically updates GitHub Actions versions and creates a PR if changes are detected",
+      "domain": "ci",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/daily-workflow-updater.md"
+    },
+    {
+      "id": "dead-code-remover",
+      "name": "dead-code-remover",
+      "description": "Daily dead code assessment and removal \u2014 identifies unreachable Go functions using static analysis and creates a PR to r",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "pull_request",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/dead-code-remover.md"
+    },
+    {
+      "id": "deep-report",
+      "name": "deep-report",
+      "description": "Intelligence gathering agent that continuously reviews and aggregates information from agent-generated reports in discus",
+      "domain": "reporting",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion",
+        "security_scan"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/deep-report.md"
+    },
+    {
+      "id": "delight",
+      "name": "Delight",
+      "description": "Targeted scan of user-facing aspects to improve clarity, usability, and professionalism in enterprise software context",
+      "domain": "docs",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "discussion",
+        "schedule",
+        "workflow_dispatch",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/delight.md"
+    },
+    {
+      "id": "dependabot-burner",
+      "name": "dependabot-burner",
+      "description": "dependabot-burner",
+      "domain": "ci",
+      "engine": "copilot",
+      "triggers": [
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/dependabot-burner.md"
+    },
+    {
+      "id": "dependabot-go-checker",
+      "name": "dependabot-go-checker",
+      "description": "Checks for Go module and NPM dependency updates and analyzes Dependabot PRs for compatibility and breaking changes",
+      "domain": "ci",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search",
+        "runs_bash",
+        "uses_github_mcp",
+        "security_scan"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/dependabot-go-checker.md"
+    },
+    {
+      "id": "design-decision-gate",
+      "name": "design-decision-gate",
+      "description": "Enforces Architecture Decision Records (ADRs) before implementation work can merge, detecting missing design decisions a",
+      "domain": "ci",
+      "engine": "  id: claude\n  max-turns: 15",
+      "triggers": [
+        "status",
+        "issues",
+        "push",
+        "pull_request",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/design-decision-gate.md"
+    },
+    {
+      "id": "dev-hawk",
+      "name": "Dev Hawk",
+      "description": "Monitors development workflow activities and provides real-time alerts and insights on pull requests and CI status",
+      "domain": "ci",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "pull_request",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/dev-hawk.md"
+    },
+    {
+      "id": "dev",
+      "name": "Dev",
+      "description": "Daily status report for gh-aw project",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/dev.md"
+    },
+    {
+      "id": "developer-docs-consolidator",
+      "name": "Developer Documentation Consolidator",
+      "description": "Consolidates and organizes developer documentation from multiple sources into a unified, searchable knowledge base",
+      "domain": "docs",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/developer-docs-consolidator.md"
+    },
+    {
+      "id": "dictation-prompt",
+      "name": "Dictation Prompt Generator",
+      "description": "Generates optimized prompts for voice dictation and speech-to-text workflows",
+      "domain": "ci",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/dictation-prompt.md"
+    },
+    {
+      "id": "discussion-task-miner",
+      "name": "discussion-task-miner",
+      "description": "Scans AI-generated discussions to extract actionable code quality improvement tasks",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "discussion",
+        "schedule",
+        "workflow_dispatch",
+        "issues"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/discussion-task-miner.md"
+    },
+    {
+      "id": "docs-noob-tester",
+      "name": "Documentation Noob Tester",
+      "description": "Tests documentation as a new user would, identifying confusing or broken steps in getting started guides",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/docs-noob-tester.md"
+    },
+    {
+      "id": "draft-pr-cleanup",
+      "name": "Draft PR Cleanup",
+      "description": "Automated cleanup policy for stale draft pull requests to reduce clutter and improve triage efficiency",
+      "domain": "ci",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "schedule",
+        "pull_request",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp",
+        "adds_labels"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/draft-pr-cleanup.md"
+    },
+    {
+      "id": "duplicate-code-detector",
+      "name": "Duplicate Code Detector",
+      "description": "Identifies duplicate code patterns across the codebase and suggests refactoring opportunities",
+      "domain": "quality",
+      "engine": "codex",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/duplicate-code-detector.md"
+    },
+    {
+      "id": "example-permissions-warning",
+      "name": "example-permissions-warning",
+      "description": "Example workflow demonstrating proper permission provisioning and security best practices",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "pull_request",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/example-permissions-warning.md"
+    },
+    {
+      "id": "example-workflow-analyzer",
+      "name": "example-workflow-analyzer",
+      "description": "Analyzes workflow examples to identify patterns, best practices, and potential improvements",
+      "domain": "quality",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/example-workflow-analyzer.md"
+    },
+    {
+      "id": "firewall-escape",
+      "name": "The Great Escapi",
+      "description": "Security testing to find escape paths in the AWF (Agent Workflow Firewall)",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "discussion",
+        "schedule",
+        "workflow_dispatch",
+        "pull_request",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/firewall-escape.md"
+    },
+    {
+      "id": "firewall",
+      "name": "firewall",
+      "description": "Tests network firewall functionality and validates security rules for workflow network access",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "workflow_dispatch",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/firewall.md"
+    },
+    {
+      "id": "functional-pragmatist",
+      "name": "Functional Pragmatist",
+      "description": "Identifies opportunities to apply moderate functional programming techniques systematically - immutability, functional o",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/functional-pragmatist.md"
+    },
+    {
+      "id": "github-mcp-structural-analysis",
+      "name": "github-mcp-structural-analysis",
+      "description": "Structural analysis of GitHub MCP tool responses with schema evaluation and usefulness ratings for agentic work",
+      "domain": "quality",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "uses_github_mcp",
+        "posts_discussion",
+        "security_scan"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/github-mcp-structural-analysis.md"
+    },
+    {
+      "id": "github-mcp-tools-report",
+      "name": "github-mcp-tools-report",
+      "description": "Generates a comprehensive report of available MCP server tools and their capabilities for GitHub integration",
+      "domain": "reporting",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "uses_github_mcp",
+        "posts_discussion",
+        "security_scan"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/github-mcp-tools-report.md"
+    },
+    {
+      "id": "github-remote-mcp-auth-test",
+      "name": "github-remote-mcp-auth-test",
+      "description": "Daily test of GitHub remote MCP authentication with GitHub Actions token",
+      "domain": "quality",
+      "engine": "  id: copilot\n  model: gpt-5.1-codex-mini",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/github-remote-mcp-auth-test.md"
+    },
+    {
+      "id": "glossary-maintainer",
+      "name": "Glossary Maintainer",
+      "description": "Maintains and updates the documentation glossary based on codebase changes",
+      "domain": "docs",
+      "engine": "  id: copilot\n  agent: technical-doc-writer",
+      "triggers": [
+        "schedule",
+        "pull_request",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/glossary-maintainer.md"
+    },
+    {
+      "id": "go-fan",
+      "name": "Go Fan",
+      "description": "Daily Go module usage reviewer - analyzes direct dependencies prioritizing recently updated ones",
+      "domain": "quality",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/go-fan.md"
+    },
+    {
+      "id": "go-logger",
+      "name": "Go Logger Enhancement",
+      "description": "Analyzes and enhances Go logging practices across the codebase for improved debugging and observability",
+      "domain": "reporting",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/go-logger.md"
+    },
+    {
+      "id": "go-pattern-detector",
+      "name": "Go Pattern Detector",
+      "description": "Detects common Go code patterns and anti-patterns to maintain code quality and consistency",
+      "domain": "quality",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/go-pattern-detector.md"
+    },
+    {
+      "id": "gpclean",
+      "name": "gpclean",
+      "description": "Reviews go.mod dependencies daily to detect and remove GPL-licensed transitive dependencies",
+      "domain": "ci",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/gpclean.md"
+    },
+    {
+      "id": "grumpy-reviewer",
+      "name": "grumpy-reviewer",
+      "description": "Performs critical code review with a focus on edge cases, potential bugs, and code quality issues",
+      "domain": "quality",
+      "engine": "codex",
+      "triggers": [
+        "status",
+        "slash_command",
+        "issues",
+        "pull_request_review"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_prs",
+        "uses_memory",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/grumpy-reviewer.md"
+    },
+    {
+      "id": "hourly-ci-cleaner",
+      "name": "hourly-ci-cleaner",
+      "description": "CI cleaner that fixes format, lint, and test issues when CI fails on main branch. Schedule disabled (issue #26015); use ",
+      "domain": "quality",
+      "engine": "  id: claude\n  max-turns: 20\n  agent: ci-cleaner",
+      "triggers": [
+        "status",
+        "workflow_dispatch",
+        "issues"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/hourly-ci-cleaner.md"
+    },
+    {
+      "id": "instructions-janitor",
+      "name": "Instructions Janitor",
+      "description": "Reviews and cleans up instruction files to ensure clarity, consistency, and adherence to best practices",
+      "domain": "prs",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/instructions-janitor.md"
+    },
+    {
+      "id": "issue-arborist",
+      "name": "Issue Arborist",
+      "description": "Daily workflow that analyzes recent issues and links related issues as sub-issues",
+      "domain": "ci",
+      "engine": "codex",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/issue-arborist.md"
+    },
+    {
+      "id": "issue-monster",
+      "name": "Issue Monster",
+      "description": "The Cookie Monster of issues - assigns issues to Copilot coding agent one at a time",
+      "domain": "issues",
+      "engine": "  id: copilot\n  model: claude-haiku-4.5",
+      "triggers": [
+        "status",
+        "discussion",
+        "issues",
+        "schedule",
+        "push",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/issue-monster.md"
+    },
+    {
+      "id": "issue-triage-agent",
+      "name": "issue-triage-agent",
+      "description": "issue-triage-agent",
+      "domain": "issues",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "uses_github_mcp",
+        "adds_labels",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/issue-triage-agent.md"
+    },
+    {
+      "id": "jsweep",
+      "name": "jsweep",
+      "description": "Daily JavaScript unbloater that cleans one .cjs file per day, prioritizing files with @ts-nocheck to enable type checkin",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/jsweep.md"
+    },
+    {
+      "id": "layout-spec-maintainer",
+      "name": "Layout Specification Maintainer",
+      "description": "Maintains scratchpad/layout.md with patterns of file paths, folder names, and artifact names used in lock.yml files",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "schedule",
+        "workflow_dispatch",
+        "pull_request",
+        "issues"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/layout-spec-maintainer.md"
+    },
+    {
+      "id": "lockfile-stats",
+      "name": "lockfile-stats",
+      "description": "Analyzes package lockfiles to track dependency statistics, vulnerabilities, and update patterns",
+      "domain": "security",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/lockfile-stats.md"
+    },
+    {
+      "id": "mcp-inspector",
+      "name": "mcp-inspector",
+      "description": "Inspects MCP (Model Context Protocol) server configurations and validates their functionality",
+      "domain": "docs",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search",
+        "uses_memory",
+        "runs_bash",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/mcp-inspector.md"
+    },
+    {
+      "id": "mergefest",
+      "name": "Mergefest",
+      "description": "Automatically merges the main branch into pull request branches when invoked with /mergefest command",
+      "domain": "ci",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "pull_request",
+        "slash_command",
+        "push"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/mergefest.md"
+    },
+    {
+      "id": "metrics-collector",
+      "name": "metrics-collector",
+      "description": "Collects daily performance metrics for the agent ecosystem and stores them in repo-memory",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "discussion",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/metrics-collector.md"
+    },
+    {
+      "id": "notion-issue-summary",
+      "name": "notion-issue-summary",
+      "description": "Creates issue summaries and syncs them to Notion for project management and tracking",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "workflow_dispatch",
+        "issues"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/notion-issue-summary.md"
+    },
+    {
+      "id": "org-health-report",
+      "name": "org-health-report",
+      "description": "Generate an organization-wide health report for all public repositories in the GitHub org",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "discussion",
+        "schedule",
+        "workflow_dispatch",
+        "pull_request",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/org-health-report.md"
+    },
+    {
+      "id": "pdf-summary",
+      "name": "pdf-summary",
+      "description": "pdf summarizer",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "discussion",
+        "issues",
+        "slash_command",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/pdf-summary.md"
+    },
+    {
+      "id": "plan",
+      "name": "Plan Command",
+      "description": "Generates project plans and task breakdowns when invoked with /plan command in issues or PRs",
+      "domain": "issues",
+      "engine": "copilot",
+      "triggers": [
+        "slash_command",
+        "issues",
+        "discussion"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/plan.md"
+    },
+    {
+      "id": "poem-bot",
+      "name": "poem-bot",
+      "description": "Generates creative poems on specified themes when invoked with /poem-bot command",
+      "domain": "docs",
+      "engine": "  id: copilot\n  model: gpt-5\n  bare: true",
+      "triggers": [
+        "status",
+        "discussion",
+        "issues",
+        "push",
+        "slash_command",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp",
+        "adds_labels",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/poem-bot.md"
+    },
+    {
+      "id": "pr-nitpick-reviewer",
+      "name": "pr-nitpick-reviewer",
+      "description": "Provides detailed nitpicky code review focusing on style, best practices, and minor improvements",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "slash_command",
+        "discussion",
+        "pull_request_review"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_prs",
+        "uses_memory",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/pr-nitpick-reviewer.md"
+    },
+    {
+      "id": "pr-triage-agent",
+      "name": "pr-triage-agent",
+      "description": "Automates PR categorization, risk assessment, and prioritization for agent-created pull requests",
+      "domain": "issues",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "discussion",
+        "schedule",
+        "workflow_dispatch",
+        "pull_request",
+        "issues"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp",
+        "adds_labels",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/pr-triage-agent.md"
+    },
+    {
+      "id": "prompt-clustering-analysis",
+      "name": "prompt-clustering-analysis",
+      "description": "Analyzes and clusters GitHub Copilot coding agent prompts to identify patterns and usage trends",
+      "domain": "quality",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "pull_request",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/prompt-clustering-analysis.md"
+    },
+    {
+      "id": "python-data-charts",
+      "name": "python-data-charts",
+      "description": "Generates high-quality data visualizations and trend charts using Python scientific computing libraries",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "workflow_dispatch",
+        "discussion",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/python-data-charts.md"
+    },
+    {
+      "id": "q",
+      "name": "Q",
+      "description": "Intelligent assistant that answers questions, analyzes repositories, and can create PRs for workflow optimizations",
+      "domain": "ci",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "slash_command",
+        "issues",
+        "discussion"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp",
+        "adds_labels"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/q.md"
+    },
+    {
+      "id": "refactoring-cadence",
+      "name": "Refactoring Cadence",
+      "description": "Tracks repository code health over time using file length, cyclomatic complexity, file growth, and TODO/FIXME/HACK churn",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/refactoring-cadence.md"
+    },
+    {
+      "id": "refiner",
+      "name": "refiner",
+      "description": "Aligns code style with repository conventions, detects security issues, and improves tests",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "pull_request",
+        "issues"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/refiner.md"
+    },
+    {
+      "id": "release",
+      "name": "Release",
+      "description": "Build, test, and release gh-aw extension, then generate and prepend release highlights",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "issues",
+        "push",
+        "pull_request",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/release.md"
+    },
+    {
+      "id": "repo-audit-analyzer",
+      "name": "repo-audit-analyzer",
+      "description": "Comprehensive repository audit to identify productivity improvement opportunities using agentic workflows",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "workflow_dispatch",
+        "issues"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/repo-audit-analyzer.md"
+    },
+    {
+      "id": "repo-tree-map",
+      "name": "repo-tree-map",
+      "description": "Generates ASCII tree map visualization of repository file structure weekly",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/repo-tree-map.md"
+    },
+    {
+      "id": "repository-quality-improver",
+      "name": "repository-quality-improver",
+      "description": "Daily analysis and improvement of repository quality focusing on different software development lifecycle areas",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/repository-quality-improver.md"
+    },
+    {
+      "id": "research",
+      "name": "research",
+      "description": "Performs web research on any topic using Tavily search and creates a discussion with findings",
+      "domain": "issues",
+      "engine": "copilot",
+      "triggers": [
+        "workflow_dispatch",
+        "discussion",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/research.md"
+    },
+    {
+      "id": "safe-output-health",
+      "name": "safe-output-health",
+      "description": "Monitors and analyzes the health of safe output operations across all agentic workflows",
+      "domain": "ci",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "adds_comments",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "adds_labels",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/safe-output-health.md"
+    },
+    {
+      "id": "schema-consistency-checker",
+      "name": "schema-consistency-checker",
+      "description": "Detects inconsistencies between JSON schema, implementation code, and documentation",
+      "domain": "quality",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/schema-consistency-checker.md"
+    },
+    {
+      "id": "schema-feature-coverage",
+      "name": "schema-feature-coverage",
+      "description": "Ensures 100% schema feature coverage across existing agentic workflows by creating PRs for any uncovered fields",
+      "domain": "quality",
+      "engine": "codex",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/schema-feature-coverage.md"
+    },
+    {
+      "id": "scout",
+      "name": "Scout",
+      "description": "Performs deep research investigations using web search to gather and synthesize comprehensive information on any topic",
+      "domain": "prs",
+      "engine": "claude",
+      "triggers": [
+        "status",
+        "workflow_dispatch",
+        "slash_command",
+        "issues"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search",
+        "uses_memory",
+        "uses_github_mcp",
+        "adds_labels"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/scout.md"
+    },
+    {
+      "id": "security-compliance",
+      "name": "Security Compliance Campaign",
+      "description": "Fix critical vulnerabilities before audit deadline with full tracking and reporting",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "workflow_dispatch",
+        "issues"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "uses_github_mcp",
+        "security_scan"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/security-compliance.md"
+    },
+    {
+      "id": "security-review",
+      "name": "security-review",
+      "description": "Security-focused AI agent that reviews pull requests to identify changes that could weaken security posture or extend AW",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "discussion",
+        "pull_request_review",
+        "slash_command",
+        "issues"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp",
+        "security_scan"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/security-review.md"
+    },
+    {
+      "id": "semantic-function-refactor",
+      "name": "Semantic Function Refactoring",
+      "description": "Analyzes Go codebase daily to identify opportunities for semantic function extraction and refactoring",
+      "domain": "quality",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/semantic-function-refactor.md"
+    },
+    {
+      "id": "sergo",
+      "name": "Sergo - Serena Go Expert",
+      "description": "Daily Go code quality analysis using Serena MCP language service protocol expert",
+      "domain": "quality",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "discussion",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/sergo.md"
+    },
+    {
+      "id": "slide-deck-maintainer",
+      "name": "Slide Deck Maintainer",
+      "description": "Maintains the gh-aw slide deck by scanning repository content and detecting layout issues using Playwright",
+      "domain": "security",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/slide-deck-maintainer.md"
+    },
+    {
+      "id": "spec-enforcer",
+      "name": "Package Specification Enforcer",
+      "description": "Generates and maintains specification-driven test suites for each Go package, relying on README.md specifications rather",
+      "domain": "quality",
+      "engine": "  id: claude\n  max-turns: 100",
+      "triggers": [
+        "status",
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/spec-enforcer.md"
+    },
+    {
+      "id": "spec-extractor",
+      "name": "Package Specification Extractor",
+      "description": "Extracts and maintains README.md specifications for each Go package under pkg/ using round-robin scheduling and cache-me",
+      "domain": "docs",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/spec-extractor.md"
+    },
+    {
+      "id": "spec-librarian",
+      "name": "Package Specification Librarian",
+      "description": "Daily review of all package README.md specifications to detect inconsistencies, staleness, and cross-package conflicts",
+      "domain": "docs",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/spec-librarian.md"
+    },
+    {
+      "id": "stale-repo-identifier",
+      "name": "Stale Repository Identifier",
+      "description": "Monthly workflow that identifies stale repositories in an organization and creates detailed activity reports",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "schedule",
+        "workflow_dispatch",
+        "pull_request",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/stale-repo-identifier.md"
+    },
+    {
+      "id": "static-analysis-report",
+      "name": "static-analysis-report",
+      "description": "Scans agentic workflows daily for security vulnerabilities using zizmor, poutine, actionlint, and runner-guard",
+      "domain": "security",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "uses_github_mcp",
+        "security_scan"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/static-analysis-report.md"
+    },
+    {
+      "id": "step-name-alignment",
+      "name": "Step Name Alignment",
+      "description": "Scans step names in .lock.yml files and aligns them with step intent and project glossary",
+      "domain": "docs",
+      "engine": "  id: claude\n  max-turns: 30",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/step-name-alignment.md"
+    },
+    {
+      "id": "sub-issue-closer",
+      "name": "Sub-Issue Closer",
+      "description": "Scheduled workflow that recursively closes parent issues when all sub-issues are 100% complete",
+      "domain": "ci",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "reads_issues",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/sub-issue-closer.md"
+    },
+    {
+      "id": "super-linter",
+      "name": "Super Linter Report",
+      "description": "Runs Markdown quality checks using Super Linter and creates issues for violations",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/super-linter.md"
+    },
+    {
+      "id": "technical-doc-writer",
+      "name": "technical-doc-writer",
+      "description": "Reviews and improves technical documentation based on provided topics",
+      "domain": "docs",
+      "engine": "  id: copilot\n  agent: technical-doc-writer",
+      "triggers": [
+        "status",
+        "workflow_dispatch",
+        "issues"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/technical-doc-writer.md"
+    },
+    {
+      "id": "terminal-stylist",
+      "name": "Terminal Stylist",
+      "description": "Analyzes and improves console output styling and formatting in the codebase",
+      "domain": "prs",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/terminal-stylist.md"
+    },
+    {
+      "id": "tidy",
+      "name": "Tidy",
+      "description": "Automatically formats and tidies code files (Go, JS, TypeScript) when code changes are pushed or on command",
+      "domain": "quality",
+      "engine": "copilot",
+      "triggers": [
+        "status",
+        "schedule",
+        "workflow_dispatch",
+        "push",
+        "pull_request",
+        "slash_command",
+        "issues"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/tidy.md"
+    },
+    {
+      "id": "typist",
+      "name": "Typist - Go Type Analysis",
+      "description": "Analyzes Go type usage patterns and identifies opportunities for better type safety and code improvements",
+      "domain": "quality",
+      "engine": "claude",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/typist.md"
+    },
+    {
+      "id": "ubuntu-image-analyzer",
+      "name": "Ubuntu Actions Image Analyzer",
+      "description": "Weekly analysis of the default Ubuntu Actions runner image and guidance for creating Docker mimics",
+      "domain": "docs",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/ubuntu-image-analyzer.md"
+    },
+    {
+      "id": "unbloat-docs",
+      "name": "Documentation Unbloat",
+      "description": "Reviews and simplifies documentation by reducing verbosity while maintaining clarity and completeness",
+      "domain": "quality",
+      "engine": "  id: claude\n  max-turns: 90  # Reduce from avg 115 turns",
+      "triggers": [
+        "status",
+        "issues",
+        "schedule",
+        "pull_request",
+        "slash_command",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "uses_memory",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/unbloat-docs.md"
+    },
+    {
+      "id": "update-astro",
+      "name": "Update Astro",
+      "description": "Daily workflow to update Astro and related npm packages in the docs folder, review migration guides, ensure the docs bui",
+      "domain": "docs",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_prs",
+        "web_search",
+        "runs_bash"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/update-astro.md"
+    },
+    {
+      "id": "video-analyzer",
+      "name": "video-analyzer",
+      "description": "Analyzes video files using ffmpeg to extract metadata, frames, and other technical information",
+      "domain": "research",
+      "engine": "copilot",
+      "triggers": [
+        "workflow_dispatch",
+        "issues"
+      ],
+      "capabilities": [
+        "reads_issues",
+        "reads_prs",
+        "runs_bash"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/video-analyzer.md"
+    },
+    {
+      "id": "weekly-blog-post-writer",
+      "name": "Weekly Blog Post Writer",
+      "description": "Generates a weekly blog post summarizing gh-aw releases, changelogs, and highlights from the past week, then opens a pul",
+      "domain": "docs",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "pull_request",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/weekly-blog-post-writer.md"
+    },
+    {
+      "id": "weekly-editors-health-check",
+      "name": "Weekly Editors Health Check",
+      "description": "Checks that the workflow editors listed in the documentation are still valid, takes Playwright screenshots, and opens a ",
+      "domain": "docs",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_prs",
+        "web_search",
+        "runs_bash"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/weekly-editors-health-check.md"
+    },
+    {
+      "id": "weekly-issue-summary",
+      "name": "Weekly Issue Summary",
+      "description": "Creates weekly summary of issue activity including trends, charts, and insights every Monday",
+      "domain": "reporting",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/weekly-issue-summary.md"
+    },
+    {
+      "id": "weekly-safe-outputs-spec-review",
+      "name": "weekly-safe-outputs-spec-review",
+      "description": "Reviews changes to the Safe Outputs specification and ensures the conformance checker script is up to date",
+      "domain": "docs",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "pull_request",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "creates_pr",
+        "edits_files",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/weekly-safe-outputs-spec-review.md"
+    },
+    {
+      "id": "workflow-generator",
+      "name": "workflow-generator",
+      "description": "Workflow generator that updates issue status and assigns to Copilot coding agent for workflow design",
+      "domain": "ci",
+      "engine": "  id: copilot\n  agent: agentic-workflows",
+      "triggers": [
+        "status",
+        "issues"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "web_search",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/workflow-generator.md"
+    },
+    {
+      "id": "workflow-health-manager",
+      "name": "workflow-health-manager",
+      "description": "Meta-orchestrator for monitoring and managing health of all agentic workflows in the repository",
+      "domain": "ci",
+      "engine": "copilot",
+      "triggers": [
+        "issues"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/workflow-health-manager.md"
+    },
+    {
+      "id": "workflow-normalizer",
+      "name": "workflow-normalizer",
+      "description": "Daily review of agentic workflow prompts to ensure consistent markdown style and progressive disclosure formatting in re",
+      "domain": "docs",
+      "engine": "copilot",
+      "triggers": [
+        "schedule",
+        "issues",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "adds_comments",
+        "reads_issues",
+        "reads_prs",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/workflow-normalizer.md"
+    },
+    {
+      "id": "workflow-skill-extractor",
+      "name": "Workflow Skill Extractor",
+      "description": "Analyzes existing agentic workflows to identify shared skills, tools, and prompts that could be refactored into shared c",
+      "domain": "quality",
+      "engine": "  id: copilot",
+      "triggers": [
+        "discussion",
+        "issues",
+        "schedule",
+        "push",
+        "workflow_dispatch"
+      ],
+      "capabilities": [
+        "edits_files",
+        "reads_issues",
+        "reads_prs",
+        "runs_bash",
+        "uses_github_mcp",
+        "posts_discussion"
+      ],
+      "path": "/home/runner/work/gh-aw/gh-aw/.github/workflows/workflow-skill-extractor.md"
+    }
+  ],
+  "redundancy_pairs": [
+    {
+      "workflow_a": "daily-doc-healer",
+      "workflow_b": "daily-doc-updater",
+      "overlap": 0.875,
+      "domain": "docs"
+    },
+    {
+      "workflow_a": "copilot-pr-nlp-analysis",
+      "workflow_b": "copilot-pr-prompt-analysis",
+      "overlap": 0.857,
+      "domain": "quality"
+    },
+    {
+      "workflow_a": "copilot-agent-analysis",
+      "workflow_b": "copilot-pr-nlp-analysis",
+      "overlap": 0.825,
+      "domain": "quality"
+    },
+    {
+      "workflow_a": "copilot-agent-analysis",
+      "workflow_b": "copilot-pr-prompt-analysis",
+      "overlap": 0.825,
+      "domain": "quality"
+    },
+    {
+      "workflow_a": "daily-regulatory",
+      "workflow_b": "daily-repo-chronicle",
+      "overlap": 0.812,
+      "domain": "reporting"
+    },
+    {
+      "workflow_a": "spec-extractor",
+      "workflow_b": "spec-librarian",
+      "overlap": 0.804,
+      "domain": "docs"
+    },
+    {
+      "workflow_a": "duplicate-code-detector",
+      "workflow_b": "go-pattern-detector",
+      "overlap": 0.8,
+      "domain": "quality"
+    },
+    {
+      "workflow_a": "go-fan",
+      "workflow_b": "sergo",
+      "overlap": 0.8,
+      "domain": "quality"
+    },
+    {
+      "workflow_a": "daily-file-diet",
+      "workflow_b": "daily-testify-uber-super-expert",
+      "overlap": 0.786,
+      "domain": "quality"
+    },
+    {
+      "workflow_a": "weekly-blog-post-writer",
+      "workflow_b": "weekly-safe-outputs-spec-review",
+      "overlap": 0.781,
+      "domain": "docs"
+    },
+    {
+      "workflow_a": "copilot-agent-analysis",
+      "workflow_b": "copilot-pr-merged-report",
+      "overlap": 0.771,
+      "domain": "quality"
+    },
+    {
+      "workflow_a": "daily-integrity-analysis",
+      "workflow_b": "daily-regulatory",
+      "overlap": 0.771,
+      "domain": "reporting"
+    },
+    {
+      "workflow_a": "daily-performance-summary",
+      "workflow_b": "daily-regulatory",
+      "overlap": 0.771,
+      "domain": "reporting"
+    },
+    {
+      "workflow_a": "daily-doc-healer",
+      "workflow_b": "developer-docs-consolidator",
+      "overlap": 0.769,
+      "domain": "docs"
+    },
+    {
+      "workflow_a": "daily-doc-updater",
+      "workflow_b": "developer-docs-consolidator",
+      "overlap": 0.769,
+      "domain": "docs"
+    },
+    {
+      "workflow_a": "daily-firewall-report",
+      "workflow_b": "daily-secrets-analysis",
+      "overlap": 0.764,
+      "domain": "security"
+    },
+    {
+      "workflow_a": "audit-workflows",
+      "workflow_b": "copilot-token-audit",
+      "overlap": 0.762,
+      "domain": "security"
+    },
+    {
+      "workflow_a": "daily-integrity-analysis",
+      "workflow_b": "daily-repo-chronicle",
+      "overlap": 0.758,
+      "domain": "reporting"
+    },
+    {
+      "workflow_a": "daily-performance-summary",
+      "workflow_b": "daily-repo-chronicle",
+      "overlap": 0.758,
+      "domain": "reporting"
+    },
+    {
+      "workflow_a": "daily-repo-chronicle",
+      "workflow_b": "repo-tree-map",
+      "overlap": 0.758,
+      "domain": "reporting"
+    },
+    {
+      "workflow_a": "daily-community-attribution",
+      "workflow_b": "daily-doc-updater",
+      "overlap": 0.752,
+      "domain": "docs"
+    },
+    {
+      "workflow_a": "agentic-observability-kit",
+      "workflow_b": "daily-performance-summary",
+      "overlap": 0.75,
+      "domain": "reporting"
+    },
+    {
+      "workflow_a": "blog-auditor",
+      "workflow_b": "copilot-token-audit",
+      "overlap": 0.75,
+      "domain": "security"
+    },
+    {
+      "workflow_a": "copilot-pr-merged-report",
+      "workflow_b": "example-workflow-analyzer",
+      "overlap": 0.75,
+      "domain": "quality"
+    },
+    {
+      "workflow_a": "copilot-session-insights",
+      "workflow_b": "repository-quality-improver",
+      "overlap": 0.75,
+      "domain": "quality"
+    },
+    {
+      "workflow_a": "copilot-session-insights",
+      "workflow_b": "typist",
+      "overlap": 0.75,
+      "domain": "quality"
+    },
+    {
+      "workflow_a": "daily-code-metrics",
+      "workflow_b": "docs-noob-tester",
+      "overlap": 0.75,
+      "domain": "quality"
+    },
+    {
+      "workflow_a": "daily-community-attribution",
+      "workflow_b": "daily-rendering-scripts-verifier",
+      "overlap": 0.75,
+      "domain": "docs"
+    },
+    {
+      "workflow_a": "daily-compiler-quality",
+      "workflow_b": "go-fan",
+      "overlap": 0.75,
+      "domain": "quality"
+    },
+    {
+      "workflow_a": "daily-compiler-quality",
+      "workflow_b": "schema-consistency-checker",
+      "overlap": 0.75,
+      "domain": "quality"
+    }
+  ]
+}
