@@ -69,9 +69,10 @@ plugins:
 
 	require.NoError(t, err)
 	assert.True(t, applied, "Codemod should have been applied")
-	assert.NotContains(t, result, "\nplugins:", "top-level plugins key should be removed")
+	assertNoTopLevelPluginsKey(t, result)
 	assert.Contains(t, result, "imports:", "imports key should be present")
 	assert.Contains(t, result, "- uses: shared/copilot-plugins.md", "shared workflow import should be present")
+	assert.Contains(t, result, "with:\n      plugins:", "nested plugins input under with should be preserved")
 	assert.Contains(t, result, "plugins: [\"github/test-plugin\", \"acme/custom-tools\"]", "plugin list should be preserved")
 }
 
@@ -107,9 +108,10 @@ plugins:
 
 	require.NoError(t, err)
 	assert.True(t, applied, "Codemod should have been applied")
-	assert.NotContains(t, result, "\nplugins:", "top-level plugins key should be removed")
+	assertNoTopLevelPluginsKey(t, result)
 	assert.Contains(t, result, "imports:", "imports key should be present")
 	assert.Contains(t, result, "- uses: shared/copilot-plugins.md", "shared workflow import should be present")
+	assert.Contains(t, result, "with:\n      plugins:", "nested plugins input under with should be preserved")
 	assert.Contains(t, result, "plugins: [\"github/test-plugin\", \"acme/custom-tools\"]", "repos list should map to plugins input")
 	assert.Contains(t, result, "github-token: ${{ secrets.MY_TOKEN }}", "github-token should be preserved")
 }
@@ -146,8 +148,23 @@ plugins:
 
 	require.NoError(t, err)
 	assert.True(t, applied, "Codemod should have been applied")
-	assert.NotContains(t, result, "\nplugins:", "plugins field should be removed")
+	assertNoTopLevelPluginsKey(t, result)
 	assert.Equal(t, 1, strings.Count(result, "shared/copilot-plugins.md"), "Codemod should not add duplicate imports")
+}
+
+func TestHasCopilotPluginsSharedImport_AcceptsExtensionlessPath(t *testing.T) {
+	frontmatter := map[string]any{
+		"imports": []any{
+			"shared/copilot-plugins",
+		},
+	}
+
+	assert.True(t, hasCopilotPluginsSharedImport(frontmatter), "Extensionless shared/copilot-plugins import should be detected")
+}
+
+func assertNoTopLevelPluginsKey(t *testing.T, content string) {
+	t.Helper()
+	assert.NotRegexp(t, `(?m)^plugins:`, content, "top-level plugins key should be removed")
 }
 
 func TestPluginsToSharedImportCodemod_PreservesMarkdownBody(t *testing.T) {

@@ -26,8 +26,12 @@ func getPluginsToSharedImportCodemod() Codemod {
 			}
 
 			plugins, githubToken, ok := extractPluginsMigrationConfig(pluginsAny)
-			if !ok || len(plugins) == 0 {
-				pluginsCodemodLog.Print("Found plugins field but it was empty or invalid - skipping migration")
+			if !ok {
+				pluginsCodemodLog.Print("Found plugins field but format was invalid - skipping migration")
+				return content, false, nil
+			}
+			if len(plugins) == 0 {
+				pluginsCodemodLog.Print("Found plugins field but plugin list was empty - skipping migration")
 				return content, false, nil
 			}
 
@@ -131,7 +135,16 @@ func isCopilotPluginsImportPath(path string) bool {
 	return trimmed == "shared/copilot-plugins.md" || trimmed == "shared/copilot-plugins"
 }
 
+// addCopilotPluginsImport appends an import entry for shared/copilot-plugins.md.
+// Insertion priority is:
+//  1. Append to existing imports block.
+//  2. Create imports block after engine.
+//  3. Otherwise create imports block after on.
+//  4. Otherwise create imports block after the first top-level key.
+//  5. As a last resort, append at the end.
 func addCopilotPluginsImport(lines []string, plugins []string, githubToken string) []string {
+	// formatStringArrayInline is shared with codemod_serena_import.go and keeps
+	// array formatting consistent across import migration codemods.
 	entry := []string{
 		"  - uses: shared/copilot-plugins.md",
 		"    with:",
@@ -166,11 +179,36 @@ func addCopilotPluginsImport(lines []string, plugins []string, githubToken strin
 	}
 
 	insertAt := 0
+	foundInsertPoint := false
 	for i, line := range lines {
-		if isTopLevelKey(line) && strings.HasPrefix(strings.TrimSpace(line), "engine:") {
+		trimmed := strings.TrimSpace(line)
+		if isTopLevelKey(line) && strings.HasPrefix(trimmed, "engine:") {
 			insertAt = i + 1
+			foundInsertPoint = true
 			break
 		}
+	}
+	if !foundInsertPoint {
+		for i, line := range lines {
+			trimmed := strings.TrimSpace(line)
+			if isTopLevelKey(line) && strings.HasPrefix(trimmed, "on:") {
+				insertAt = i + 1
+				foundInsertPoint = true
+				break
+			}
+		}
+	}
+	if !foundInsertPoint {
+		for i, line := range lines {
+			if isTopLevelKey(line) {
+				insertAt = i + 1
+				foundInsertPoint = true
+				break
+			}
+		}
+	}
+	if !foundInsertPoint {
+		insertAt = len(lines)
 	}
 
 	importBlock := make([]string, 0, 1+len(entry))
@@ -184,6 +222,8 @@ func addCopilotPluginsImport(lines []string, plugins []string, githubToken strin
 	return result
 }
 
+// removeTopLevelBlock removes a top-level YAML block (e.g. plugins:) and all
+// nested lines until the next top-level key or end of frontmatter.
 func removeTopLevelBlock(lines []string, blockName string) ([]string, bool) {
 	blockIdx := -1
 	blockEnd := len(lines)

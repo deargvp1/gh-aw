@@ -52,6 +52,11 @@ jobs:
         id: copilot_plugins_pack
         uses: microsoft/apm-action@v1.4.1
         env:
+          # Token precedence:
+          # 1) import-provided github-token from github.aw.import-inputs.github-token (workflow-specific override)
+          # 2) GH_AW_PLUGINS_TOKEN (plugin/package access token)
+          # 3) GH_AW_GITHUB_TOKEN (general gh-aw token)
+          # 4) GITHUB_TOKEN (default fallback)
           GITHUB_TOKEN: ${{ github.aw.import-inputs.github-token || secrets.GH_AW_PLUGINS_TOKEN || secrets.GH_AW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
         with:
           dependencies: ${{ steps.copilot_plugins_prep.outputs.deps }}
@@ -79,7 +84,13 @@ jobs:
 
       - name: Find Copilot plugin bundle path
         id: copilot_plugins_bundle
-        run: echo "path=$(find /tmp/gh-aw/copilot-plugins-bundle -name '*.tar.gz' | head -1)" >> "$GITHUB_OUTPUT"
+        run: |
+          BUNDLE_PATH="$(find /tmp/gh-aw/copilot-plugins-bundle -name '*.tar.gz' | head -1)"
+          if [ -z "$BUNDLE_PATH" ]; then
+            echo "No Copilot plugin bundle (.tar.gz) found in /tmp/gh-aw/copilot-plugins-bundle" >&2
+            exit 1
+          fi
+          echo "path=$BUNDLE_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Restore Copilot plugins before checkout
         uses: microsoft/apm-action@v1.4.1
