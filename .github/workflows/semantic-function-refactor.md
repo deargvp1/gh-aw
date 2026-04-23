@@ -13,7 +13,9 @@ permissions:
 engine: claude
 
 imports:
-  - shared/go-source-analysis.md
+  - uses: shared/go-daily-audit.md
+    with:
+      title-prefix: "[semantic-function-refactor] "
 
 safe-outputs:
   close-issue:

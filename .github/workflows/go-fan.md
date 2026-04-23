@@ -23,11 +23,10 @@ network:
     - go
 
 imports:
-  - uses: shared/daily-audit-discussion.md
+  - uses: shared/go-daily-audit.md
     with:
       title-prefix: "[go-fan] "
-      expires: 1d
-  - shared/go-source-analysis.md
+      expires: "1d"
 
 tools:
   mount-as-clis: true

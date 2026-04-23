@@ -10,7 +10,9 @@ permissions:
   pull-requests: read
 engine: codex
 imports:
-  - shared/go-source-analysis.md
+  - uses: shared/go-daily-audit.md
+    with:
+      title-prefix: "[duplicate-code] "
 safe-outputs:
   create-issue:
     expires: 2d

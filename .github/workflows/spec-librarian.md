@@ -16,8 +16,9 @@ engine: copilot
 strict: true
 
 imports:
-  - shared/reporting.md
-  - shared/go-source-analysis.md
+  - uses: shared/go-daily-audit.md
+    with:
+      title-prefix: "[spec-librarian] "
 
 network:
   allowed:
