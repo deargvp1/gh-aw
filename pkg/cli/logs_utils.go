@@ -118,7 +118,7 @@ func resolveExcludeWorkflows(excludes []string, verbose bool) []string {
 }
 
 // isWorkflowExcluded reports whether a workflow display name matches any entry in the exclude list.
-// Matching is case-insensitive to be resilient to capitalisation differences.
+// Matching is case-insensitive to be resilient to capitalization differences.
 func isWorkflowExcluded(workflowName string, excludes []string) bool {
 	lowerName := strings.ToLower(workflowName)
 	for _, ex := range excludes {
