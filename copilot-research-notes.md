@@ -2,6 +2,26 @@
 
 ## Analysis History
 
+### 2026-04-25 (Run 24940623939)
+- 202 total MD workflows; 91 explicit copilot (45%)
+- **bare mode RECOVERED**: 8 workflows (from 0 yesterday → possibly counting method stabilized)
+- **version pinning newly detected**: 10 workflows now pin Copilot CLI version
+- **mcp-scripts jump**: 6 workflows (from 1 yesterday — significant adoption gain)
+- **cache-memory**: 49 direct uses (true = 49, custom paths = 11+)
+- **safe-outputs**: 166 occurrences across workflows
+- **web-fetch**: 19, **web-search**: 2 (stable)
+- **max-continuations**: 2 (stable — persistent gap)
+- **startup-timeout / tool-timeout**: 0 (10th consecutive run — persistent gap)
+- **api-target**: 0 (persistent gap — no GHEC/GHES users evident)
+- **engine.agent** custom: 10 workflows (up from 7)
+- **AWF sandbox**: ~11 workflows
+- **model overrides**: 10 workflows (stable)
+- **Custom agent files still unused**: grumpy-reviewer, w3c-specification-writer, create-safe-output-type, custom-engine-implementation, interactive-agent-designer
+- **toolsets [all]**: 3 workflows — overly broad GitHub access risk
+- **toolsets empty**: ~18 workflows — no GitHub tool scoping
+
+
+
 ### 2026-04-21 (Run 24746483988)
 - 197 total MD workflows; 87 explicit copilot + 24 default = 111 total Copilot effective
 - 46 Claude, 10 Codex workflows
