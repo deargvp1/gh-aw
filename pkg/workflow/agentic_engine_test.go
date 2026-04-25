@@ -209,3 +209,82 @@ func TestEngineRegistry_GetAllAgentManifestFiles(t *testing.T) {
 		assert.Empty(t, files, "empty registry should return no manifest files")
 	})
 }
+
+func TestEngineRegistry_GetEngineAgentManifestFolders(t *testing.T) {
+	t.Run("known engine returns its specific folders plus .agents", func(t *testing.T) {
+		registry := NewEngineRegistry()
+		folders := registry.GetEngineAgentManifestFolders("claude")
+		assert.Contains(t, folders, ".agents", "claude folders should always include .agents platform directory")
+		assert.Contains(t, folders, ".claude", "claude folders should include .claude config directory")
+		assert.NotContains(t, folders, ".gemini", "claude folders should not include .gemini")
+		assert.NotContains(t, folders, ".codex", "claude folders should not include .codex")
+		assert.NotContains(t, folders, ".crush", "claude folders should not include .crush")
+	})
+
+	t.Run("copilot engine returns its specific folders plus .agents", func(t *testing.T) {
+		registry := NewEngineRegistry()
+		folders := registry.GetEngineAgentManifestFolders("copilot")
+		assert.Contains(t, folders, ".agents", "copilot folders should always include .agents platform directory")
+		assert.Contains(t, folders, ".github", "copilot folders should include .github config directory")
+		assert.NotContains(t, folders, ".claude", "copilot folders should not include .claude")
+	})
+
+	t.Run("unknown engine ID returns only .agents", func(t *testing.T) {
+		registry := NewEngineRegistry()
+		folders := registry.GetEngineAgentManifestFolders("unknown-engine")
+		assert.Equal(t, []string{".agents"}, folders, "unknown engine should return only .agents")
+	})
+
+	t.Run("empty engine ID returns only .agents", func(t *testing.T) {
+		registry := NewEngineRegistry()
+		folders := registry.GetEngineAgentManifestFolders("")
+		assert.Equal(t, []string{".agents"}, folders, "empty engine ID should return only .agents")
+	})
+
+	t.Run("result is sorted and deduplicated", func(t *testing.T) {
+		registry := NewEngineRegistry()
+		folders := registry.GetEngineAgentManifestFolders("claude")
+		for i := 1; i < len(folders); i++ {
+			assert.Less(t, folders[i-1], folders[i], "manifest folders should be sorted and deduplicated")
+		}
+	})
+}
+
+func TestEngineRegistry_GetEngineAgentManifestFiles(t *testing.T) {
+	t.Run("claude engine returns its specific files", func(t *testing.T) {
+		registry := NewEngineRegistry()
+		files := registry.GetEngineAgentManifestFiles("claude")
+		assert.Contains(t, files, "CLAUDE.md", "claude files should include CLAUDE.md")
+		assert.Contains(t, files, "AGENTS.md", "claude files should include AGENTS.md")
+		assert.NotContains(t, files, "GEMINI.md", "claude files should not include GEMINI.md")
+		assert.NotContains(t, files, "opencode.jsonc", "claude files should not include opencode.jsonc")
+	})
+
+	t.Run("gemini engine returns its specific files", func(t *testing.T) {
+		registry := NewEngineRegistry()
+		files := registry.GetEngineAgentManifestFiles("gemini")
+		assert.Contains(t, files, "GEMINI.md", "gemini files should include GEMINI.md")
+		assert.Contains(t, files, "AGENTS.md", "gemini files should include AGENTS.md")
+		assert.NotContains(t, files, "CLAUDE.md", "gemini files should not include CLAUDE.md")
+	})
+
+	t.Run("unknown engine ID returns nil", func(t *testing.T) {
+		registry := NewEngineRegistry()
+		files := registry.GetEngineAgentManifestFiles("unknown-engine")
+		assert.Nil(t, files, "unknown engine should return nil")
+	})
+
+	t.Run("empty engine ID returns nil", func(t *testing.T) {
+		registry := NewEngineRegistry()
+		files := registry.GetEngineAgentManifestFiles("")
+		assert.Nil(t, files, "empty engine ID should return nil")
+	})
+
+	t.Run("result is sorted and deduplicated", func(t *testing.T) {
+		registry := NewEngineRegistry()
+		files := registry.GetEngineAgentManifestFiles("claude")
+		for i := 1; i < len(files); i++ {
+			assert.Less(t, files[i-1], files[i], "manifest files should be sorted and deduplicated")
+		}
+	})
+}

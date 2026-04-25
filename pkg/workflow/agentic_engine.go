@@ -566,6 +566,57 @@ func (r *EngineRegistry) GetAllAgentManifestFiles() []string {
 	return result
 }
 
+// GetEngineAgentManifestFolders returns the manifest folder prefixes for the engine
+// with the given ID, with trailing slashes stripped. Always includes ".agents" as the
+// gh-aw platform agent directory. Returns [".agents"] if the engine is not found or
+// does not provide any path prefixes. The returned list is sorted and deduplicated.
+func (r *EngineRegistry) GetEngineAgentManifestFolders(engineID string) []string {
+	seen := map[string]bool{}
+	var result []string
+	if engine, exists := r.engines[engineID]; exists {
+		if provider, ok := engine.(AgentFileProvider); ok {
+			for _, prefix := range provider.GetAgentManifestPathPrefixes() {
+				folder := strings.TrimSuffix(prefix, "/")
+				if folder != "" && !seen[folder] {
+					seen[folder] = true
+					result = append(result, folder)
+				}
+			}
+		}
+	}
+	// Always include .agents — the gh-aw platform agent directory.
+	// It is not owned by any specific engine but must always be snapshotted.
+	if !seen[".agents"] {
+		result = append(result, ".agents")
+	}
+	sort.Strings(result)
+	return result
+}
+
+// GetEngineAgentManifestFiles returns the manifest files for the engine with the given ID.
+// Returns nil if the engine is not found or does not provide any manifest files.
+// The returned list is sorted and deduplicated.
+func (r *EngineRegistry) GetEngineAgentManifestFiles(engineID string) []string {
+	engine, exists := r.engines[engineID]
+	if !exists {
+		return nil
+	}
+	provider, ok := engine.(AgentFileProvider)
+	if !ok {
+		return nil
+	}
+	seen := map[string]bool{}
+	var result []string
+	for _, file := range provider.GetAgentManifestFiles() {
+		if !seen[file] {
+			seen[file] = true
+			result = append(result, file)
+		}
+	}
+	sort.Strings(result)
+	return result
+}
+
 // GetEngineByPrefix returns an engine that matches the given prefix
 // This is useful for backward compatibility with strings like "codex-experimental"
 func (r *EngineRegistry) GetEngineByPrefix(prefix string) (CodingAgentEngine, error) {

@@ -342,9 +342,13 @@ func (c *Compiler) generateMainJobSteps(yaml *strings.Builder, data *WorkflowDat
 	// placed in .github/skills/ by pre-agent-steps are not clobbered by this restore.
 	if ShouldGeneratePRCheckoutStep(data) {
 		registry := GetGlobalEngineRegistry()
+		engineID := ""
+		if data.EngineConfig != nil {
+			engineID = data.EngineConfig.ID
+		}
 		generateRestoreBaseGitHubFoldersStep(yaml,
-			registry.GetAllAgentManifestFolders(),
-			registry.GetAllAgentManifestFiles(),
+			registry.GetEngineAgentManifestFolders(engineID),
+			registry.GetEngineAgentManifestFiles(engineID),
 		)
 	}
 

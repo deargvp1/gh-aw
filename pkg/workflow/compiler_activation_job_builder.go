@@ -200,9 +200,13 @@ func (c *Compiler) addActivationRepositoryAndOutputSteps(ctx *activationJobBuild
 	if len(checkoutSteps) > 0 {
 		compilerActivationJobLog.Print("Adding step to save agent config folders for base branch restoration")
 		registry := GetGlobalEngineRegistry()
+		engineID := ""
+		if ctx.data != nil && ctx.data.EngineConfig != nil {
+			engineID = ctx.data.EngineConfig.ID
+		}
 		ctx.steps = append(ctx.steps, generateSaveBaseGitHubFoldersStep(
-			registry.GetAllAgentManifestFolders(),
-			registry.GetAllAgentManifestFiles(),
+			registry.GetEngineAgentManifestFolders(engineID),
+			registry.GetEngineAgentManifestFiles(engineID),
 		)...)
 	}
 
