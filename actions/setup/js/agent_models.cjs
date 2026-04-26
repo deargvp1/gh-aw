@@ -18,18 +18,20 @@
  * github-script convenience wrapper (uses core.* globals):
  *   main()   — reads env vars and delegates to queryModels()
  *
- * Required environment variables when using main():
- *   - GH_AW_MODELS_ROUTE:       Route path for the models endpoint (e.g. "/models")
- *   - GITHUB_COPILOT_BASE_URL:  API base URL; assembled with GH_AW_MODELS_ROUTE to form the full URL
- *   - COPILOT_GITHUB_TOKEN:     Bearer token for authentication
- *   - GH_AW_ENGINE_ID:          Agentic engine identifier (e.g. "copilot")
- *   - GH_AW_ENGINE_VERSION:     Version string of the engine CLI
+ * Required environment variables (set by the Go engine via GH_AW_MODELS_* vars):
+ *   - GH_AW_MODELS_ROUTE:            Route path for the models endpoint (e.g. "/models")
+ *   - GH_AW_MODELS_BASE_URL_ENV:     Name of the env var that holds the API base URL at runtime
+ *                                    (e.g. "GITHUB_COPILOT_BASE_URL", "ANTHROPIC_BASE_URL")
+ *   - GH_AW_MODELS_DEFAULT_BASE_URL: Fallback base URL when the above env var is not set
+ *   - GH_AW_MODELS_TOKEN_ENV:        Name of the env var that holds the auth token
+ *                                    (e.g. "COPILOT_GITHUB_TOKEN", "ANTHROPIC_API_KEY")
+ *   - GH_AW_ENGINE_ID:               Agentic engine identifier (e.g. "copilot")
  */
 
 const fs = require("fs");
 const { getErrorMessage } = require("./error_helpers.cjs");
 
-/** Default Copilot API base URL when GITHUB_COPILOT_BASE_URL is not configured. */
+/** Default Copilot API base URL — used as last-resort fallback when no engine-specific default is provided. */
 const DEFAULT_COPILOT_BASE_URL = "https://api.githubcopilot.com";
 
 /** Path where model data is written so it is bundled in the agent artifact. */
@@ -37,6 +39,33 @@ const AGENTS_JSON_PATH = "/tmp/gh-aw/agents.json";
 
 /** Request timeout in milliseconds for the models HTTP call. */
 const REQUEST_TIMEOUT_MS = 15_000;
+
+/**
+ * Resolve the effective models endpoint URL from environment variables set by the Go engine.
+ * Uses GH_AW_MODELS_BASE_URL_ENV to dynamically look up the runtime base URL, falling back to
+ * GH_AW_MODELS_DEFAULT_BASE_URL and then DEFAULT_COPILOT_BASE_URL.
+ *
+ * @param {string} modelsRoute - Route path from GH_AW_MODELS_ROUTE (e.g. "/models")
+ * @returns {string} Full models endpoint URL
+ */
+function resolveModelsEndpoint(modelsRoute) {
+  const baseUrlEnvName = process.env.GH_AW_MODELS_BASE_URL_ENV;
+  const runtimeBaseUrl = baseUrlEnvName ? process.env[baseUrlEnvName] : undefined;
+  const defaultBaseUrl = process.env.GH_AW_MODELS_DEFAULT_BASE_URL || DEFAULT_COPILOT_BASE_URL;
+  const baseUrl = (runtimeBaseUrl || defaultBaseUrl).replace(/\/$/, "");
+  return baseUrl + modelsRoute;
+}
+
+/**
+ * Resolve the authentication token from the env var named by GH_AW_MODELS_TOKEN_ENV,
+ * falling back to COPILOT_GITHUB_TOKEN for backwards compatibility.
+ *
+ * @returns {string | undefined}
+ */
+function resolveModelsToken() {
+  const tokenEnvName = process.env.GH_AW_MODELS_TOKEN_ENV;
+  return tokenEnvName ? process.env[tokenEnvName] : process.env.COPILOT_GITHUB_TOKEN;
+}
 
 /**
  * Perform an HTTP GET request to the models endpoint and return the parsed JSON body.
@@ -191,6 +220,7 @@ async function queryModels({ endpoint, token, engineId, engineVersion, agentsJso
 
 /**
  * Main entry point — called by the compiler-generated github-script step.
+ * Reads engine identity from GH_AW_MODELS_* env vars set by the Go engine.
  * Exits cleanly (non-fatal) when required env vars are absent.
  */
 async function main() {
@@ -200,15 +230,13 @@ async function main() {
     return;
   }
 
-  const authToken = process.env.COPILOT_GITHUB_TOKEN;
+  const authToken = resolveModelsToken();
   if (!authToken) {
-    core.info("COPILOT_GITHUB_TOKEN is not set — skipping models query");
+    core.info("Auth token env var is not set — skipping models query");
     return;
   }
 
-  const baseUrl = (process.env.GITHUB_COPILOT_BASE_URL || DEFAULT_COPILOT_BASE_URL).replace(/\/$/, "");
-  const endpoint = baseUrl + modelsRoute;
-
+  const endpoint = resolveModelsEndpoint(modelsRoute);
   const engineId = process.env.GH_AW_ENGINE_ID || "copilot";
   const engineVersion = process.env.GH_AW_ENGINE_VERSION || "unknown";
 
@@ -229,15 +257,33 @@ module.exports = {
   extractModelsList,
   buildModelsMarkdown,
   logModels,
+  resolveModelsEndpoint,
+  resolveModelsToken,
   AGENTS_JSON_PATH,
   REQUEST_TIMEOUT_MS,
   DEFAULT_COPILOT_BASE_URL,
 };
 
 if (require.main === module) {
-  main().catch(err => {
-    // eslint-disable-next-line no-console
-    console.error(`[agent_models] unexpected error: ${err.message}`);
-    process.exit(1);
+  // Standalone mode: invoked directly from a shell preamble (e.g. node agent_models.cjs).
+  // Reads all config from GH_AW_MODELS_* environment variables; no github-script context needed.
+  const modelsRoute = process.env.GH_AW_MODELS_ROUTE;
+  if (!modelsRoute) process.exit(0); // Nothing configured — silent skip
+
+  const authToken = resolveModelsToken();
+  if (!authToken) process.exit(0); // Token unavailable (e.g. secret excluded in AWF sandbox)
+
+  const endpoint = resolveModelsEndpoint(modelsRoute);
+  const engineId = process.env.GH_AW_ENGINE_ID || "unknown";
+
+  queryModels({
+    endpoint,
+    token: authToken,
+    engineId,
+    engineVersion: "unknown",
+    stepSummaryPath: process.env.GITHUB_STEP_SUMMARY || null,
+    logFn: msg => process.stderr.write(`[agent_models] ${msg}\n`),
+  }).catch(e => {
+    process.stderr.write(`[agent_models] warning: ${e.message || e}\n`);
   });
 }

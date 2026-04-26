@@ -365,16 +365,10 @@ touch %s
 		env["GH_AW_VERSION"] = "dev"
 	}
 
-	// Expose the models route to the driver so it can query available models before the
-	// agent starts. Only emitted for agent runs (not detection) to avoid unnecessary requests.
-	// The driver reads GH_AW_MODELS_ROUTE and combines it with GITHUB_COPILOT_BASE_URL
-	// to construct the full URL, ensuring requests are routed through the gateway.
-	// When either env var is absent the driver skips the query silently.
-	if !workflowData.IsDetectionRun {
-		if route := e.GetModelsRoute(); route != "" {
-			env["GH_AW_MODELS_ROUTE"] = route
-		}
-	}
+	// Expose models-query env vars so the driver can query available models before the
+	// agent starts. The shared helper emits GH_AW_MODELS_ROUTE, GH_AW_MODELS_BASE_URL_ENV,
+	// GH_AW_MODELS_DEFAULT_BASE_URL, and GH_AW_MODELS_TOKEN_ENV for non-detection runs.
+	applyModelsRouteEnvVarsToMap(env, e, workflowData)
 
 	// Add GH_AW_MCP_CONFIG for MCP server configuration only if there are MCP servers
 	if HasMCPServers(workflowData) {

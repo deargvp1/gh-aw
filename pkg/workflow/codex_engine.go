@@ -53,6 +53,29 @@ func (e *CodexEngine) GetModelEnvVarName() string {
 	return ""
 }
 
+// GetModelsRoute returns the route path of the OpenAI models endpoint.
+func (e *CodexEngine) GetModelsRoute() string {
+	return "/v1/models"
+}
+
+// GetModelsBaseURLEnvVar returns the env var name that holds the OpenAI API base URL.
+// The gateway sets this to its local proxy address when the LLM firewall is enabled.
+func (e *CodexEngine) GetModelsBaseURLEnvVar() string {
+	return "OPENAI_BASE_URL"
+}
+
+// GetModelsDefaultBaseURL returns the default OpenAI API base URL used as a
+// fallback when OPENAI_BASE_URL is not set at runtime.
+func (e *CodexEngine) GetModelsDefaultBaseURL() string {
+	return "https://api.openai.com"
+}
+
+// GetModelsTokenEnvVar returns the name of the env var that holds the OpenAI
+// authentication token used for models endpoint requests.
+func (e *CodexEngine) GetModelsTokenEnvVar() string {
+	return "CODEX_API_KEY"
+}
+
 // GetRequiredSecretNames returns the list of secrets required by the Codex engine
 // This includes CODEX_API_KEY, OPENAI_API_KEY, and optionally MCP_GATEWAY_API_KEY and mcp-scripts secrets
 func (e *CodexEngine) GetRequiredSecretNames(workflowData *WorkflowData) []string {
@@ -208,6 +231,8 @@ func (e *CodexEngine) GetExecutionSteps(workflowData *WorkflowData, logFile stri
 
 	// Build the full command with agent file handling and AWF wrapping if enabled
 	var command string
+	// Inject a best-effort models query before the main agent command.
+	modelsPreamble := generateModelsQueryPreamble(e, workflowData)
 	if firewallEnabled {
 		// Build AWF-wrapped command using helper function
 		// Get allowed domains (Codex defaults + network permissions + HTTP MCP server URLs + runtime ecosystem domains)
@@ -235,6 +260,10 @@ func (e *CodexEngine) GetExecutionSteps(workflowData *WorkflowData, logFile stri
 		if mcpCLIPath := GetMCPCLIPathSetup(workflowData); mcpCLIPath != "" {
 			codexCommandWithSetup = fmt.Sprintf("%s && %s", mcpCLIPath, codexCommandWithSetup)
 		}
+		// Prepend models query inside the AWF command (runs inside container)
+		if modelsPreamble != "" {
+			codexCommandWithSetup = fmt.Sprintf("%s && %s", modelsPreamble, codexCommandWithSetup)
+		}
 
 		command = BuildAWFCommand(AWFCommandConfig{
 			EngineName:     "codex",
@@ -256,12 +285,16 @@ func (e *CodexEngine) GetExecutionSteps(workflowData *WorkflowData, logFile stri
 		// For engines that do not support native agent-file handling (including Codex),
 		// the compiler prepends the agent file content to prompt.txt so no special
 		// shell variable juggling is needed here.
+		var modelsPreambleLine string
+		if modelsPreamble != "" {
+			modelsPreambleLine = modelsPreamble + "\n"
+		}
 		command = fmt.Sprintf(`set -o pipefail
 touch %s
 (umask 177 && touch %s)
 INSTRUCTION="$(cat "$GH_AW_PROMPT")"
 mkdir -p "$CODEX_HOME/logs"
-%s 2>&1 | tee %s`, AgentStepSummaryPath, logFile, codexCommand, logFile)
+%s%s 2>&1 | tee %s`, AgentStepSummaryPath, logFile, modelsPreambleLine, codexCommand, logFile)
 	}
 
 	// Get effective GitHub token based on precedence: custom token > default
@@ -332,6 +365,10 @@ mkdir -p "$CODEX_HOME/logs"
 	} else {
 		env[modelEnvVar] = fmt.Sprintf("${{ vars.%s || '' }}", modelEnvVar)
 	}
+
+	// Add models-query env vars so the JavaScript preamble can construct the
+	// full endpoint URL and locate the auth token at runtime.
+	applyModelsRouteEnvVarsToMap(env, e, workflowData)
 
 	// Add custom environment variables from engine config
 	if workflowData.EngineConfig != nil && len(workflowData.EngineConfig.Env) > 0 {

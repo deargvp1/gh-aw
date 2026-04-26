@@ -47,6 +47,29 @@ func (e *ClaudeEngine) GetAPMTarget() string {
 	return "claude"
 }
 
+// GetModelsRoute returns the route path of the Anthropic models endpoint.
+func (e *ClaudeEngine) GetModelsRoute() string {
+	return "/v1/models"
+}
+
+// GetModelsBaseURLEnvVar returns the env var name that holds the Anthropic API base URL.
+// The gateway sets this to its local proxy address when the LLM firewall is enabled.
+func (e *ClaudeEngine) GetModelsBaseURLEnvVar() string {
+	return "ANTHROPIC_BASE_URL"
+}
+
+// GetModelsDefaultBaseURL returns the default Anthropic API base URL used as a
+// fallback when ANTHROPIC_BASE_URL is not set at runtime.
+func (e *ClaudeEngine) GetModelsDefaultBaseURL() string {
+	return "https://api.anthropic.com"
+}
+
+// GetModelsTokenEnvVar returns the name of the env var that holds the Anthropic
+// authentication token used for models endpoint requests.
+func (e *ClaudeEngine) GetModelsTokenEnvVar() string {
+	return "ANTHROPIC_API_KEY"
+}
+
 // GetRequiredSecretNames returns the list of secrets required by the Claude engine
 // This includes ANTHROPIC_API_KEY and optionally MCP_GATEWAY_API_KEY and mcp-scripts secrets
 func (e *ClaudeEngine) GetRequiredSecretNames(workflowData *WorkflowData) []string {
@@ -246,6 +269,10 @@ func (e *ClaudeEngine) GetExecutionSteps(workflowData *WorkflowData, logFile str
 
 	// Build the full command based on whether firewall is enabled
 	var command string
+	// Inject a best-effort models query before the main agent command.
+	// For engines without a JS driver this is the only place to run the query.
+	// In AWF mode the token is excluded from the container so the preamble silently skips.
+	modelsPreamble := generateModelsQueryPreamble(e, workflowData)
 	if isFirewallEnabled(workflowData) {
 		// Build the AWF-wrapped command using helper function
 		// Get allowed domains (Claude defaults + network permissions + HTTP MCP server URLs + runtime ecosystem domains)
@@ -267,6 +294,10 @@ func (e *ClaudeEngine) GetExecutionSteps(workflowData *WorkflowData, logFile str
 		if mcpCLIPath := GetMCPCLIPathSetup(workflowData); mcpCLIPath != "" {
 			claudeCommandWithPath = fmt.Sprintf("%s && %s", mcpCLIPath, claudeCommandWithPath)
 		}
+		// Prepend models query inside the AWF command (runs inside container)
+		if modelsPreamble != "" {
+			claudeCommandWithPath = fmt.Sprintf("%s && %s", modelsPreamble, claudeCommandWithPath)
+		}
 
 		command = BuildAWFCommand(AWFCommandConfig{
 			EngineName:     "claude",
@@ -286,11 +317,15 @@ func (e *ClaudeEngine) GetExecutionSteps(workflowData *WorkflowData, logFile str
 		// Use tee to capture stdout (stream-json output) to the log file while also displaying on console
 		// The combined output (debug logs + JSON) will be in the log file for parsing
 		// PATH is already set correctly by actions/setup-* steps which prepend to PATH
+		var modelsPreambleSection string
+		if modelsPreamble != "" {
+			modelsPreambleSection = "          " + modelsPreamble + "\n"
+		}
 		command = fmt.Sprintf(`set -o pipefail
           touch %s
           (umask 177 && touch %s)
-          # Execute Claude Code CLI with prompt from file
-          %s 2>&1 | tee -a %s`, AgentStepSummaryPath, logFile, claudeCommand, logFile)
+          %s# Execute Claude Code CLI with prompt from file
+          %s 2>&1 | tee -a %s`, AgentStepSummaryPath, logFile, modelsPreambleSection, claudeCommand, logFile)
 	}
 
 	// Build environment variables map
@@ -391,6 +426,10 @@ func (e *ClaudeEngine) GetExecutionSteps(workflowData *WorkflowData, logFile str
 			env[constants.EnvVarModelAgentClaude] = fmt.Sprintf("${{ vars.%s || '' }}", constants.EnvVarModelAgentClaude)
 		}
 	}
+
+	// Add models-query env vars so the JavaScript preamble (injected above)
+	// can construct the full endpoint URL and locate the auth token at runtime.
+	applyModelsRouteEnvVarsToMap(env, e, workflowData)
 
 	// Add custom environment variables from engine config
 	if workflowData.EngineConfig != nil && len(workflowData.EngineConfig.Env) > 0 {

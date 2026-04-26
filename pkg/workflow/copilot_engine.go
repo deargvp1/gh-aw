@@ -138,6 +138,24 @@ func (e *CopilotEngine) GetModelsRoute() string {
 	return "/models"
 }
 
+// GetModelsBaseURLEnvVar returns the name of the env var that holds the Copilot
+// API base URL at runtime. The gateway sets this to its local proxy address.
+func (e *CopilotEngine) GetModelsBaseURLEnvVar() string {
+	return "GITHUB_COPILOT_BASE_URL"
+}
+
+// GetModelsDefaultBaseURL returns the default Copilot API base URL used as a
+// fallback when GITHUB_COPILOT_BASE_URL is not set at runtime.
+func (e *CopilotEngine) GetModelsDefaultBaseURL() string {
+	return "https://" + constants.GitHubCopilotMCPDomain
+}
+
+// GetModelsTokenEnvVar returns the name of the env var that holds the Copilot
+// authentication token used for models endpoint requests.
+func (e *CopilotEngine) GetModelsTokenEnvVar() string {
+	return "COPILOT_GITHUB_TOKEN"
+}
+
 // GetExecutionSteps is implemented in copilot_engine_execution.go
 
 // RenderMCPConfig is implemented in copilot_mcp.go

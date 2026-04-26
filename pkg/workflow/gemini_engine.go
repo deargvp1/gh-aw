@@ -38,6 +38,29 @@ func (e *GeminiEngine) GetModelEnvVarName() string {
 	return constants.GeminiCLIModelEnvVar
 }
 
+// GetModelsRoute returns the route path of the Gemini models endpoint.
+func (e *GeminiEngine) GetModelsRoute() string {
+	return "/v1/models"
+}
+
+// GetModelsBaseURLEnvVar returns the env var name that holds the Gemini API base URL.
+// The gateway sets this to its local proxy address when the LLM firewall is enabled.
+func (e *GeminiEngine) GetModelsBaseURLEnvVar() string {
+	return "GEMINI_API_BASE_URL"
+}
+
+// GetModelsDefaultBaseURL returns the default Gemini API base URL used as a
+// fallback when GEMINI_API_BASE_URL is not set at runtime.
+func (e *GeminiEngine) GetModelsDefaultBaseURL() string {
+	return "https://generativelanguage.googleapis.com"
+}
+
+// GetModelsTokenEnvVar returns the name of the env var that holds the Gemini
+// authentication token used for models endpoint requests.
+func (e *GeminiEngine) GetModelsTokenEnvVar() string {
+	return "GEMINI_API_KEY"
+}
+
 // GetRequiredSecretNames returns the list of secrets required by the Gemini engine
 // This includes GEMINI_API_KEY and optionally MCP_GATEWAY_API_KEY, GITHUB_MCP_SERVER_TOKEN,
 // HTTP MCP header secrets, and mcp-scripts secrets
@@ -194,6 +217,8 @@ func (e *GeminiEngine) GetExecutionSteps(workflowData *WorkflowData, logFile str
 
 	// Build the full command with AWF wrapping if enabled
 	var command string
+	// Inject a best-effort models query before the main agent command.
+	modelsPreamble := generateModelsQueryPreamble(e, workflowData)
 	firewallEnabled := isFirewallEnabled(workflowData)
 	if firewallEnabled {
 		allowedDomains := GetGeminiAllowedDomainsWithToolsAndRuntimes(
@@ -212,6 +237,10 @@ func (e *GeminiEngine) GetExecutionSteps(workflowData *WorkflowData, logFile str
 		if mcpCLIPath := GetMCPCLIPathSetup(workflowData); mcpCLIPath != "" {
 			geminiCommandWithPath = fmt.Sprintf("%s && %s", mcpCLIPath, geminiCommandWithPath)
 		}
+		// Prepend models query inside the AWF command (runs inside container)
+		if modelsPreamble != "" {
+			geminiCommandWithPath = fmt.Sprintf("%s && %s", modelsPreamble, geminiCommandWithPath)
+		}
 
 		command = BuildAWFCommand(AWFCommandConfig{
 			EngineName:     "gemini",
@@ -229,10 +258,14 @@ func (e *GeminiEngine) GetExecutionSteps(workflowData *WorkflowData, logFile str
 			ExcludeEnvVarNames: ComputeAWFExcludeEnvVarNames(workflowData, []string{"GEMINI_API_KEY"}),
 		})
 	} else {
+		var modelsPreambleLine string
+		if modelsPreamble != "" {
+			modelsPreambleLine = modelsPreamble + "\n"
+		}
 		command = fmt.Sprintf(`set -o pipefail
 touch %s
 (umask 177 && touch %s)
-%s 2>&1 | tee -a %s`, AgentStepSummaryPath, logFile, geminiCommand, logFile)
+%s%s 2>&1 | tee -a %s`, AgentStepSummaryPath, logFile, modelsPreambleLine, geminiCommand, logFile)
 	}
 
 	// Build environment variables
@@ -297,6 +330,10 @@ touch %s
 		geminiLog.Printf("Setting %s env var for model: %s", constants.GeminiCLIModelEnvVar, workflowData.EngineConfig.Model)
 		env[constants.GeminiCLIModelEnvVar] = workflowData.EngineConfig.Model
 	}
+
+	// Add models-query env vars so the JavaScript preamble can construct the
+	// full endpoint URL and locate the auth token at runtime.
+	applyModelsRouteEnvVarsToMap(env, e, workflowData)
 
 	// Add custom environment variables from engine config.
 	// This allows users to override the default engine token expression (e.g.

@@ -825,7 +825,10 @@ jobs:
           GH_AW_ASSETS_BRANCH: "assets/${{ github.workflow }}"
           GH_AW_ASSETS_MAX_SIZE_KB: 10240
           GH_AW_MCP_CONFIG: /home/runner/.copilot/mcp-config.json
+          GH_AW_MODELS_BASE_URL_ENV: GITHUB_COPILOT_BASE_URL
+          GH_AW_MODELS_DEFAULT_BASE_URL: https://api.githubcopilot.com
           GH_AW_MODELS_ROUTE: /models
+          GH_AW_MODELS_TOKEN_ENV: COPILOT_GITHUB_TOKEN
           GH_AW_PHASE: agent
           GH_AW_PROMPT: /tmp/gh-aw/aw-prompts/prompt.txt
           GH_AW_SAFE_OUTPUTS: ${{ steps.set-runtime-paths.outputs.GH_AW_SAFE_OUTPUTS }}

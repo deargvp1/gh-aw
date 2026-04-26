@@ -255,14 +255,80 @@ type DriverProvider interface {
 // a models REST endpoint for listing available AI models. When implemented, the
 // driver JavaScript harness queries the endpoint before agent execution and stores
 // the results in /tmp/gh-aw/agents.json for inclusion in the artifact.
-// The route is combined with the configured API base URL (GITHUB_COPILOT_BASE_URL)
-// at runtime so the query works correctly through the gateway.
+// The route is combined with the configured API base URL at runtime so the query
+// works correctly through the gateway for any engine.
 type ModelsRouteProvider interface {
 	// GetModelsRoute returns the route path of the models endpoint
-	// (e.g. "/models"). The JavaScript harness combines this with the API base
-	// URL environment variable to construct the final request URL.
-	// Returns an empty string if the engine does not support models querying.
+	// (e.g. "/models" or "/v1/models"). Combined with GetModelsDefaultBaseURL or the
+	// runtime env var from GetModelsBaseURLEnvVar to form the full request URL.
 	GetModelsRoute() string
+
+	// GetModelsBaseURLEnvVar returns the name of the environment variable that holds
+	// the engine's API base URL at runtime (e.g. "GITHUB_COPILOT_BASE_URL",
+	// "ANTHROPIC_BASE_URL"). The gateway sets this variable to its local proxy address
+	// so the models query is automatically routed through the gateway.
+	GetModelsBaseURLEnvVar() string
+
+	// GetModelsDefaultBaseURL returns the fallback base URL to use when the env var
+	// named by GetModelsBaseURLEnvVar is not set at runtime
+	// (e.g. "https://api.githubcopilot.com", "https://api.anthropic.com").
+	GetModelsDefaultBaseURL() string
+
+	// GetModelsTokenEnvVar returns the name of the environment variable that holds
+	// the authentication token for the models request
+	// (e.g. "COPILOT_GITHUB_TOKEN", "ANTHROPIC_API_KEY"). When the variable is absent
+	// (e.g. inside the AWF sandbox where secrets are excluded) the query is skipped.
+	GetModelsTokenEnvVar() string
+}
+
+// applyModelsRouteEnvVarsToMap adds the models-query env vars to the provided map when:
+//   - this is not a detection run, and
+//   - the engine implements ModelsRouteProvider, and
+//   - GetModelsRoute() returns a non-empty string.
+//
+// The emitted variables are:
+//
+//	GH_AW_MODELS_ROUTE            — route path, e.g. "/models"
+//	GH_AW_MODELS_BASE_URL_ENV     — name of the runtime base-URL env var
+//	GH_AW_MODELS_DEFAULT_BASE_URL — fallback base URL when the above var is absent
+//	GH_AW_MODELS_TOKEN_ENV        — name of the runtime auth-token env var
+func applyModelsRouteEnvVarsToMap(env map[string]string, engine CodingAgentEngine, workflowData *WorkflowData) {
+	if workflowData.IsDetectionRun {
+		return
+	}
+	mrp, ok := engine.(ModelsRouteProvider)
+	if !ok {
+		return
+	}
+	route := mrp.GetModelsRoute()
+	if route == "" {
+		return
+	}
+	env["GH_AW_MODELS_ROUTE"] = route
+	env["GH_AW_MODELS_BASE_URL_ENV"] = mrp.GetModelsBaseURLEnvVar()
+	env["GH_AW_MODELS_DEFAULT_BASE_URL"] = mrp.GetModelsDefaultBaseURL()
+	env["GH_AW_MODELS_TOKEN_ENV"] = mrp.GetModelsTokenEnvVar()
+}
+
+// generateModelsQueryPreamble returns a shell one-liner that invokes agent_models.cjs
+// before the main agent command, or an empty string when:
+//   - this is a detection run,
+//   - the engine does not implement ModelsRouteProvider, or
+//   - the engine already handles model querying via its JS driver.
+//
+// The preamble is best-effort: stderr is discarded and failure never propagates.
+func generateModelsQueryPreamble(engine CodingAgentEngine, workflowData *WorkflowData) string {
+	if workflowData.IsDetectionRun {
+		return ""
+	}
+	if _, ok := engine.(ModelsRouteProvider); !ok {
+		return ""
+	}
+	// Engines with a JS driver handle the models query from within the driver itself.
+	if dp, hasDrv := engine.(DriverProvider); hasDrv && dp.GetDriverScriptName() != "" {
+		return ""
+	}
+	return fmt.Sprintf(`node "%s/agent_models.cjs" 2>/dev/null || true`, SetupActionDestinationShell)
 }
 
 // engineRequiresNodeDriver reports whether the engine's execution command wraps

@@ -1,13 +1,14 @@
 // @ts-check
 /// <reference types="@actions/github-script" />
 
-"use strict";
+import { describe, test, expect, beforeEach, afterEach, vi } from "vitest";
+import { createRequire } from "module";
+import fs from "fs";
+import os from "os";
+import path from "path";
 
-const fs = require("fs");
-const path = require("path");
-const os = require("os");
-
-const { main, queryModels, fetchModels, extractModelsList, buildModelsMarkdown, logModels, AGENTS_JSON_PATH, DEFAULT_COPILOT_BASE_URL } = require("./agent_models.cjs");
+const require = createRequire(import.meta.url);
+const { main, queryModels, extractModelsList, buildModelsMarkdown, logModels, resolveModelsEndpoint, resolveModelsToken, AGENTS_JSON_PATH, DEFAULT_COPILOT_BASE_URL } = require("./agent_models.cjs");
 
 // ---------------------------------------------------------------------------
 // Sample API response fixtures
@@ -130,6 +131,73 @@ describe("agent_models", () => {
   });
 
   // -------------------------------------------------------------------------
+  // resolveModelsEndpoint and resolveModelsToken — generic env var helpers
+  // -------------------------------------------------------------------------
+  describe("resolveModelsEndpoint", () => {
+    let savedEnv;
+    beforeEach(() => {
+      savedEnv = { ...process.env };
+    });
+    afterEach(() => {
+      process.env = savedEnv;
+    });
+
+    test("uses runtime env var when GH_AW_MODELS_BASE_URL_ENV points to a set var", () => {
+      process.env.GH_AW_MODELS_BASE_URL_ENV = "ANTHROPIC_BASE_URL";
+      process.env.ANTHROPIC_BASE_URL = "http://gateway:1234";
+      delete process.env.GH_AW_MODELS_DEFAULT_BASE_URL;
+      expect(resolveModelsEndpoint("/v1/models")).toBe("http://gateway:1234/v1/models");
+    });
+
+    test("falls back to GH_AW_MODELS_DEFAULT_BASE_URL when runtime var is absent", () => {
+      process.env.GH_AW_MODELS_BASE_URL_ENV = "ANTHROPIC_BASE_URL";
+      delete process.env.ANTHROPIC_BASE_URL;
+      process.env.GH_AW_MODELS_DEFAULT_BASE_URL = "https://api.anthropic.com";
+      expect(resolveModelsEndpoint("/v1/models")).toBe("https://api.anthropic.com/v1/models");
+    });
+
+    test("strips trailing slash from base URL", () => {
+      delete process.env.GH_AW_MODELS_BASE_URL_ENV;
+      process.env.GH_AW_MODELS_DEFAULT_BASE_URL = "https://api.example.com/";
+      expect(resolveModelsEndpoint("/models")).toBe("https://api.example.com/models");
+    });
+
+    test("falls back to DEFAULT_COPILOT_BASE_URL when nothing is configured", () => {
+      delete process.env.GH_AW_MODELS_BASE_URL_ENV;
+      delete process.env.GH_AW_MODELS_DEFAULT_BASE_URL;
+      expect(resolveModelsEndpoint("/models")).toBe(`${DEFAULT_COPILOT_BASE_URL}/models`);
+    });
+  });
+
+  describe("resolveModelsToken", () => {
+    let savedEnv;
+    beforeEach(() => {
+      savedEnv = { ...process.env };
+    });
+    afterEach(() => {
+      process.env = savedEnv;
+    });
+
+    test("returns token from env var named by GH_AW_MODELS_TOKEN_ENV", () => {
+      process.env.GH_AW_MODELS_TOKEN_ENV = "ANTHROPIC_API_KEY";
+      process.env.ANTHROPIC_API_KEY = "sk-ant-test";
+      expect(resolveModelsToken()).toBe("sk-ant-test");
+    });
+
+    test("falls back to COPILOT_GITHUB_TOKEN when GH_AW_MODELS_TOKEN_ENV is not set", () => {
+      delete process.env.GH_AW_MODELS_TOKEN_ENV;
+      process.env.COPILOT_GITHUB_TOKEN = "ghs_copilot_token";
+      expect(resolveModelsToken()).toBe("ghs_copilot_token");
+    });
+
+    test("returns undefined when both token env vars are absent", () => {
+      delete process.env.GH_AW_MODELS_TOKEN_ENV;
+      delete process.env.COPILOT_GITHUB_TOKEN;
+      expect(resolveModelsToken()).toBeUndefined();
+    });
+  });
+
+  // -------------------------------------------------------------------------
   // queryModels — core driver-context function
   // -------------------------------------------------------------------------
   describe("queryModels", () => {
@@ -162,12 +230,6 @@ describe("agent_models", () => {
       const agentsJsonPath = path.join(tmpDir, "agents.json");
       const summaryPath = path.join(tmpDir, "summary.md");
       const logs = [];
-
-      // Patch fetchModels to return fake data without a real network call
-      const originalFetch = require("https").request;
-      // We test the full integration indirectly via the unreachable-endpoint path;
-      // the unit test for the happy path mocks fs/fetchModels in the describe below.
-      // Here we verify that providing a valid path + no error writes to disk.
 
       // Use an in-process HTTP server to simulate a successful models response
       const http = require("http");
@@ -274,6 +336,7 @@ describe("agent_models", () => {
 
     test("skips when GH_AW_MODELS_ROUTE is not set", async () => {
       delete process.env.GH_AW_MODELS_ROUTE;
+      delete process.env.GH_AW_MODELS_TOKEN_ENV;
       delete process.env.COPILOT_GITHUB_TOKEN;
 
       await main();
@@ -281,28 +344,30 @@ describe("agent_models", () => {
       expect(mockCore.info).toHaveBeenCalledWith(expect.stringContaining("GH_AW_MODELS_ROUTE is not set"));
     });
 
-    test("skips when COPILOT_GITHUB_TOKEN is not set", async () => {
+    test("skips when auth token env var is not set", async () => {
       process.env.GH_AW_MODELS_ROUTE = "/models";
+      delete process.env.GH_AW_MODELS_TOKEN_ENV;
       delete process.env.COPILOT_GITHUB_TOKEN;
 
       await main();
 
-      expect(mockCore.info).toHaveBeenCalledWith(expect.stringContaining("COPILOT_GITHUB_TOKEN is not set"));
+      expect(mockCore.info).toHaveBeenCalledWith(expect.stringContaining("Auth token env var is not set"));
     });
 
     test("logs warning when endpoint is unreachable", async () => {
       process.env.GH_AW_MODELS_ROUTE = "/models";
+      process.env.GH_AW_MODELS_BASE_URL_ENV = "GITHUB_COPILOT_BASE_URL";
       process.env.GITHUB_COPILOT_BASE_URL = "https://127.0.0.1:1";
+      process.env.GH_AW_MODELS_TOKEN_ENV = "COPILOT_GITHUB_TOKEN";
       process.env.COPILOT_GITHUB_TOKEN = "test-token";
       process.env.GH_AW_ENGINE_ID = "copilot";
-      process.env.GH_AW_ENGINE_VERSION = "1.0.36";
 
       await main();
 
       expect(mockCore.info).toHaveBeenCalledWith(expect.stringContaining("warning: failed to query models endpoint"));
     });
 
-    test("assembles URL from GITHUB_COPILOT_BASE_URL and GH_AW_MODELS_ROUTE", async () => {
+    test("assembles URL from base URL env var and GH_AW_MODELS_ROUTE for any engine", async () => {
       const http = require("http");
       const fakeModels = { models: [] };
       const server = http.createServer((req, res) => {
@@ -313,10 +378,13 @@ describe("agent_models", () => {
       const port = server.address().port;
 
       try {
-        process.env.GH_AW_MODELS_ROUTE = "/models";
-        process.env.GITHUB_COPILOT_BASE_URL = `http://127.0.0.1:${port}`;
-        process.env.COPILOT_GITHUB_TOKEN = "test-token";
-        process.env.GH_AW_ENGINE_ID = "copilot";
+        // Simulate Claude engine with ANTHROPIC_BASE_URL
+        process.env.GH_AW_MODELS_ROUTE = "/v1/models";
+        process.env.GH_AW_MODELS_BASE_URL_ENV = "ANTHROPIC_BASE_URL";
+        process.env.ANTHROPIC_BASE_URL = `http://127.0.0.1:${port}`;
+        process.env.GH_AW_MODELS_TOKEN_ENV = "ANTHROPIC_API_KEY";
+        process.env.ANTHROPIC_API_KEY = "sk-ant-test";
+        process.env.GH_AW_ENGINE_ID = "claude";
 
         await main();
 
