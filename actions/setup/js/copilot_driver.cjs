@@ -26,7 +26,7 @@
 
 "use strict";
 
-const { spawn } = require("child_process");
+const { spawn, spawnSync } = require("child_process");
 const fs = require("fs");
 const { queryModels } = require("./agent_models.cjs");
 
@@ -177,6 +177,28 @@ function emitInfrastructureIncomplete(details, options) {
     const err = /** @type {Error} */ error;
     logger(`report_incomplete emission failed: ${err.message}`);
   }
+}
+
+/**
+ * Run the agent binary with --version and return the version string.
+ * Parses the first semver-like token (MAJOR.MINOR.PATCH) found in stdout/stderr.
+ * Returns "unknown" if the command fails or produces no parseable output.
+ *
+ * @param {string} command - Absolute path to the agent executable
+ * @returns {string} Version string (e.g. "1.0.36") or "unknown"
+ */
+function getAgentVersion(command) {
+  try {
+    const result = spawnSync(command, ["--version"], { encoding: "utf8", timeout: 10_000 });
+    const output = (result.stdout || "") + (result.stderr || "");
+    const match = output.match(/v?(\d+\.\d+\.\d+)/);
+    if (match) {
+      return match[1];
+    }
+  } catch {
+    // ignore
+  }
+  return "unknown";
 }
 
 /**
@@ -377,18 +399,23 @@ async function main() {
   const modelsEndpoint = process.env.GH_AW_MODELS_ENDPOINT;
   const copilotToken = process.env.COPILOT_GITHUB_TOKEN;
   if (modelsEndpoint && copilotToken) {
+    // Obtain the real installed version by running `command --version` so that the
+    // agents.json metadata always reflects what is actually executing, regardless of
+    // the version that was compiled into the workflow YAML.
+    const agentVersion = getAgentVersion(command);
+    log(`models: agent version=${agentVersion}`);
     try {
       await queryModels({
         endpoint: modelsEndpoint,
         token: copilotToken,
         engineId: "copilot",
-        engineVersion: process.env.GH_AW_ENGINE_VERSION || "unknown",
+        engineVersion: agentVersion,
         stepSummaryPath: process.env.GITHUB_STEP_SUMMARY || null,
         logFn: msg => log(`models: ${msg}`),
       });
     } catch (error) {
       const err = /** @type {Error} */ error;
-      log(`models: unexpected error: ${err.message}`);
+      log(`models: warning: unexpected error querying models — agent run will continue: ${err.message}`);
     }
   } else {
     log(`models: skipping query (modelsEndpoint=${modelsEndpoint ? "set" : "unset"} token=${copilotToken ? "set" : "unset"})`);
@@ -511,6 +538,7 @@ if (typeof module !== "undefined" && module.exports) {
     buildInfrastructureIncompletePayload,
     emitInfrastructureIncomplete,
     resolvePromptFileArgs,
+    getAgentVersion,
   };
 }
 

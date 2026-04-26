@@ -5,7 +5,15 @@ import os from "os";
 import path from "path";
 
 const require = createRequire(import.meta.url);
-const { appendSafeOutputLine, buildInfrastructureIncompletePayload, buildPromptFileFallbackInstruction, emitInfrastructureIncomplete, PROMPT_FILE_INLINE_THRESHOLD_BYTES, resolvePromptFileArgs } = require("./copilot_driver.cjs");
+const {
+  appendSafeOutputLine,
+  buildInfrastructureIncompletePayload,
+  buildPromptFileFallbackInstruction,
+  emitInfrastructureIncomplete,
+  PROMPT_FILE_INLINE_THRESHOLD_BYTES,
+  resolvePromptFileArgs,
+  getAgentVersion,
+} = require("./copilot_driver.cjs");
 
 describe("copilot_driver.cjs", () => {
   // Test the core logic patterns used by the driver without importing the module
@@ -474,6 +482,24 @@ describe("copilot_driver.cjs", () => {
       const logMsg = `attempt 1: failed to start process '/usr/local/bin/copilot': ${errMessage}` + ` (code=${errCode} syscall=${errSyscall})`;
       expect(logMsg).toContain("code=ENOENT");
       expect(logMsg).toContain("syscall=spawn");
+    });
+  });
+
+  describe("getAgentVersion", () => {
+    it("returns 'unknown' for a non-existent command", () => {
+      expect(getAgentVersion("/nonexistent/binary/path")).toBe("unknown");
+    });
+
+    it("returns 'unknown' for a command with no semver in output", () => {
+      // Use `true` (always exits 0, no version output) as a stand-in
+      expect(getAgentVersion("/bin/true")).toBe("unknown");
+    });
+
+    it("parses a semver from a command that prints one", () => {
+      // Use `node --version` which prints e.g. "v22.0.0"
+      const version = getAgentVersion(process.execPath);
+      // Should extract MAJOR.MINOR.PATCH from "vX.Y.Z"
+      expect(version).toMatch(/^\d+\.\d+\.\d+$/);
     });
   });
 });

@@ -369,15 +369,10 @@ touch %s
 	// agent starts. Only emitted for agent runs (not detection) to avoid unnecessary requests.
 	// The driver reads GH_AW_MODELS_ENDPOINT and COPILOT_GITHUB_TOKEN; when either is absent
 	// it skips the query silently (e.g. in AWF mode where the token is excluded from the sandbox).
+	// The driver obtains the actual version by running `command --version` at runtime.
 	if !workflowData.IsDetectionRun {
 		if modelsEndpoint := e.GetModelsEndpoint(workflowData); modelsEndpoint != "" {
 			env["GH_AW_MODELS_ENDPOINT"] = modelsEndpoint
-			// Copilot CLI version — for agents.json metadata
-			engineVersion := string(constants.DefaultCopilotVersion)
-			if workflowData.EngineConfig != nil && workflowData.EngineConfig.Version != "" {
-				engineVersion = workflowData.EngineConfig.Version
-			}
-			env["GH_AW_ENGINE_VERSION"] = engineVersion
 		}
 	}
 
