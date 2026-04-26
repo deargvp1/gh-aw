@@ -1,0 +1,32 @@
+{
+  "date": "2026-04-26",
+  "files_analyzed": {
+    "documentation": ["docs/src/content/docs/reference/triggers.md"],
+    "cli": ["pkg/cli/pr_command.go (pr command group)", "pkg/cli/validate_command.go"],
+    "messages": [".github/workflows/approach-validator.md", ".github/workflows/architecture-guardian.md"],
+    "validation": ["pkg/workflow/call_workflow_validation.go", "pkg/workflow/template_validation.go"]
+  },
+  "overall_quality": "needs-minor-work",
+  "quality_highlights": [
+    {
+      "file": "pkg/workflow/call_workflow_validation.go",
+      "note": "Excellent error messages with numbered fix steps and concrete examples"
+    },
+    {
+      "file": ".github/workflows/archie.md",
+      "note": "run-failure message is a best-practice model: describes issue, links to logs, no {status} placeholder"
+    }
+  ],
+  "single_file_improvements": [
+    {
+      "file": "docs/src/content/docs/reference/triggers.md",
+      "priority": "medium",
+      "issue": "description frontmatter is generic ('Triggers in GitHub Agentic Workflows'); introductory paragraph is terse and doesn't highlight gh-aw-specific enhancements"
+    },
+    {
+      "file": ".github/workflows/approach-validator.md",
+      "priority": "high",
+      "issue": "run-failure message uses raw {status} placeholder and provides no actionable guidance; inconsistent with the better pattern in archie.md"
+    }
+  ]
+}
