@@ -20,50 +20,6 @@ func (c *Compiler) generateEngineExecutionSteps(yaml *strings.Builder, data *Wor
 	}
 }
 
-// generateAgentModelsStep generates a pre-agent step that queries the engine's /models
-// endpoint and writes the results to /tmp/gh-aw/agents.json for inclusion in the artifact.
-// The step is skipped when the engine does not implement ModelsEndpointProvider or when
-// the computed endpoint URL is empty.
-func (c *Compiler) generateAgentModelsStep(yaml *strings.Builder, data *WorkflowData, engine CodingAgentEngine) {
-	modelsProvider, ok := engine.(ModelsEndpointProvider)
-	if !ok {
-		return
-	}
-	modelsEndpoint := modelsProvider.GetModelsEndpoint(data)
-	if modelsEndpoint == "" {
-		return
-	}
-
-	compilerYamlLog.Printf("Generating agent models step: engine=%s endpoint=%s", engine.GetID(), modelsEndpoint)
-
-	// Determine the Copilot auth token expression (same logic as execution step)
-	authToken := "${{ secrets.COPILOT_GITHUB_TOKEN }}"
-	if isFeatureEnabled(constants.CopilotRequestsFeatureFlag, data) {
-		authToken = "${{ github.token }}"
-	}
-
-	// Determine the engine version: use the configured version or the default
-	engineVersion := string(constants.DefaultCopilotVersion)
-	if data.EngineConfig != nil && data.EngineConfig.Version != "" {
-		engineVersion = data.EngineConfig.Version
-	}
-
-	yaml.WriteString("      - name: Query agent models\n")
-	yaml.WriteString("        continue-on-error: true\n")
-	fmt.Fprintf(yaml, "        uses: %s\n", getCachedActionPin("actions/github-script", data))
-	yaml.WriteString("        env:\n")
-	fmt.Fprintf(yaml, "          GH_AW_MODELS_ENDPOINT: %s\n", modelsEndpoint)
-	fmt.Fprintf(yaml, "          GH_AW_ENGINE_ID: %s\n", engine.GetID())
-	fmt.Fprintf(yaml, "          GH_AW_ENGINE_VERSION: %s\n", engineVersion)
-	fmt.Fprintf(yaml, "          COPILOT_GITHUB_TOKEN: %s\n", authToken)
-	yaml.WriteString("        with:\n")
-	yaml.WriteString("          script: |\n")
-	yaml.WriteString("            const { setupGlobals } = require('" + SetupActionDestination + "/setup_globals.cjs');\n")
-	yaml.WriteString("            setupGlobals(core, github, context, exec, io, getOctokit);\n")
-	yaml.WriteString("            const { main } = require('" + SetupActionDestination + "/agent_models.cjs');\n")
-	yaml.WriteString("            await main();\n")
-}
-
 // generateLogParsing generates a step that parses the agent's logs and adds them to the step summary
 func (c *Compiler) generateLogParsing(yaml *strings.Builder, data *WorkflowData, engine CodingAgentEngine) {
 	parserScriptName := engine.GetLogParserScriptId()

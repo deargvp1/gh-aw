@@ -7,7 +7,7 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 
-const { main, fetchModels, extractModelsList, buildModelsMarkdown, logModels, AGENTS_JSON_PATH } = require("./agent_models.cjs");
+const { main, queryModels, fetchModels, extractModelsList, buildModelsMarkdown, logModels, AGENTS_JSON_PATH } = require("./agent_models.cjs");
 
 // ---------------------------------------------------------------------------
 // Sample API response fixtures
@@ -105,55 +105,146 @@ describe("agent_models", () => {
   });
 
   // -------------------------------------------------------------------------
-  // logModels
+  // logModels — now accepts a logFn callback (no core.* dependency)
   // -------------------------------------------------------------------------
   describe("logModels", () => {
-    let mockCore;
-
-    beforeEach(() => {
-      mockCore = {
-        info: vi.fn(),
-        warning: vi.fn(),
-        error: vi.fn(),
-        setFailed: vi.fn(),
-      };
-      global.core = mockCore;
+    test("calls logFn with count and individual model IDs", () => {
+      const logs = [];
+      logModels(MODELS_RESPONSE_WITH_MODELS_KEY.models, "copilot", msg => logs.push(msg));
+      expect(logs.some(l => l.includes("2"))).toBe(true);
+      expect(logs.some(l => l.includes("gpt-4o"))).toBe(true);
+      expect(logs.some(l => l.includes("claude-3-5-sonnet"))).toBe(true);
     });
 
-    afterEach(() => {
-      delete global.core;
-    });
-
-    test("logs count and individual model IDs to core.info", () => {
-      logModels(MODELS_RESPONSE_WITH_MODELS_KEY.models, "copilot");
-      expect(mockCore.info).toHaveBeenCalledWith(expect.stringContaining("2"));
-      expect(mockCore.info).toHaveBeenCalledWith(expect.stringContaining("gpt-4o"));
-      expect(mockCore.info).toHaveBeenCalledWith(expect.stringContaining("claude-3-5-sonnet"));
-    });
-
-    test("logs empty list without error", () => {
-      logModels([], "copilot");
-      expect(mockCore.info).toHaveBeenCalledWith(expect.stringContaining("0"));
+    test("calls logFn with 0 for empty list", () => {
+      const logs = [];
+      logModels([], "copilot", msg => logs.push(msg));
+      expect(logs.some(l => l.includes("0"))).toBe(true);
     });
 
     test("skips non-object entries", () => {
-      logModels([null, "bad"], "copilot");
-      expect(mockCore.info).toHaveBeenCalledTimes(1);
+      const logs = [];
+      logModels([null, "bad"], "copilot", msg => logs.push(msg));
+      expect(logs).toHaveLength(1); // only the count line
     });
   });
 
   // -------------------------------------------------------------------------
-  // main
+  // queryModels — core driver-context function
   // -------------------------------------------------------------------------
-  describe("main", () => {
-    let mockCore;
-    let originalWriteFileSync;
-    let originalMkdirSync;
-    let savedEnv;
+  describe("queryModels", () => {
     let tmpDir;
 
     beforeEach(() => {
       tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "agent-models-test-"));
+    });
+
+    afterEach(() => {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    });
+
+    test("emits warning and exits cleanly when endpoint is unreachable", async () => {
+      const logs = [];
+      await queryModels({
+        endpoint: "https://127.0.0.1:1/models",
+        token: "test-token",
+        engineId: "copilot",
+        engineVersion: "1.0.36",
+        agentsJsonPath: path.join(tmpDir, "agents.json"),
+        stepSummaryPath: null,
+        logFn: msg => logs.push(msg),
+      });
+      expect(logs.some(l => l.includes("warning"))).toBe(true);
+      expect(fs.existsSync(path.join(tmpDir, "agents.json"))).toBe(false);
+    });
+
+    test("writes agents.json and step summary when models are returned (mocked fs)", async () => {
+      const agentsJsonPath = path.join(tmpDir, "agents.json");
+      const summaryPath = path.join(tmpDir, "summary.md");
+      const logs = [];
+
+      // Patch fetchModels to return fake data without a real network call
+      const originalFetch = require("https").request;
+      // We test the full integration indirectly via the unreachable-endpoint path;
+      // the unit test for the happy path mocks fs/fetchModels in the describe below.
+      // Here we verify that providing a valid path + no error writes to disk.
+
+      // Use an in-process HTTP server to simulate a successful models response
+      const http = require("http");
+      const fakeModels = { models: [{ id: "test-model", display_name: "Test", vendor: "test" }] };
+      const server = http.createServer((req, res) => {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(fakeModels));
+      });
+      await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
+      const port = server.address().port;
+
+      try {
+        await queryModels({
+          endpoint: `http://127.0.0.1:${port}/models`,
+          token: "test-token",
+          engineId: "copilot",
+          engineVersion: "1.0.36",
+          agentsJsonPath,
+          stepSummaryPath: summaryPath,
+          logFn: msg => logs.push(msg),
+        });
+
+        // agents.json written
+        expect(fs.existsSync(agentsJsonPath)).toBe(true);
+        const agentsData = JSON.parse(fs.readFileSync(agentsJsonPath, "utf8"));
+        expect(agentsData).toHaveProperty("copilot");
+        expect(agentsData.copilot.version).toBe("1.0.36");
+        expect(agentsData.copilot.models).toEqual(fakeModels);
+
+        // step summary written
+        expect(fs.existsSync(summaryPath)).toBe(true);
+        const summary = fs.readFileSync(summaryPath, "utf8");
+        expect(summary).toContain("<details>");
+        expect(summary).toContain("test-model");
+      } finally {
+        await new Promise(resolve => server.close(resolve));
+      }
+    });
+
+    test("skips step summary when stepSummaryPath is null", async () => {
+      const agentsJsonPath = path.join(tmpDir, "agents.json");
+      const http = require("http");
+      const fakeModels = { models: [] };
+      const server = http.createServer((req, res) => {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(fakeModels));
+      });
+      await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
+      const port = server.address().port;
+
+      try {
+        await queryModels({
+          endpoint: `http://127.0.0.1:${port}/models`,
+          token: "tok",
+          engineId: "copilot",
+          engineVersion: "1.0.36",
+          agentsJsonPath,
+          stepSummaryPath: null,
+          logFn: () => {},
+        });
+        expect(fs.existsSync(agentsJsonPath)).toBe(true);
+      } finally {
+        await new Promise(resolve => server.close(resolve));
+      }
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // main — github-script context wrapper
+  // -------------------------------------------------------------------------
+  describe("main", () => {
+    let mockCore;
+    let savedEnv;
+    let tmpDir;
+
+    beforeEach(() => {
+      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "agent-models-main-test-"));
       savedEnv = { ...process.env };
 
       mockCore = {
@@ -167,15 +258,10 @@ describe("agent_models", () => {
         },
       };
       global.core = mockCore;
-
-      originalWriteFileSync = fs.writeFileSync;
-      originalMkdirSync = fs.mkdirSync;
     });
 
     afterEach(() => {
       process.env = savedEnv;
-      fs.writeFileSync = originalWriteFileSync;
-      fs.mkdirSync = originalMkdirSync;
       delete global.core;
       fs.rmSync(tmpDir, { recursive: true, force: true });
     });
@@ -187,7 +273,6 @@ describe("agent_models", () => {
       await main();
 
       expect(mockCore.info).toHaveBeenCalledWith(expect.stringContaining("GH_AW_MODELS_ENDPOINT is not set"));
-      expect(mockCore.summary.addDetails).not.toHaveBeenCalled();
     });
 
     test("skips when COPILOT_GITHUB_TOKEN is not set", async () => {
@@ -197,51 +282,17 @@ describe("agent_models", () => {
       await main();
 
       expect(mockCore.info).toHaveBeenCalledWith(expect.stringContaining("COPILOT_GITHUB_TOKEN is not set"));
-      expect(mockCore.summary.addDetails).not.toHaveBeenCalled();
     });
 
-    test("emits warning and exits cleanly when fetchModels throws", async () => {
-      process.env.GH_AW_MODELS_ENDPOINT = "https://api.githubcopilot.com/models";
+    test("logs warning when endpoint is unreachable", async () => {
+      process.env.GH_AW_MODELS_ENDPOINT = "https://127.0.0.1:1/models";
       process.env.COPILOT_GITHUB_TOKEN = "test-token";
       process.env.GH_AW_ENGINE_ID = "copilot";
       process.env.GH_AW_ENGINE_VERSION = "1.0.36";
 
-      // Override fetchModels inside the module would require deeper mocking.
-      // Here we test the network-failure path by pointing at an invalid endpoint.
-      process.env.GH_AW_MODELS_ENDPOINT = "https://127.0.0.1:1/models";
-
       await main();
 
-      expect(mockCore.warning).toHaveBeenCalledWith(expect.stringContaining("Failed to query models endpoint"));
-      expect(mockCore.summary.addDetails).not.toHaveBeenCalled();
-    });
-
-    test("writes agents.json and step summary on success", async () => {
-      process.env.GH_AW_MODELS_ENDPOINT = "https://api.githubcopilot.com/models";
-      process.env.COPILOT_GITHUB_TOKEN = "test-token";
-      process.env.GH_AW_ENGINE_ID = "copilot";
-      process.env.GH_AW_ENGINE_VERSION = "1.0.36";
-
-      const writtenFiles = {};
-      fs.writeFileSync = vi.fn((p, data) => {
-        writtenFiles[p] = data;
-      });
-      fs.mkdirSync = vi.fn();
-
-      // Patch fetchModels to avoid real network call
-      const agentModels = require("./agent_models.cjs");
-      const originalFetch = agentModels.fetchModels;
-      // We cannot easily patch module-level functions, so we replicate the internal flow:
-      // restore the real fetchModels after the test.
-      // Instead test via the exported functions individually (covered by other tests).
-      // This test validates the main() flow when the endpoint is unreachable (127.0.0.1:1).
-      process.env.GH_AW_MODELS_ENDPOINT = "https://127.0.0.1:1/models";
-
-      await main();
-
-      // With unreachable endpoint, warning is emitted and agents.json is NOT written
-      expect(mockCore.warning).toHaveBeenCalled();
-      expect(writtenFiles[AGENTS_JSON_PATH]).toBeUndefined();
+      expect(mockCore.info).toHaveBeenCalledWith(expect.stringContaining("warning: failed to query models endpoint"));
     });
   });
 });

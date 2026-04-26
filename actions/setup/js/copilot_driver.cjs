@@ -28,6 +28,7 @@
 
 const { spawn } = require("child_process");
 const fs = require("fs");
+const { queryModels } = require("./agent_models.cjs");
 
 // Maximum number of retry attempts after the initial run
 const MAX_RETRIES = 3;
@@ -369,6 +370,29 @@ async function main() {
 
   await checkCommandAccessible(command);
   const resolvedArgs = resolvePromptFileArgs(args);
+
+  // Query available models before the agent starts. This is best-effort: if the endpoint
+  // is unavailable or the token is missing (e.g. running inside the AWF sandbox where
+  // COPILOT_GITHUB_TOKEN is excluded), the error is swallowed and the agent proceeds.
+  const modelsEndpoint = process.env.GH_AW_MODELS_ENDPOINT;
+  const copilotToken = process.env.COPILOT_GITHUB_TOKEN;
+  if (modelsEndpoint && copilotToken) {
+    try {
+      await queryModels({
+        endpoint: modelsEndpoint,
+        token: copilotToken,
+        engineId: "copilot",
+        engineVersion: process.env.GH_AW_ENGINE_VERSION || "unknown",
+        stepSummaryPath: process.env.GITHUB_STEP_SUMMARY || null,
+        logFn: msg => log(`models: ${msg}`),
+      });
+    } catch (error) {
+      const err = /** @type {Error} */ error;
+      log(`models: unexpected error: ${err.message}`);
+    }
+  } else {
+    log(`models: skipping query (modelsEndpoint=${modelsEndpoint ? "set" : "unset"} token=${copilotToken ? "set" : "unset"})`);
+  }
 
   let delay = INITIAL_DELAY_MS;
   let lastExitCode = 1;

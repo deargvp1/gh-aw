@@ -396,10 +396,6 @@ func (c *Compiler) generateMainJobSteps(yaml *strings.Builder, data *WorkflowDat
 	// connects to via host.docker.internal:18443.
 	c.generateStartCliProxyStep(yaml, data)
 
-	// Query available agent models before execution. Engines that implement ModelsEndpointProvider
-	// get a pre-agent step that fetches the /models endpoint and writes agents.json.
-	c.generateAgentModelsStep(yaml, data, engine)
-
 	// Add AI execution step using the agentic engine
 	compilerYamlLog.Printf("Generating engine execution steps for %s", engine.GetID())
 	c.generateEngineExecutionSteps(yaml, data, engine, logFileFull)

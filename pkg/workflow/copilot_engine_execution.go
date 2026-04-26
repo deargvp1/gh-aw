@@ -365,6 +365,22 @@ touch %s
 		env["GH_AW_VERSION"] = "dev"
 	}
 
+	// Expose the models endpoint to the driver so it can query available models before the
+	// agent starts. Only emitted for agent runs (not detection) to avoid unnecessary requests.
+	// The driver reads GH_AW_MODELS_ENDPOINT and COPILOT_GITHUB_TOKEN; when either is absent
+	// it skips the query silently (e.g. in AWF mode where the token is excluded from the sandbox).
+	if !workflowData.IsDetectionRun {
+		if modelsEndpoint := e.GetModelsEndpoint(workflowData); modelsEndpoint != "" {
+			env["GH_AW_MODELS_ENDPOINT"] = modelsEndpoint
+			// Copilot CLI version — for agents.json metadata
+			engineVersion := string(constants.DefaultCopilotVersion)
+			if workflowData.EngineConfig != nil && workflowData.EngineConfig.Version != "" {
+				engineVersion = workflowData.EngineConfig.Version
+			}
+			env["GH_AW_ENGINE_VERSION"] = engineVersion
+		}
+	}
+
 	// Add GH_AW_MCP_CONFIG for MCP server configuration only if there are MCP servers
 	if HasMCPServers(workflowData) {
 		env["GH_AW_MCP_CONFIG"] = "/home/runner/.copilot/mcp-config.json"

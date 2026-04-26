@@ -12,16 +12,17 @@
  * The JSON file follows the structure:
  *   { "<engineId>": { "version": "<version>", "models": <models-data> } }
  *
- * Required environment variables:
- *   - GH_AW_MODELS_ENDPOINT: Full URL of the models endpoint
- *     (e.g. "https://api.githubcopilot.com/models")
- *   - COPILOT_GITHUB_TOKEN: Bearer token used to authenticate the request
- *   - GH_AW_ENGINE_ID: Agentic engine identifier (e.g. "copilot")
- *   - GH_AW_ENGINE_VERSION: Version string of the engine CLI
+ * Primary API — usable from any Node.js context (driver, github-script, standalone):
+ *   queryModels({ endpoint, token, engineId, engineVersion, agentsJsonPath?, stepSummaryPath?, logFn? })
  *
- * If GH_AW_MODELS_ENDPOINT or COPILOT_GITHUB_TOKEN is unset the step exits
- * cleanly without writing anything (the compiler marks the step continue-on-error
- * so failures are non-fatal for the overall agent run).
+ * github-script convenience wrapper (uses core.* globals):
+ *   main()   — reads env vars and delegates to queryModels()
+ *
+ * Required environment variables when using main():
+ *   - GH_AW_MODELS_ENDPOINT: Full URL of the models endpoint
+ *   - COPILOT_GITHUB_TOKEN:   Bearer token for authentication
+ *   - GH_AW_ENGINE_ID:        Agentic engine identifier (e.g. "copilot")
+ *   - GH_AW_ENGINE_VERSION:   Version string of the engine CLI
  */
 
 const fs = require("fs");
@@ -145,19 +146,78 @@ function buildModelsMarkdown(models) {
 }
 
 /**
- * Log individual models to core.info for easy scanning in the Actions log.
+ * Log individual models using the provided logging function.
  *
  * @param {unknown[]} models
  * @param {string}    engineId
+ * @param {(msg: string) => void} logFn
  */
-function logModels(models, engineId) {
-  core.info(`[${engineId}] Available models (${models.length}):`);
+function logModels(models, engineId, logFn) {
+  logFn(`[${engineId}] Available models (${models.length}):`);
   for (const m of models) {
     if (!m || typeof m !== "object") continue;
     const entry = /** @type {Record<string, unknown>} */ m;
     const id = String(entry["id"] || "?");
     const name = String(entry["display_name"] || entry["name"] || "");
-    core.info(`  - ${id}${name ? ": " + name : ""}`);
+    logFn(`  - ${id}${name ? ": " + name : ""}`);
+  }
+}
+
+/**
+ * Query the models endpoint, persist results to agents.json, and optionally append
+ * a summary section to the step-summary file.  Callable from any Node.js context
+ * (driver harness, github-script, standalone) without depending on global `core.*`.
+ *
+ * @param {{
+ *   endpoint: string,
+ *   token: string,
+ *   engineId: string,
+ *   engineVersion: string,
+ *   agentsJsonPath?: string,
+ *   stepSummaryPath?: string | null,
+ *   logFn?: (msg: string) => void,
+ * }} options
+ * @returns {Promise<void>}
+ */
+async function queryModels({ endpoint, token, engineId, engineVersion, agentsJsonPath = AGENTS_JSON_PATH, stepSummaryPath = null, logFn = () => {} }) {
+  logFn(`querying models from: ${endpoint} (engine=${engineId} version=${engineVersion})`);
+
+  let modelsData;
+  try {
+    modelsData = await fetchModels(endpoint, token);
+  } catch (error) {
+    logFn(`warning: failed to query models endpoint: ${getErrorMessage(error)}`);
+    return;
+  }
+
+  const modelsList = extractModelsList(modelsData);
+  logModels(modelsList, engineId, logFn);
+
+  // Write agents.json so the data is bundled in the agent artifact
+  const agentsInfo = {
+    [engineId]: {
+      version: engineVersion,
+      models: modelsData,
+    },
+  };
+
+  try {
+    fs.mkdirSync("/tmp/gh-aw", { recursive: true });
+    fs.writeFileSync(agentsJsonPath, JSON.stringify(agentsInfo, null, 2) + "\n");
+    logFn(`wrote models info to ${agentsJsonPath}`);
+  } catch (error) {
+    logFn(`warning: failed to write ${agentsJsonPath}: ${getErrorMessage(error)}`);
+  }
+
+  // Append a collapsible section to the step summary file
+  if (stepSummaryPath) {
+    const markdown = buildModelsMarkdown(modelsList);
+    const section = `\n<details>\n<summary>Available Models (${engineId} ${engineVersion})</summary>\n\n${markdown}\n</details>\n`;
+    try {
+      fs.appendFileSync(stepSummaryPath, section);
+    } catch (error) {
+      logFn(`warning: failed to write models step summary: ${getErrorMessage(error)}`);
+    }
   }
 }
 
@@ -181,46 +241,19 @@ async function main() {
   const engineId = process.env.GH_AW_ENGINE_ID || "copilot";
   const engineVersion = process.env.GH_AW_ENGINE_VERSION || "unknown";
 
-  core.info(`Querying models from: ${modelsEndpoint} (engine=${engineId} version=${engineVersion})`);
-
-  let modelsData;
-  try {
-    modelsData = await fetchModels(modelsEndpoint, authToken);
-  } catch (error) {
-    core.warning(`Failed to query models endpoint: ${getErrorMessage(error)}`);
-    return;
-  }
-
-  const modelsList = extractModelsList(modelsData);
-  logModels(modelsList, engineId);
-
-  // Write agents.json so the data is bundled in the agent artifact
-  const agentsInfo = {
-    [engineId]: {
-      version: engineVersion,
-      models: modelsData,
-    },
-  };
-
-  try {
-    fs.mkdirSync("/tmp/gh-aw", { recursive: true });
-    fs.writeFileSync(AGENTS_JSON_PATH, JSON.stringify(agentsInfo, null, 2) + "\n");
-    core.info(`Wrote models info to ${AGENTS_JSON_PATH}`);
-  } catch (error) {
-    core.warning(`Failed to write ${AGENTS_JSON_PATH}: ${getErrorMessage(error)}`);
-  }
-
-  // Add collapsible section to step summary
-  const markdown = buildModelsMarkdown(modelsList);
-  try {
-    await core.summary.addDetails(`Available Models (${engineId} ${engineVersion})`, "\n\n" + markdown + "\n").write();
-  } catch (error) {
-    core.warning(`Failed to write models step summary: ${getErrorMessage(error)}`);
-  }
+  await queryModels({
+    endpoint: modelsEndpoint,
+    token: authToken,
+    engineId,
+    engineVersion,
+    stepSummaryPath: process.env.GITHUB_STEP_SUMMARY || null,
+    logFn: msg => core.info(msg),
+  });
 }
 
 module.exports = {
   main,
+  queryModels,
   fetchModels,
   extractModelsList,
   buildModelsMarkdown,
