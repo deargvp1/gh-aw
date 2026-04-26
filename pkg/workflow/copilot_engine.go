@@ -131,6 +131,16 @@ func (e *CopilotEngine) GetDriverScriptName() string {
 	return "copilot_driver.cjs"
 }
 
+// GetModelsEndpoint returns the full Copilot models API endpoint URL for the current
+// workflow. It respects the effective API base URL determined by engine.api-target or
+// GITHUB_COPILOT_BASE_URL in engine.env, falling back to the default Copilot API domain.
+func (e *CopilotEngine) GetModelsEndpoint(workflowData *WorkflowData) string {
+	if apiTarget := GetCopilotAPITarget(workflowData); apiTarget != "" {
+		return "https://" + apiTarget + "/models"
+	}
+	return "https://" + constants.GitHubCopilotMCPDomain + "/models"
+}
+
 // GetExecutionSteps is implemented in copilot_engine_execution.go
 
 // RenderMCPConfig is implemented in copilot_mcp.go
