@@ -5,3 +5,4 @@
 ./pkg/constants/constants_test.go|2026-04-21
 ./pkg/workflow/agentic_engine_test.go|2026-04-24
 ./pkg/parser/schedule_cron_detection_test.go|2026-04-25
+./pkg/cli/health_command_test.go|2026-04-26
