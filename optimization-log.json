@@ -133,5 +133,14 @@
     "total_tokens_analyzed": 12740535,
     "estimated_savings_per_run": 1620000,
     "recommendations_count": 4
+  },
+  {
+    "date": "2026-04-27",
+    "workflow_name": "Agentic Observability Kit",
+    "workflow_file": "agentic-observability-kit",
+    "runs_audited": 1,
+    "total_tokens_analyzed": 1986286,
+    "estimated_savings_per_run": 600000,
+    "recommendations_count": 5
   }
 ]
