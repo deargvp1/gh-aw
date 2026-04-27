@@ -156,5 +156,15 @@
     "recommendations_count": 4,
     "estimated_savings_per_run": 1400000,
     "notes": "Single run, 60 turns vs 3-page target (20-25 expected). agentic_fraction=0.5. 6 shared imports, no max-turns, npm install done agentically. Primary lever: bash pre-steps for npm install+server+IP (~10 turns), max-turns: 25 cap, prompt slimming."
+  },
+  {
+    "date": "2026-04-27",
+    "workflow_name": "Daily Syntax Error Quality Check",
+    "workflow_file": "daily-syntax-error-quality",
+    "total_tokens_analyzed": 3399393,
+    "runs_audited": 1,
+    "recommendations_count": 4,
+    "estimated_savings_per_run": 1360000,
+    "notes": "Single run, 56 turns, resource_heavy_for_domain (high severity), partially_reducible (agentic_fraction=0.50). Primary lever: bash pre-steps for workflow discovery (Phase 1) + compiler setup (~8-10 turns). Add max-turns:35 cap. Remove Category C error scenarios. Reduce scoring rubric in prompt."
   }
 ]
