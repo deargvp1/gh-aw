@@ -530,6 +530,43 @@ Either approach works well. AI-assisted authoring using `/agent agentic-workflow
 
 Yes, for the purpose of this technology. An **"agent"** is an agentic workflow in a repository - an AI-powered automation that can reason, make decisions, and take actions. We use **"agentic workflow"** as it's plainer and emphasizes the workflow nature of the automation, but the terms are synonymous in this context.
 
+### My custom safe output job receives `[Content too large, saved to file: ...]` instead of the body I expected
+
+When the agent passes large content (exceeding ~16,000 tokens) to a safe output tool, the MCP Gateway saves the content to a file in `/tmp/gh-aw/safeoutputs/` and writes a placeholder string instead of inlining the full body into the output artifact. Built-in safe outputs (`create-issue`, `add-comment`, etc.) resolve this file reference automatically. Custom safe output jobs that read directly from `$GH_AW_AGENT_OUTPUT` must resolve it manually.
+
+The placeholder format is:
+
+```
+[Content too large, saved to file: <filename>]
+```
+
+Resolve it in your custom job step like this:
+
+```javascript
+const fs = require('fs');
+const path = require('path');
+
+const LARGE_CONTENT_PREFIX = '[Content too large, saved to file: ';
+const SAFEOUTPUTS_DIR = '/tmp/gh-aw/safeoutputs';
+
+function resolveBody(rawBody) {
+  if (rawBody.startsWith(LARGE_CONTENT_PREFIX) && rawBody.endsWith(']')) {
+    const filename = path.basename(rawBody.slice(LARGE_CONTENT_PREFIX.length, -1));
+    const filePath = path.join(SAFEOUTPUTS_DIR, filename);
+    if (!fs.existsSync(filePath)) {
+      core.setFailed(`Referenced content file not found: ${filePath}`);
+      return null;
+    }
+    return fs.readFileSync(filePath, 'utf8');
+  }
+  return rawBody;
+}
+```
+
+Note that built-in safe outputs cap body content at 65,000 characters before the file offload applies. If your use case involves content that regularly approaches or exceeds that limit, consider splitting it across multiple safe output calls or using a different output strategy (e.g., committing large files to the repository via `create-pull-request`).
+
+See [Custom Safe Output Jobs](/gh-aw/reference/custom-safe-outputs/) for the full `GH_AW_AGENT_OUTPUT` reference.
+
 ## Costs & Usage
 
 ### Who pays for the use of AI?
