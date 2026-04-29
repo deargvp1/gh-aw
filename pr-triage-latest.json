@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-04-29T07:06:02.979Z",
-  "run_id": "25095475879",
+  "run_date": "2026-04-29T12:50:17.851Z",
+  "run_id": "25109761248",
   "fork_prs": 0,
-  "agent_prs_found": 6,
-  "agent_prs_excluded": 6,
-  "notes": "7 open PRs found. Copilot-assigned PRs: #29060, #29053, #29052, #29051, #28778, #28777. All are same-repo branches (head.repo == base.repo), not forks. Per policy, only fork PRs are triaged. No fork PRs to triage.",
+  "agent_prs_found": 7,
+  "agent_prs_excluded": 7,
+  "notes": "7 open PRs found (#29099, #29098, #29096, #29094, #29089, #28778, #28777). All are same-repo branches (head.repo == base.repo), not forks. Per policy, only fork PRs are triaged. No fork PRs to triage.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -17,10 +17,10 @@
     "by_action": {}
   },
   "previous_run": {
-    "run_id": "25085834129",
-    "run_date": "2026-04-29T01:08:29.747Z",
+    "run_id": "25095475879",
+    "run_date": "2026-04-29T07:06:02.979Z",
     "fork_prs": 0,
-    "agent_prs_found": 5,
-    "agent_prs_excluded": 5
+    "agent_prs_found": 6,
+    "agent_prs_excluded": 6
   }
 }
