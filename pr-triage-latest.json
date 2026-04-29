@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-04-29T12:50:17.851Z",
-  "run_id": "25109761248",
+  "run_date": "2026-04-29T18:45:15.544Z",
+  "run_id": "25127352869",
   "fork_prs": 0,
-  "agent_prs_found": 7,
-  "agent_prs_excluded": 7,
-  "notes": "7 open PRs found (#29099, #29098, #29096, #29094, #29089, #28778, #28777). All are same-repo branches (head.repo == base.repo), not forks. Per policy, only fork PRs are triaged. No fork PRs to triage.",
+  "agent_prs_found": 6,
+  "agent_prs_excluded": 6,
+  "notes": "6 open Copilot PRs found (#29170, #29168, #29153, #29137, #28778, #28777). All are same-repo branches (head.repo == base.repo = github/gh-aw), not forks. Per policy, only fork PRs are triaged. No fork PRs to triage.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -16,11 +16,19 @@
     "by_priority": {},
     "by_action": {}
   },
+  "pr_list": [
+    {"number": 29170, "title": "feat: add --stdin flag to logs and audit commands", "draft": true, "same_repo": true},
+    {"number": 29168, "title": "design-decision-gate: reduce max-turns 20→12, add explicit turn budget and stopping criteria", "draft": true, "same_repo": true},
+    {"number": 29153, "title": "Add reuse-existing-ref option to create_pull_request for reusing an existing remote branch", "draft": false, "same_repo": true},
+    {"number": 29137, "title": "Add @filepath expansion in safe output body processing", "draft": true, "same_repo": true},
+    {"number": 28778, "title": "feat(ASI-08): Add circuit breaker for repeatedly failing workflows", "draft": false, "same_repo": true},
+    {"number": 28777, "title": "ASI-06: Sanitize repo-memory and cache-memory content before prompt injection", "draft": false, "same_repo": true}
+  ],
   "previous_run": {
-    "run_id": "25095475879",
-    "run_date": "2026-04-29T07:06:02.979Z",
+    "run_id": "25109761248",
+    "run_date": "2026-04-29T12:50:17.851Z",
     "fork_prs": 0,
-    "agent_prs_found": 6,
-    "agent_prs_excluded": 6
+    "agent_prs_found": 7,
+    "agent_prs_excluded": 7
   }
 }
