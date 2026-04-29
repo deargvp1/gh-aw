@@ -1,1 +1,182 @@
-{"analyses":[{"date":"2026-04-16","sessions_analyzed":50,"completion_rate_pct":4.0,"copilot_coding_agents":2,"copilot_success_rate_pct":100.0,"avg_copilot_duration_min":38.94,"experimental_strategy":null,"key_insights":["Two simultaneous Copilot sessions both succeeded","fix-bearer-token-bypass stalled - no agent"]},{"date":"2026-04-17","sessions_analyzed":50,"completion_rate_pct":10.0,"copilot_coding_agents":2,"copilot_success_rate_pct":100.0,"avg_copilot_duration_min":51.5,"experimental_strategy":"Gate Storm Detection","key_insights":["Gate STORM: 8 concurrent gates at 11:22 (double trigger)","6th consecutive 100% Copilot day"]},{"date":"2026-04-18","sessions_analyzed":50,"completion_rate_pct":10.0,"copilot_coding_agents":2,"copilot_success_rate_pct":0.0,"avg_copilot_duration_min":0.18,"experimental_strategy":null,"key_insights":["Both agents still pending at analysis time","56% action_required gate density - highest observed"]},{"date":"2026-04-19","sessions_analyzed":100,"completion_rate_pct":11.0,"copilot_coding_agents":2,"copilot_success_rate_pct":100.0,"avg_copilot_duration_min":13.45,"experimental_strategy":null,"key_insights":["100 sessions across 7 branches - highest volume day","11% overall completion - new high"]},{"date":"2026-04-20","sessions_analyzed":50,"completion_rate_pct":4.0,"copilot_coding_agents":2,"copilot_success_rate_pct":100.0,"avg_copilot_duration_min":16.0,"experimental_strategy":"Multi-Branch Parallelism Analysis","key_insights":["add-latex + fix-windows: both SUCCESS in parallel overlap","No cross-branch interference detected across 45 concurrent gates"]},{"date":"2026-04-21","sessions_analyzed":50,"completion_rate_pct":2.0,"copilot_coding_agents":1,"copilot_success_rate_pct":100.0,"avg_copilot_duration_min":20.28,"experimental_strategy":null,"key_insights":["Content Moderation + AI Moderator gates appeared for first time on fix-concurrency-issues","5 CI rounds in 20 min = faster convergence than previous long sessions"]},{"date":"2026-04-22","sessions_analyzed":50,"completion_rate_pct":10.0,"copilot_coding_agents":6,"copilot_success_rate_pct":50.0,"avg_copilot_duration_min":13.18,"experimental_strategy":null,"key_insights":["Cancellation storm on consolidate-optimization-work: 2 success + 2 cancels in 36min","50% success breaks 8-day 100% streak - driven by cancellations not failures","fix-mcp-tools-max-tokens: 29 gate sessions all action_required - highest gate density per session"]},{"date":"2026-04-23","sessions_analyzed":50,"completion_rate_pct":24.0,"copilot_coding_agents":4,"copilot_success_rate_pct":100.0,"avg_copilot_duration_min":13.0,"experimental_strategy":null,"key_insights":["100% Copilot success rate - streak restored after Apr 22 break","24% overall success rate - new daily record","fix-cli-integer-params: 18 sessions all action_required - pure gate saturation with no Copilot agent"]},{"date":"2026-04-24","sessions_analyzed":50,"completion_rate_pct":2.0,"copilot_coding_agents":2,"copilot_success_rate_pct":50.0,"avg_copilot_duration_min":13.07,"experimental_strategy":"Task Category to Copilot Assignment Correlation","key_insights":["update-golang-org-x-vuln (security patch) got Copilot agent: SUCCESS in 13.07min","update-charmbracelet-golden (lib version bump): NO Copilot agent - pure gate-only automation","rename-actionpins-another-one (refactoring): Copilot in-progress at snapshot time"]},{"date":"2026-04-26","sessions_analyzed":50,"completion_rate_pct":10.0,"copilot_coding_agents":5,"copilot_success_rate_pct":20.0,"avg_copilot_duration_min":1.8,"experimental_strategy":null,"key_insights":["Record 5 concurrent Copilot branches active simultaneously - highest parallelism observed","fix-package-specification-extractor: only CGO success (Design Decision Gate + Test Quality Sentinel + Grumpy Reviewer all passed)","fix-daily-issues-report-generator-again: 'again' suffix signals repeat task - CGO failed despite 11.3min branch activity"]},{"date":"2026-04-27","sessions_analyzed":50,"completion_rate_pct":2.0,"copilot_coding_agents":2,"copilot_success_rate_pct":50.0,"avg_copilot_duration_min":8.3,"experimental_strategy":"Sub-PR Iteration Pattern Analysis","key_insights":["docs PR (Organization Practices) attracted Copilot agent - first observed pure-docs task","startup_failure on create-agentic-workflows branch - new infrastructure failure mode","Sub-PR model: single branch spawns multiple addressing-comment Copilot re-engagements"]},{"date":"2026-04-28","sessions_analyzed":0,"completion_rate_pct":null,"copilot_coding_agents":null,"copilot_success_rate_pct":null,"avg_copilot_duration_min":null,"experimental_strategy":"Historical Trend Regression Analysis","key_insights":["API rate limit hit during pre-fetch - no fresh session data available","Historical regression (16 days): duration >15min = 100% success; <5min = ~7% success","Agent count inflates risk: >=4 agents/day = 48.8% success vs <=2 agents/day = 75%"]}],"last_updated":"2026-04-28"}
+{
+  "analyses": [
+    {
+      "date": "2026-04-16",
+      "sessions_analyzed": 50,
+      "completion_rate_pct": 4.0,
+      "copilot_coding_agents": 2,
+      "copilot_success_rate_pct": 100.0,
+      "avg_copilot_duration_min": 38.94,
+      "experimental_strategy": null,
+      "key_insights": [
+        "Two simultaneous Copilot sessions both succeeded",
+        "fix-bearer-token-bypass stalled - no agent"
+      ]
+    },
+    {
+      "date": "2026-04-17",
+      "sessions_analyzed": 50,
+      "completion_rate_pct": 10.0,
+      "copilot_coding_agents": 2,
+      "copilot_success_rate_pct": 100.0,
+      "avg_copilot_duration_min": 51.5,
+      "experimental_strategy": "Gate Storm Detection",
+      "key_insights": [
+        "Gate STORM: 8 concurrent gates at 11:22 (double trigger)",
+        "6th consecutive 100% Copilot day"
+      ]
+    },
+    {
+      "date": "2026-04-18",
+      "sessions_analyzed": 50,
+      "completion_rate_pct": 10.0,
+      "copilot_coding_agents": 2,
+      "copilot_success_rate_pct": 0.0,
+      "avg_copilot_duration_min": 0.18,
+      "experimental_strategy": null,
+      "key_insights": [
+        "Both agents still pending at analysis time",
+        "56% action_required gate density - highest observed"
+      ]
+    },
+    {
+      "date": "2026-04-19",
+      "sessions_analyzed": 100,
+      "completion_rate_pct": 11.0,
+      "copilot_coding_agents": 2,
+      "copilot_success_rate_pct": 100.0,
+      "avg_copilot_duration_min": 13.45,
+      "experimental_strategy": null,
+      "key_insights": [
+        "100 sessions across 7 branches - highest volume day",
+        "11% overall completion - new high"
+      ]
+    },
+    {
+      "date": "2026-04-20",
+      "sessions_analyzed": 50,
+      "completion_rate_pct": 4.0,
+      "copilot_coding_agents": 2,
+      "copilot_success_rate_pct": 100.0,
+      "avg_copilot_duration_min": 16.0,
+      "experimental_strategy": "Multi-Branch Parallelism Analysis",
+      "key_insights": [
+        "add-latex + fix-windows: both SUCCESS in parallel overlap",
+        "No cross-branch interference detected across 45 concurrent gates"
+      ]
+    },
+    {
+      "date": "2026-04-21",
+      "sessions_analyzed": 50,
+      "completion_rate_pct": 2.0,
+      "copilot_coding_agents": 1,
+      "copilot_success_rate_pct": 100.0,
+      "avg_copilot_duration_min": 20.28,
+      "experimental_strategy": null,
+      "key_insights": [
+        "Content Moderation + AI Moderator gates appeared for first time on fix-concurrency-issues",
+        "5 CI rounds in 20 min = faster convergence than previous long sessions"
+      ]
+    },
+    {
+      "date": "2026-04-22",
+      "sessions_analyzed": 50,
+      "completion_rate_pct": 10.0,
+      "copilot_coding_agents": 6,
+      "copilot_success_rate_pct": 50.0,
+      "avg_copilot_duration_min": 13.18,
+      "experimental_strategy": null,
+      "key_insights": [
+        "Cancellation storm on consolidate-optimization-work: 2 success + 2 cancels in 36min",
+        "50% success breaks 8-day 100% streak - driven by cancellations not failures",
+        "fix-mcp-tools-max-tokens: 29 gate sessions all action_required - highest gate density per session"
+      ]
+    },
+    {
+      "date": "2026-04-23",
+      "sessions_analyzed": 50,
+      "completion_rate_pct": 24.0,
+      "copilot_coding_agents": 4,
+      "copilot_success_rate_pct": 100.0,
+      "avg_copilot_duration_min": 13.0,
+      "experimental_strategy": null,
+      "key_insights": [
+        "100% Copilot success rate - streak restored after Apr 22 break",
+        "24% overall success rate - new daily record",
+        "fix-cli-integer-params: 18 sessions all action_required - pure gate saturation with no Copilot agent"
+      ]
+    },
+    {
+      "date": "2026-04-24",
+      "sessions_analyzed": 50,
+      "completion_rate_pct": 2.0,
+      "copilot_coding_agents": 2,
+      "copilot_success_rate_pct": 50.0,
+      "avg_copilot_duration_min": 13.07,
+      "experimental_strategy": "Task Category to Copilot Assignment Correlation",
+      "key_insights": [
+        "update-golang-org-x-vuln (security patch) got Copilot agent: SUCCESS in 13.07min",
+        "update-charmbracelet-golden (lib version bump): NO Copilot agent - pure gate-only automation",
+        "rename-actionpins-another-one (refactoring): Copilot in-progress at snapshot time"
+      ]
+    },
+    {
+      "date": "2026-04-26",
+      "sessions_analyzed": 50,
+      "completion_rate_pct": 10.0,
+      "copilot_coding_agents": 5,
+      "copilot_success_rate_pct": 20.0,
+      "avg_copilot_duration_min": 1.8,
+      "experimental_strategy": null,
+      "key_insights": [
+        "Record 5 concurrent Copilot branches active simultaneously - highest parallelism observed",
+        "fix-package-specification-extractor: only CGO success (Design Decision Gate + Test Quality Sentinel + Grumpy Reviewer all passed)",
+        "fix-daily-issues-report-generator-again: 'again' suffix signals repeat task - CGO failed despite 11.3min branch activity"
+      ]
+    },
+    {
+      "date": "2026-04-27",
+      "sessions_analyzed": 50,
+      "completion_rate_pct": 2.0,
+      "copilot_coding_agents": 2,
+      "copilot_success_rate_pct": 50.0,
+      "avg_copilot_duration_min": 8.3,
+      "experimental_strategy": "Sub-PR Iteration Pattern Analysis",
+      "key_insights": [
+        "docs PR (Organization Practices) attracted Copilot agent - first observed pure-docs task",
+        "startup_failure on create-agentic-workflows branch - new infrastructure failure mode",
+        "Sub-PR model: single branch spawns multiple addressing-comment Copilot re-engagements"
+      ]
+    },
+    {
+      "date": "2026-04-28",
+      "sessions_analyzed": 0,
+      "completion_rate_pct": null,
+      "copilot_coding_agents": null,
+      "copilot_success_rate_pct": null,
+      "avg_copilot_duration_min": null,
+      "experimental_strategy": "Historical Trend Regression Analysis",
+      "key_insights": [
+        "API rate limit hit during pre-fetch - no fresh session data available",
+        "Historical regression (16 days): duration >15min = 100% success; <5min = ~7% success",
+        "Agent count inflates risk: >=4 agents/day = 48.8% success vs <=2 agents/day = 75%"
+      ]
+    },
+    {
+      "date": "2026-04-29",
+      "sessions_analyzed": 50,
+      "completion_rate_pct": 8.0,
+      "copilot_coding_agents": 3,
+      "copilot_success_rate_pct": 0.0,
+      "avg_copilot_duration_min": 0.2,
+      "experimental_strategy": null,
+      "key_insights": [
+        "fix-daily-sentrux-report-failure: 19 gate sessions, no agent assigned, 3 rounds wasted (orphaned branch pattern)",
+        "update-cli-versions-again: all 4 gates SUCCESS (Design Decision + Grumpy + Test Quality + CGO)",
+        "3 Copilot agents all in-progress at snapshot time (0.2 min) - similar to Apr 18 pending pattern",
+        "Orphaned branch count = 2 today (sentrux + import-inputs): highest since Apr 26"
+      ]
+    }
+  ],
+  "last_updated": "2026-04-29"
+}
