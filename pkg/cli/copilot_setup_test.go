@@ -804,7 +804,7 @@ jobs:
 }
 
 // TestEnsureCopilotSetupSteps_SkipsUpdateWhenGHExtensionInstallExists tests that update is skipped when gh extension install exists
-func TestEnsureCopilotSetupSteps_SkipsUpdateWhenCurlExists(t *testing.T) {
+func TestEnsureCopilotSetupSteps_SkipsUpdateWhenGHExtensionInstallExists(t *testing.T) {
 	tmpDir := t.TempDir()
 	originalDir, err := os.Getwd()
 	if err != nil {

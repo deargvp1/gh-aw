@@ -204,14 +204,15 @@ func ensureCopilotSetupStepsWithUpgrade(verbose bool, actionMode workflow.Action
 
 		// Check if the extension install step is already present (check for all modes)
 		contentStr := string(content)
-		hasLegacyInstall := strings.Contains(contentStr, "install-gh-aw.sh") ||
+		// hasCurlBashInstall detects the old curl-pipe-bash installation pattern (now legacy)
+		hasCurlBashInstall := strings.Contains(contentStr, "install-gh-aw.sh") ||
 			(strings.Contains(contentStr, "Install gh-aw extension") && strings.Contains(contentStr, "curl -fsSL"))
 		hasActionInstall := strings.Contains(contentStr, "actions/setup-cli")
 		hasGHExtensionInstall := strings.Contains(contentStr, "gh extension install github/gh-aw")
 
 		// If we have an install step and upgradeVersion is true, this is from upgrade command
 		// In this case, we still update the file for backward compatibility
-		if (hasLegacyInstall || hasActionInstall || hasGHExtensionInstall) && upgradeVersion {
+		if (hasCurlBashInstall || hasActionInstall || hasGHExtensionInstall) && upgradeVersion {
 			copilotSetupLog.Print("Extension install step exists, attempting version upgrade (upgrade command)")
 
 			upgraded, updatedContent, err := upgradeSetupCliVersionInContent(content, actionMode, version, resolver)
@@ -239,7 +240,7 @@ func ensureCopilotSetupStepsWithUpgrade(verbose bool, actionMode workflow.Action
 		}
 
 		// File exists - render instructions instead of editing
-		if hasLegacyInstall || hasActionInstall || hasGHExtensionInstall {
+		if hasCurlBashInstall || hasActionInstall || hasGHExtensionInstall {
 			copilotSetupLog.Print("Extension install step already exists, file is up to date")
 			if verbose {
 				fmt.Fprintf(os.Stderr, "Skipping %s (already has gh-aw extension install step)\n", setupStepsPath)
