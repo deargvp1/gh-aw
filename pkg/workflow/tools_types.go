@@ -196,7 +196,11 @@ func (t *ToolsConfig) ToMap() map[string]any {
 		result["github"] = t.GitHub
 	}
 	if t.Bash != nil {
-		result["bash"] = t.Bash.AllowedCommands
+		if t.Bash.AllowedCommandsExpr != "" {
+			result["bash"] = t.Bash.AllowedCommandsExpr
+		} else {
+			result["bash"] = t.Bash.AllowedCommands
+		}
 	}
 	if t.WebFetch != nil {
 		result["web-fetch"] = t.WebFetch
@@ -297,8 +301,12 @@ type GitHubToolConfig struct {
 	ReadOnly    bool               `yaml:"read-only,omitempty"`
 	GitHubToken string             `yaml:"github-token,omitempty"`
 	Toolset     GitHubToolsets     `yaml:"toolsets,omitempty"`
-	Lockdown    bool               `yaml:"lockdown,omitempty"`
-	GitHubApp   *GitHubAppConfig   `yaml:"github-app,omitempty"` // GitHub App configuration for token minting
+	// ToolsetExpr holds a GitHub Actions expression (e.g. "${{ inputs.github-toolsets }}")
+	// that resolves at runtime to a comma-separated list of toolset names.
+	// Set when the toolsets field is a string expression rather than a literal array.
+	ToolsetExpr string           `yaml:"-"`
+	Lockdown    bool             `yaml:"lockdown,omitempty"`
+	GitHubApp   *GitHubAppConfig `yaml:"github-app,omitempty"` // GitHub App configuration for token minting
 
 	// Guard policy fields (flat syntax under github:)
 	// AllowedRepos defines the access scope for policy enforcement.
@@ -363,6 +371,10 @@ type PlaywrightToolConfig struct {
 // Can be nil (all commands allowed) or an array of allowed commands
 type BashToolConfig struct {
 	AllowedCommands []string `yaml:"-"` // List of allowed bash commands
+	// AllowedCommandsExpr holds a GitHub Actions expression (e.g. "${{ inputs.bash-allowlist }}")
+	// that resolves at runtime to a comma- or newline-separated list of allowed bash commands.
+	// Set when the bash field is a string expression rather than a literal array or boolean.
+	AllowedCommandsExpr string `yaml:"-"`
 }
 
 // WebFetchToolConfig represents the configuration for the web-fetch tool
@@ -377,7 +389,10 @@ type WebSearchToolConfig struct {
 
 // EditToolConfig represents the configuration for the edit tool
 type EditToolConfig struct {
-	// Currently an empty object or nil
+	// EnabledExpr holds a GitHub Actions expression (e.g. "${{ inputs.enable-edit }}")
+	// that resolves at runtime to "true" or "false".
+	// Set when the edit field is a string expression rather than null/boolean/object.
+	EnabledExpr string `yaml:"-"`
 }
 
 // AgenticWorkflowsToolConfig represents the configuration for the agentic-workflows tool

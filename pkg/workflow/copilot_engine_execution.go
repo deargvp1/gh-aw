@@ -113,8 +113,22 @@ func (e *CopilotEngine) GetExecutionSteps(workflowData *WorkflowData, logFile st
 		}
 	}
 
+	// Detect expression-parameterized bash and edit tool configs.
+	// When these are expressions, static --allow-tool args are omitted from copilotArgs
+	// (handled by computeCopilotToolArguments above), and we instead generate a runtime
+	// preamble script that builds the tool args from env var values.
+	hasBashExpr := workflowData.ParsedTools != nil &&
+		workflowData.ParsedTools.Bash != nil &&
+		workflowData.ParsedTools.Bash.AllowedCommandsExpr != ""
+	hasEditExpr := workflowData.ParsedTools != nil &&
+		workflowData.ParsedTools.Edit != nil &&
+		workflowData.ParsedTools.Edit.EnabledExpr != ""
+
 	// Add --allow-all-paths when edit tool is enabled to allow write on all paths
 	// See: https://github.com/github/copilot-cli/issues/67#issuecomment-3411256174
+	// When edit is an expression, include --allow-all-paths statically (path access is less
+	// sensitive than write permission; the write permission itself is gated at runtime by
+	// GH_AW_EDIT_ENABLED). The preamble will conditionally add --allow-tool write.
 	if workflowData.ParsedTools != nil && workflowData.ParsedTools.Edit != nil {
 		copilotArgs = append(copilotArgs, "--allow-all-paths")
 	}
@@ -198,12 +212,26 @@ func (e *CopilotEngine) GetExecutionSteps(workflowData *WorkflowData, logFile st
 		execPrefix = commandName
 	}
 
+	// Build preamble and dynamic args injection for expression-parameterized tools.
+	// When bash or edit tools are expressions, the tool args are computed at runtime from
+	// env vars GH_AW_BASH_ALLOWLIST and GH_AW_EDIT_ENABLED respectively.
+	dynamicArgsPreamble := buildCopilotDynamicToolArgsPreamble(hasBashExpr, hasEditExpr)
+	// Dynamic args are injected BEFORE the static args so that order matches intent.
+	// "${_bash_tool_args[@]}" and "${_edit_tool_args[@]}" expand to zero or more arguments.
+	var dynamicArgsPrefix string
+	if hasBashExpr {
+		dynamicArgsPrefix += `"${_bash_tool_args[@]}" `
+	}
+	if hasEditExpr {
+		dynamicArgsPrefix += `"${_edit_tool_args[@]}" `
+	}
+
 	if sandboxEnabled {
 		// Sandbox mode: add workspace dir and pass prompt file path directly
-		copilotCommand = fmt.Sprintf(`%s %s --add-dir "${GITHUB_WORKSPACE}" --prompt-file /tmp/gh-aw/aw-prompts/prompt.txt`, execPrefix, shellJoinArgs(copilotArgs))
+		copilotCommand = fmt.Sprintf(`%s %s%s --add-dir "${GITHUB_WORKSPACE}" --prompt-file /tmp/gh-aw/aw-prompts/prompt.txt`, execPrefix, dynamicArgsPrefix, shellJoinArgs(copilotArgs))
 	} else {
 		// Non-sandbox mode: pass prompt file path directly
-		copilotCommand = fmt.Sprintf(`%s %s --prompt-file /tmp/gh-aw/aw-prompts/prompt.txt`, execPrefix, shellJoinArgs(copilotArgs))
+		copilotCommand = fmt.Sprintf(`%s %s%s --prompt-file /tmp/gh-aw/aw-prompts/prompt.txt`, execPrefix, dynamicArgsPrefix, shellJoinArgs(copilotArgs))
 	}
 
 	// Conditionally wrap with sandbox (AWF only)
@@ -248,7 +276,16 @@ func (e *CopilotEngine) GetExecutionSteps(workflowData *WorkflowData, logFile st
 		// succeeds regardless of runner type. This mirrors the pattern used by the
 		// Claude and Codex engines.
 		npmPathSetup := GetNpmBinPathSetup()
-		engineCommand := fmt.Sprintf("%s && %s", npmPathSetup, copilotCommand)
+		// When tools have expression-based configs, inject the dynamic args preamble inside
+		// the engine command (runs inside the AWF container, same bash context as copilot).
+		// The preamble declares _bash_tool_args and _edit_tool_args arrays that are then
+		// referenced in copilotCommand via "${_bash_tool_args[@]}" and "${_edit_tool_args[@]}".
+		var engineCommand string
+		if dynamicArgsPreamble != "" {
+			engineCommand = fmt.Sprintf("%s\n%s\n%s", npmPathSetup, dynamicArgsPreamble, copilotCommand)
+		} else {
+			engineCommand = fmt.Sprintf("%s && %s", npmPathSetup, copilotCommand)
+		}
 
 		// MCP CLI bin directory: when cli-proxy is enabled, the CLI wrapper scripts
 		// live under ${RUNNER_TEMP}/gh-aw/mcp-cli/bin. core.addPath() adds this to
@@ -292,6 +329,11 @@ func (e *CopilotEngine) GetExecutionSteps(workflowData *WorkflowData, logFile st
 		preCommandSetup := mkdirCommands.String()
 		if customCommandScriptSetup != "" {
 			preCommandSetup = customCommandScriptSetup + "\n" + preCommandSetup
+		}
+		// When tools have expression-based configs, inject the dynamic args preamble before
+		// the copilot command so that _bash_tool_args and _edit_tool_args are defined.
+		if dynamicArgsPreamble != "" {
+			preCommandSetup += dynamicArgsPreamble + "\n"
 		}
 		command = fmt.Sprintf(`set -o pipefail
 touch %s
@@ -398,6 +440,20 @@ touch %s
 	// Supports both literal integers and GitHub Actions expressions (e.g. "${{ inputs.tool-timeout }}")
 	if workflowData.ToolsTimeout != "" {
 		env["GH_AW_TOOL_TIMEOUT"] = workflowData.ToolsTimeout
+	}
+
+	// Add GH_AW_BASH_ALLOWLIST when tools.bash is a GitHub Actions expression.
+	// The runtime preamble reads this env var to dynamically build --allow-tool shell(...) args.
+	// Supported format: comma- or newline-separated list of bash commands (e.g. "git,npm,echo").
+	if hasBashExpr {
+		env["GH_AW_BASH_ALLOWLIST"] = workflowData.ParsedTools.Bash.AllowedCommandsExpr
+	}
+
+	// Add GH_AW_EDIT_ENABLED when tools.edit is a GitHub Actions expression.
+	// The runtime preamble reads this env var to conditionally add --allow-tool write.
+	// Supported values: "true" to enable, anything else (or empty) to disable.
+	if hasEditExpr {
+		env["GH_AW_EDIT_ENABLED"] = workflowData.ParsedTools.Edit.EnabledExpr
 	}
 
 	if workflowData.EngineConfig != nil && workflowData.EngineConfig.MaxTurns != "" {

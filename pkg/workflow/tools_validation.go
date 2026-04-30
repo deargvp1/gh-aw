@@ -17,7 +17,7 @@ func validateBashToolConfig(tools *Tools, workflowName string) error {
 	if rawMap := tools.ToMap(); rawMap != nil {
 		if _, hasBash := rawMap["bash"]; hasBash && tools.Bash == nil {
 			toolsValidationLog.Printf("Invalid bash tool configuration in workflow: %s", workflowName)
-			return errors.New("invalid bash tool configuration: anonymous syntax 'bash:' is not supported. Use 'bash: true' (enable all commands), 'bash: false' (disable), or 'bash: [\"cmd1\", \"cmd2\"]' (specific commands). Run 'gh aw fix' to automatically migrate")
+			return errors.New("invalid bash tool configuration: anonymous syntax 'bash:' is not supported. Use 'bash: true' (enable all commands), 'bash: false' (disable), 'bash: [\"cmd1\", \"cmd2\"]' (specific commands), or 'bash: ${{ inputs.bash-allowlist }}' (GitHub Actions expression). Run 'gh aw fix' to automatically migrate")
 		}
 	}
 

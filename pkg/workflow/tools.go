@@ -40,7 +40,9 @@ func (c *Compiler) applyDefaults(data *WorkflowData, markdownPath string) error 
 		// Cache the expanded + parsed toolsets for the GitHub tool so both
 		// ValidatePermissions and validateToolConfiguration reuse one result.
 		// Use GetToolsets() to stay aligned with the runtime normalization done by GitHubToolConfig.
-		if data.ParsedTools != nil && data.ParsedTools.GitHub != nil {
+		// When toolsets is a GitHub Actions expression, GetToolsets() returns "" and we leave
+		// CachedParsedToolsets nil to signal "unknown at compile time" to callers.
+		if data.ParsedTools != nil && data.ParsedTools.GitHub != nil && data.ParsedTools.GitHub.ToolsetExpr == "" {
 			data.CachedParsedToolsets = ParseGitHubToolsets(data.ParsedTools.GitHub.GetToolsets())
 		}
 	}()

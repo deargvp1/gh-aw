@@ -302,27 +302,34 @@ func (c *Compiler) validateToolConfiguration(workflowData *WorkflowData, markdow
 	// Validate GitHub tools against enabled toolsets
 	log.Printf("Validating GitHub tools against enabled toolsets")
 	if workflowData.ParsedTools != nil && workflowData.ParsedTools.GitHub != nil {
-		// Extract allowed tools and reuse the cached parsed toolsets from applyDefaults to
-		// avoid a redundant ParseGitHubToolsets call on every validateWorkflowData iteration.
-		allowedTools := workflowData.ParsedTools.GitHub.Allowed.ToStringSlice()
-		var enabledToolsets []string
-		if workflowData.CachedParsedToolsets != nil {
-			enabledToolsets = workflowData.CachedParsedToolsets
+		// Skip compile-time toolset validation when toolsets is a GitHub Actions expression
+		// (e.g. "${{ inputs.github-toolsets }}"). The value is resolved at runtime and cannot
+		// be validated here without knowing the actual input values.
+		if workflowData.ParsedTools.GitHub.ToolsetExpr != "" {
+			log.Printf("Skipping toolset validation: toolsets is a runtime expression: %s", workflowData.ParsedTools.GitHub.ToolsetExpr)
 		} else {
-			enabledToolsets = ParseGitHubToolsets(strings.Join(workflowData.ParsedTools.GitHub.Toolset.ToStringSlice(), ","))
-		}
+			// Extract allowed tools and reuse the cached parsed toolsets from applyDefaults to
+			// avoid a redundant ParseGitHubToolsets call on every validateWorkflowData iteration.
+			allowedTools := workflowData.ParsedTools.GitHub.Allowed.ToStringSlice()
+			var enabledToolsets []string
+			if workflowData.CachedParsedToolsets != nil {
+				enabledToolsets = workflowData.CachedParsedToolsets
+			} else {
+				enabledToolsets = ParseGitHubToolsets(strings.Join(workflowData.ParsedTools.GitHub.Toolset.ToStringSlice(), ","))
+			}
 
-		// Validate that all allowed tools have their toolsets enabled
-		if err := ValidateGitHubToolsAgainstToolsets(allowedTools, enabledToolsets); err != nil {
-			return formatCompilerError(markdownPath, "error", err.Error(), err)
-		}
+			// Validate that all allowed tools have their toolsets enabled
+			if err := ValidateGitHubToolsAgainstToolsets(allowedTools, enabledToolsets); err != nil {
+				return formatCompilerError(markdownPath, "error", err.Error(), err)
+			}
 
-		// Print informational message if "projects" toolset is explicitly specified
-		// (not when implied by "all", as users unlikely intend to use projects with "all")
-		originalToolsets := workflowData.ParsedTools.GitHub.Toolset.ToStringSlice()
-		if slices.Contains(originalToolsets, "projects") {
-			fmt.Fprintln(os.Stderr, console.FormatInfoMessage("The 'projects' toolset requires additional authentication."))
-			fmt.Fprintln(os.Stderr, console.FormatInfoMessage("See: https://github.github.com/gh-aw/reference/auth-projects/"))
+			// Print informational message if "projects" toolset is explicitly specified
+			// (not when implied by "all", as users unlikely intend to use projects with "all")
+			originalToolsets := workflowData.ParsedTools.GitHub.Toolset.ToStringSlice()
+			if slices.Contains(originalToolsets, "projects") {
+				fmt.Fprintln(os.Stderr, console.FormatInfoMessage("The 'projects' toolset requires additional authentication."))
+				fmt.Fprintln(os.Stderr, console.FormatInfoMessage("See: https://github.github.com/gh-aw/reference/auth-projects/"))
+			}
 		}
 	}
 

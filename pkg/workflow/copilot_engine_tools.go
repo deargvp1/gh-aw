@@ -35,6 +35,15 @@ var copilotEngineToolsLog = logger.New("workflow:copilot_engine_tools")
 // computeCopilotToolArguments computes the --allow-tool arguments for Copilot CLI based on tool configurations.
 // It handles bash/shell tools, edit tools, safe outputs, mcp-scripts, and MCP server tools.
 // Returns a sorted list of arguments ready to be passed to the Copilot CLI.
+//
+// When tools.bash is a GitHub Actions expression, bash tool arguments are omitted from the
+// returned list. The caller (GetExecutionSteps) is responsible for detecting this case via
+// workflowData.ParsedTools.Bash.AllowedCommandsExpr and injecting a runtime preamble that
+// dynamically builds shell() --allow-tool arguments from the GH_AW_BASH_ALLOWLIST env var.
+//
+// When tools.edit is a GitHub Actions expression, edit tool arguments are omitted from the
+// returned list. The caller is responsible for detecting this and conditionally adding
+// --allow-tool write via a runtime check on GH_AW_EDIT_ENABLED.
 func (e *CopilotEngine) computeCopilotToolArguments(tools map[string]any, safeOutputs *SafeOutputsConfig, mcpScripts *MCPScriptsConfig, workflowData *WorkflowData) []string {
 	copilotEngineToolsLog.Printf("Computing tool arguments: tools=%d", len(tools))
 	if tools == nil {
@@ -62,7 +71,13 @@ func (e *CopilotEngine) computeCopilotToolArguments(tools map[string]any, safeOu
 
 	// Handle bash/shell tools (when no wildcard)
 	if bashConfig, hasBash := tools["bash"]; hasBash {
-		if bashCommands, ok := bashConfig.([]any); ok {
+		if bashExpr, ok := bashConfig.(string); ok && isExpression(bashExpr) {
+			// GitHub Actions expression: tool arguments are built dynamically at runtime
+			// from GH_AW_BASH_ALLOWLIST env var. Treat as restricted (no static shell args).
+			copilotEngineToolsLog.Printf("Bash tool is a runtime expression, deferring shell args to runtime: %s", bashExpr)
+			hasRestrictedBashAllowlist = true
+			// No static --allow-tool shell(...) args added here.
+		} else if bashCommands, ok := bashConfig.([]any); ok {
 			hasRestrictedBashAllowlist = true
 			// Add specific shell commands
 			for _, cmd := range bashCommands {
@@ -96,9 +111,15 @@ func (e *CopilotEngine) computeCopilotToolArguments(tools map[string]any, safeOu
 
 	// Handle edit tools requirement for file write access
 	// Note: safe-outputs do not need write permission as they use MCP
-	if _, hasEdit := tools["edit"]; hasEdit {
-		copilotEngineToolsLog.Print("Edit tool enabled, adding write permission")
-		args = append(args, "--allow-tool", "write")
+	if editConfig, hasEdit := tools["edit"]; hasEdit {
+		if editExpr, ok := editConfig.(string); ok && isExpression(editExpr) {
+			// GitHub Actions expression: edit permission added dynamically at runtime
+			// via GH_AW_EDIT_ENABLED env var. No static --allow-tool write added here.
+			copilotEngineToolsLog.Printf("Edit tool is a runtime expression, deferring write permission to runtime: %s", editExpr)
+		} else {
+			copilotEngineToolsLog.Print("Edit tool enabled, adding write permission")
+			args = append(args, "--allow-tool", "write")
+		}
 	}
 
 	// Handle safe_outputs MCP server - allow all tools if safe outputs are enabled
@@ -233,4 +254,52 @@ func (e *CopilotEngine) generateCopilotToolArgumentsComment(tools map[string]any
 	}
 
 	return comment.String()
+}
+
+// buildCopilotDynamicToolArgsPreamble generates a bash preamble script that builds
+// --allow-tool arguments for parameterized bash and edit tools at runtime.
+//
+// For bash expressions: reads GH_AW_BASH_ALLOWLIST (comma-separated commands)
+// and populates _bash_tool_args array with --allow-tool shell(<cmd>) entries.
+//
+// For edit expressions: reads GH_AW_EDIT_ENABLED ("true" to enable) and
+// populates _edit_tool_args with --allow-tool write.
+//
+// The caller injects these arrays into the copilot command as:
+//
+//	copilot "${_bash_tool_args[@]}" "${_edit_tool_args[@]}" <other-args>
+func buildCopilotDynamicToolArgsPreamble(hasBashExpr, hasEditExpr bool) string {
+	if !hasBashExpr && !hasEditExpr {
+		return ""
+	}
+
+	var preamble strings.Builder
+
+	if hasBashExpr {
+		// Build _bash_tool_args from GH_AW_BASH_ALLOWLIST (comma-separated commands).
+		// Each command becomes --allow-tool shell(<cmd>). Empty or whitespace-only
+		// entries are skipped. The array is empty when GH_AW_BASH_ALLOWLIST is unset
+		// or empty, which results in no shell access being granted (fail-closed).
+		preamble.WriteString("_bash_tool_args=()\n")
+		preamble.WriteString("if [ -n \"${GH_AW_BASH_ALLOWLIST:-}\" ]; then\n")
+		preamble.WriteString("  while IFS= read -r _cmd; do\n")
+		// Trim leading and trailing whitespace from each command
+		preamble.WriteString("    _cmd=\"${_cmd#\"${_cmd%%[![:space:]]*}\"}\"\n")
+		preamble.WriteString("    _cmd=\"${_cmd%\"${_cmd##*[![:space:]]}\"}\" \n")
+		preamble.WriteString("    [ -z \"$_cmd\" ] && continue\n")
+		preamble.WriteString("    _bash_tool_args+=(\"--allow-tool\" \"shell($_cmd)\")\n")
+		preamble.WriteString("  done < <(printf '%s\\n' \"${GH_AW_BASH_ALLOWLIST}\" | tr ',' '\\n')\n")
+		preamble.WriteString("fi\n")
+	}
+
+	if hasEditExpr {
+		// Conditionally add --allow-tool write based on GH_AW_EDIT_ENABLED env var.
+		// The array is empty when the expression evaluates to anything other than "true".
+		preamble.WriteString("_edit_tool_args=()\n")
+		preamble.WriteString("if [ \"${GH_AW_EDIT_ENABLED:-}\" = \"true\" ]; then\n")
+		preamble.WriteString("  _edit_tool_args=(\"--allow-tool\" \"write\")\n")
+		preamble.WriteString("fi\n")
+	}
+
+	return preamble.String()
 }

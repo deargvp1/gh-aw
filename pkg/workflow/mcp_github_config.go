@@ -205,6 +205,12 @@ func hasGitHubLockdownExplicitlySet(githubTool any) bool {
 func getGitHubToolsets(githubTool any) string {
 	if toolConfig, ok := githubTool.(map[string]any); ok {
 		if toolsetsSetting, exists := toolConfig["toolsets"]; exists {
+			// Handle GitHub Actions expression string: pass through verbatim so that
+			// GitHub Actions evaluates it at runtime when the MCP config is written.
+			if toolsetsStr, ok := toolsetsSetting.(string); ok && isExpression(toolsetsStr) {
+				githubConfigLog.Printf("GitHub MCP toolsets is a runtime expression: %s", toolsetsStr)
+				return toolsetsStr
+			}
 			// Handle array format only
 			if toolsets := parseStringSliceAny(toolsetsSetting, githubConfigLog); toolsets != nil {
 				toolsetsStr := strings.Join(toolsets, ",")

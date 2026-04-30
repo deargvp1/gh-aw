@@ -28,6 +28,12 @@ func hasBashWildcardInTools(tools map[string]any) bool {
 	if !hasBash {
 		return false
 	}
+	// GitHub Actions expression (e.g. "${{ inputs.bash-allowlist }}"): treat as restricted.
+	// We cannot determine at compile time whether the expression will resolve to a wildcard,
+	// so we conservatively treat it as a restricted allowlist (not bypass-permissions mode).
+	if strVal, ok := bashVal.(string); ok && isExpression(strVal) {
+		return false
+	}
 	// bash: true (non-list value) means unrestricted bash
 	bashCommands, ok := bashVal.([]any)
 	if !ok {

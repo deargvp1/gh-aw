@@ -83,6 +83,12 @@ func (g *GitHubToolConfig) GetToolsets() string {
 		// Should not happen - ValidatePermissions checks for nil before calling this
 		return ""
 	}
+	// When toolsets is a GitHub Actions expression, we cannot expand it at compile time.
+	// Return empty string to skip compile-time toolset-based validation; the runtime
+	// GitHub MCP server will enforce the actual toolset restrictions.
+	if g.ToolsetExpr != "" {
+		return ""
+	}
 	// Convert toolset array to comma-separated string
 	// If empty, expandDefaultToolset will apply defaults
 	toolsetsStr := strings.Join(g.Toolset.ToStringSlice(), ",")

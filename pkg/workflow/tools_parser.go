@@ -248,9 +248,8 @@ func parseGitHubTool(val any) *GitHubToolConfig {
 		}
 
 		// Check for both "toolset" and "toolsets" (plural is more common in user configs).
-		// Both fields accept either a single string (coerced to a one-element slice) or an
-		// array of strings, so that users can write either `toolsets: "default"` or
-		// `toolsets: [default]`.
+		// Both fields accept either a single string (coerced to a one-element slice), an
+		// array of strings, or a GitHub Actions expression string that is resolved at runtime.
 		if toolset, ok := configMap["toolsets"].([]any); ok {
 			config.Toolset = make(GitHubToolsets, 0, len(toolset))
 			for _, item := range toolset {
@@ -259,10 +258,16 @@ func parseGitHubTool(val any) *GitHubToolConfig {
 				}
 			}
 		} else if toolsetStr, ok := configMap["toolsets"].(string); ok {
-			config.Toolset = GitHubToolsets{GitHubToolset(toolsetStr)}
-			// Normalize the raw map to an array so the compiled GitHub Actions YAML
-			// always emits an array, maintaining consistent output regardless of input form.
-			configMap["toolsets"] = []any{toolsetStr}
+			if isExpression(toolsetStr) {
+				// GitHub Actions expression: preserve for runtime evaluation via GITHUB_TOOLSETS env var.
+				config.ToolsetExpr = toolsetStr
+				// Leave raw map unchanged so getGitHubToolsets() receives the expression string.
+			} else {
+				config.Toolset = GitHubToolsets{GitHubToolset(toolsetStr)}
+				// Normalize the raw map to an array so the compiled GitHub Actions YAML
+				// always emits an array, maintaining consistent output regardless of input form.
+				configMap["toolsets"] = []any{toolsetStr}
+			}
 		} else if toolset, ok := configMap["toolset"].([]any); ok {
 			config.Toolset = make(GitHubToolsets, 0, len(toolset))
 			for _, item := range toolset {
@@ -271,10 +276,15 @@ func parseGitHubTool(val any) *GitHubToolConfig {
 				}
 			}
 		} else if toolsetStr, ok := configMap["toolset"].(string); ok {
-			config.Toolset = GitHubToolsets{GitHubToolset(toolsetStr)}
-			// Normalize the raw map to an array so the compiled GitHub Actions YAML
-			// always emits an array, maintaining consistent output regardless of input form.
-			configMap["toolset"] = []any{toolsetStr}
+			if isExpression(toolsetStr) {
+				// GitHub Actions expression for singular "toolset" key.
+				config.ToolsetExpr = toolsetStr
+			} else {
+				config.Toolset = GitHubToolsets{GitHubToolset(toolsetStr)}
+				// Normalize the raw map to an array so the compiled GitHub Actions YAML
+				// always emits an array, maintaining consistent output regardless of input form.
+				configMap["toolset"] = []any{toolsetStr}
+			}
 		}
 
 		if lockdown, ok := configMap["lockdown"].(bool); ok {
@@ -419,6 +429,18 @@ func parseBashTool(val any) *BashToolConfig {
 		}
 	}
 
+	// Handle GitHub Actions expression string (e.g. "${{ inputs.bash-allowlist }}")
+	// The expression is preserved for runtime evaluation via GH_AW_BASH_ALLOWLIST env var.
+	if strVal, ok := val.(string); ok {
+		if isExpression(strVal) {
+			toolsParserLog.Printf("Bash tool configured with expression: %s", strVal)
+			return &BashToolConfig{AllowedCommandsExpr: strVal}
+		}
+		// Non-expression strings are invalid
+		toolsParserLog.Printf("Bash tool configured with non-expression string (invalid): %s", strVal)
+		return nil
+	}
+
 	// Handle array of allowed commands
 	if cmdArray, ok := val.([]any); ok {
 		config := &BashToolConfig{
@@ -492,7 +514,16 @@ func parseWebSearchTool(val any) *WebSearchToolConfig {
 
 // parseEditTool converts raw edit tool configuration
 func parseEditTool(val any) *EditToolConfig {
-	// edit is either nil or an empty object
+	// Handle GitHub Actions expression string (e.g. "${{ inputs.enable-edit }}")
+	if strVal, ok := val.(string); ok {
+		if isExpression(strVal) {
+			toolsParserLog.Printf("Edit tool configured with expression: %s", strVal)
+			return &EditToolConfig{EnabledExpr: strVal}
+		}
+		toolsParserLog.Printf("Edit tool configured with non-expression string (invalid): %s", strVal)
+		return &EditToolConfig{}
+	}
+	// edit is either nil, boolean, or an empty object
 	return &EditToolConfig{}
 }
 
