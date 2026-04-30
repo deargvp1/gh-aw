@@ -3627,7 +3627,7 @@ safe-outputs:
     github-token-for-extra-empty-commit: "example-value"
 
     # Controls protected-file protection. String form: blocked (default), allowed, or
-    # fallback-to-issue. Object form: { policy, exclude } to customise the
+    # fallback-to-issue. Object form: { policy, exclude } to customize the
     # protected-file set.
     # (optional)
     # This field supports multiple formats (oneOf):
@@ -4818,7 +4818,7 @@ safe-outputs:
       # Array of strings
 
     # Controls protected-file protection. String form: blocked (default), allowed, or
-    # fallback-to-issue. Object form: { policy, exclude } to customise the
+    # fallback-to-issue. Object form: { policy, exclude } to customize the
     # protected-file set.
     # (optional)
     # This field supports multiple formats (oneOf):
@@ -5339,7 +5339,7 @@ safe-outputs:
     # Default values injected when the model omits a field
     # (optional)
     defaults:
-      # Behaviour when no files match: 'error' (default) or 'ignore'
+      # Behavior when no files match: 'error' (default) or 'ignore'
       # (optional)
       if-no-files: "error"
 
