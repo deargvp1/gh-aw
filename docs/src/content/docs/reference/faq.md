@@ -526,6 +526,40 @@ One workflow is simpler to maintain and good for learning, while multiple workfl
 
 Either approach works well. AI-assisted authoring using `/agent agentic-workflows create` in GitHub Copilot Chat provides interactive guidance with automatic best practices, while manual editing gives full control and is essential for advanced customizations. See [Creating Workflows](/gh-aw/setup/creating-workflows/) for AI-assisted approach, or [Reference documentation](/gh-aw/reference/frontmatter/) for manual configuration.
 
+### Can the agent use a branch name specified in an issue or Jira description?
+
+Yes. The agent receives the full issue body as context and can extract a branch name from natural language instructions like `Use existing branch: feature/abc-123-my-change`.
+
+To push changes to an **existing PR's branch**, use [`push-to-pull-request-branch`](/gh-aw/reference/safe-outputs-pull-requests/#push-to-pr-branch-push-to-pull-request-branch):
+
+```yaml wrap
+safe-outputs:
+  push-to-pull-request-branch:
+    target: "*"
+    title-prefix: "[bot] "
+checkout:
+  fetch: ["*"]
+  fetch-depth: 0
+```
+
+To create or force-update a **named branch** (no random suffix, push semantics), use `preserve-branch-name` and `recreate-ref` on [`create-pull-request`](/gh-aw/reference/safe-outputs-pull-requests/#pull-request-creation-create-pull-request):
+
+```yaml wrap
+safe-outputs:
+  create-pull-request:
+    preserve-branch-name: true
+    recreate-ref: true
+```
+
+Then instruct the agent in your workflow body to extract the branch name from the issue:
+
+```markdown
+If the issue description contains a line starting with "Branch:",
+use that value as the working branch name.
+```
+
+For reliable extraction, use a consistent format in your Jira descriptions (e.g., `Branch: feature/abc-123-my-change`). Jira branching rules in gh-aw (`preserve-branch-name`) apply only to naming new branches, not to selecting an existing one — the patterns above cover both cases.
+
 ### You use 'agent' and 'agentic workflow' interchangeably. Are they the same thing?
 
 Yes, for the purpose of this technology. An **"agent"** is an agentic workflow in a repository - an AI-powered automation that can reason, make decisions, and take actions. We use **"agentic workflow"** as it's plainer and emphasizes the workflow nature of the automation, but the terms are synonymous in this context.
