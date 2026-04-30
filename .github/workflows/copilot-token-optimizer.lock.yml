@@ -390,10 +390,10 @@ jobs:
         run: bash "${RUNNER_TEMP}/gh-aw/actions/configure_gh_for_ghe.sh"
         env:
           GH_TOKEN: ${{ github.token }}
-      - env:
-          GH_TOKEN: ${{ github.token }}
-        name: Install gh-aw extension
-        run: gh extension install github/gh-aw
+      - name: Install gh-aw extension
+        uses: ./actions/setup-cli
+        with:
+          version: latest
       - name: Install npm dependencies
         run: cd actions/setup/js && npm ci
       - name: Install development dependencies

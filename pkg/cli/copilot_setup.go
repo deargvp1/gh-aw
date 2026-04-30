@@ -81,7 +81,7 @@ jobs:
 `, actionRepo, actionRef, version)
 	}
 
-	// Default (dev/script mode): use gh extension install
+	// Default (dev/script mode): use actions/setup-cli
 	return `name: "Copilot Setup Steps"
 
 # This workflow configures the environment for GitHub Copilot Agent with gh-aw MCP server
@@ -102,10 +102,12 @@ jobs:
       contents: read
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
       - name: Install gh-aw extension
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh extension install github/gh-aw
+        uses: github/gh-aw/actions/setup-cli@main
+        with:
+          version: latest
 `
 }
 
@@ -129,10 +131,12 @@ jobs:
       contents: read
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
       - name: Install gh-aw extension
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh extension install github/gh-aw
+        uses: github/gh-aw/actions/setup-cli@main
+        with:
+          version: latest
 `
 
 // CopilotWorkflowStep represents a GitHub Actions workflow step for Copilot setup scaffolding
@@ -289,10 +293,12 @@ func renderCopilotSetupUpdateInstructions(filePath string, actionMode workflow.A
 		fmt.Fprintln(os.Stderr, "        with:")
 		fmt.Fprintf(os.Stderr, "          version: %s\n", version)
 	} else {
+		fmt.Fprintln(os.Stderr, "      - name: Checkout repository")
+		fmt.Fprintln(os.Stderr, "        uses: actions/checkout@v6")
 		fmt.Fprintln(os.Stderr, "      - name: Install gh-aw extension")
-		fmt.Fprintln(os.Stderr, "        env:")
-		fmt.Fprintln(os.Stderr, "          GH_TOKEN: ${{ github.token }}")
-		fmt.Fprintln(os.Stderr, "        run: gh extension install github/gh-aw")
+		fmt.Fprintln(os.Stderr, "        uses: github/gh-aw/actions/setup-cli@main")
+		fmt.Fprintln(os.Stderr, "        with:")
+		fmt.Fprintln(os.Stderr, "          version: latest")
 	}
 	fmt.Fprintln(os.Stderr)
 }
