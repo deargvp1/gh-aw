@@ -1,58 +1,6 @@
 {
   "analyses": [
     {
-      "date": "2026-04-16",
-      "sessions_analyzed": 50,
-      "completion_rate_pct": 4.0,
-      "copilot_coding_agents": 2,
-      "copilot_success_rate_pct": 100.0,
-      "avg_copilot_duration_min": 38.94,
-      "experimental_strategy": null,
-      "key_insights": [
-        "Two simultaneous Copilot sessions both succeeded",
-        "fix-bearer-token-bypass stalled - no agent"
-      ]
-    },
-    {
-      "date": "2026-04-17",
-      "sessions_analyzed": 50,
-      "completion_rate_pct": 10.0,
-      "copilot_coding_agents": 2,
-      "copilot_success_rate_pct": 100.0,
-      "avg_copilot_duration_min": 51.5,
-      "experimental_strategy": "Gate Storm Detection",
-      "key_insights": [
-        "Gate STORM: 8 concurrent gates at 11:22 (double trigger)",
-        "6th consecutive 100% Copilot day"
-      ]
-    },
-    {
-      "date": "2026-04-18",
-      "sessions_analyzed": 50,
-      "completion_rate_pct": 10.0,
-      "copilot_coding_agents": 2,
-      "copilot_success_rate_pct": 0.0,
-      "avg_copilot_duration_min": 0.18,
-      "experimental_strategy": null,
-      "key_insights": [
-        "Both agents still pending at analysis time",
-        "56% action_required gate density - highest observed"
-      ]
-    },
-    {
-      "date": "2026-04-19",
-      "sessions_analyzed": 100,
-      "completion_rate_pct": 11.0,
-      "copilot_coding_agents": 2,
-      "copilot_success_rate_pct": 100.0,
-      "avg_copilot_duration_min": 13.45,
-      "experimental_strategy": null,
-      "key_insights": [
-        "100 sessions across 7 branches - highest volume day",
-        "11% overall completion - new high"
-      ]
-    },
-    {
       "date": "2026-04-20",
       "sessions_analyzed": 50,
       "completion_rate_pct": 4.0,
@@ -176,7 +124,21 @@
         "3 Copilot agents all in-progress at snapshot time (0.2 min) - similar to Apr 18 pending pattern",
         "Orphaned branch count = 2 today (sentrux + import-inputs): highest since Apr 26"
       ]
+    },
+    {
+      "date": "2026-04-30",
+      "sessions_analyzed": 50,
+      "completion_rate_pct": 2.0,
+      "copilot_coding_agents": 2,
+      "copilot_success_rate_pct": 50.0,
+      "avg_copilot_duration_min": 20.85,
+      "experimental_strategy": null,
+      "key_insights": [
+        "Self-referential CI fix: aw-failures-fix-smoke-claude-crash Copilot SUCCESS in 18.2min (4 CI rounds)",
+        "fix-session-not-found-error: Copilot CANCELLED after 23.5min - new cancellation in session tracking infra",
+        "3 orphaned branches at 06:08-06:26 snapshot - enable-create-issue-safe-output and update-agentic-maintenance-action pending agent assignment"
+      ]
     }
   ],
-  "last_updated": "2026-04-29"
+  "last_updated": "2026-04-30"
 }
