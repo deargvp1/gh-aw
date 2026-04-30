@@ -1,0 +1,14 @@
+{
+  "date": "2026-04-30",
+  "files_analyzed": {
+    "documentation": ["docs/src/content/docs/reference/effective-tokens-specification.md","docs/src/content/docs/introduction/slides.mdx"],
+    "cli": ["validate","logs"],
+    "messages": [".github/workflows/smoke-claude.md"],
+    "validation": ["pkg/workflow/github_toolset_validation_integration_test.go"]
+  },
+  "overall_quality": "professional",
+  "single_file_improvements": [
+    {"file":"docs/src/content/docs/introduction/slides.mdx","priority":"high","issue":"Bare URLs without labels, broken entry line 43 (Copilot with no URL), inconsistent link formatting"},
+    {"file":"docs/src/content/docs/reference/effective-tokens-specification.md","priority":"medium","issue":"Terminology inconsistency: section 3.2 header='Model Multiplier' but body+JSON schema use 'Copilot Multiplier' - vendor-specific name in a general specification"}
+  ]
+}
