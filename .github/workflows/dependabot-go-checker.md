@@ -27,12 +27,8 @@ safe-outputs:
     target: "*"
     max: 20
   create-issue:
-    expires: 2d
-    title-prefix: "[deps]"
-    labels: [dependencies, go, cookie]
     max: 10
     group: true
-
 tools:
   cli-proxy: true
   github:
@@ -41,8 +37,11 @@ tools:
   bash: [":*"]
 
 imports:
-  - shared/reporting.md
-
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[deps]"
+      expires: "2d"
+      labels: [dependencies, go, cookie]
 ---
 # Dependabot Dependency Checker
 

@@ -10,15 +10,17 @@ permissions:
   pull-requests: read
 engine: codex
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[duplicate-code] "
+      expires: "2d"
+      labels: [code-quality, automated-analysis, cookie]
+      assignees: [copilot]
   - shared/go-source-analysis.md
 safe-outputs:
   create-issue:
-    expires: 2d
-    title-prefix: "[duplicate-code] "
-    labels: [code-quality, automated-analysis, cookie]
-    assignees: copilot
-    group: true
     max: 3
+    group: true
 timeout-minutes: 15
 strict: true
 
@@ -26,7 +28,6 @@ tools:
   cli-proxy: true
 
 ---
-
 # Duplicate Code Detection
 
 Analyze code to identify duplicated patterns using Serena's semantic code analysis capabilities. Report significant findings that require refactoring.

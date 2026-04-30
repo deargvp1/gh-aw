@@ -16,22 +16,18 @@ permissions:
 engine: copilot
 
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[video-analysis] "
+      expires: "2d"
+      labels: [automation, video-processing, cookie]
   - shared/ffmpeg.md
-
 tools:
   bash: true
-
-safe-outputs:
-  create-issue:
-    expires: 2d
-    title-prefix: "[video-analysis] "
-    labels: [automation, video-processing, cookie]
-    max: 1
 
 timeout-minutes: 15
 strict: true
 ---
-
 # Video Analysis Agent
 
 You are a video analysis agent that uses ffmpeg to process and analyze video files.

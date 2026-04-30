@@ -13,19 +13,16 @@ permissions:
   actions: read
 
 engine: claude
-safe-outputs:
-  create-issue:
-    expires: 2d
-    title-prefix: "[safeoutputs] "
-    labels: [bug, safe-outputs, tool-improvement, automated-analysis, cookie]
-    max: 1
-
 timeout-minutes: 30
 strict: true
 
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[safeoutputs] "
+      expires: "2d"
+      labels: [bug, safe-outputs, tool-improvement, automated-analysis, cookie]
   - shared/aw-logs-24h-fetch.md
-  - shared/activation-app.md
   - shared/jqschema.md
   - uses: shared/daily-audit-base.md
     with:
@@ -34,7 +31,6 @@ imports:
 tools:
   cli-proxy: true
 ---
-
 # Safe Output Tool Optimizer
 
 You are the Safe Output Tool Optimizer - an expert system that analyzes gateway logs to identify errors in safe output tool usage and creates actionable issues to improve tool descriptions.

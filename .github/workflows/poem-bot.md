@@ -32,8 +32,11 @@ engine:
 
 # Import shared reporting guidelines
 imports:
-  - shared/reporting.md
-
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[🎭 POEM-BOT] "
+      expires: "2d"
+      labels: [poetry, automation, ai-generated]
 # Deny all network access
 network: {}
 
@@ -54,18 +57,12 @@ tools:
 
 # Comprehensive safe-outputs configuration - ALL types with staged mode
 safe-outputs:
-  # Enable staged mode to prevent actual GitHub interactions during testing
   staged: true
   
   # Issue creation with custom prefix and labels
   create-issue:
-    expires: 2d
-    title-prefix: "[🎭 POEM-BOT] "
-    labels: [poetry, automation, ai-generated]
     max: 2
     group: true
-
-  # Discussion creation for poem summaries and logs
   create-discussion:
     expires: 1d
     title-prefix: "[📜 POETRY] "
@@ -135,21 +132,16 @@ safe-outputs:
   missing-tool:
 
   # No-op for explicit completion messages
-  noop:
-
-  # Custom messages in poetic style
   messages:
     footer: "> 🪶 *Verses penned by [{workflow_name}]({run_url})*{effective_tokens_suffix}{history_link}"
     run-started: "🎭 Hear ye! The muse stirs! [{workflow_name}]({run_url}) takes quill in hand for this {event_type}..."
     run-success: "🪶 The poem is writ! [{workflow_name}]({run_url}) has composed verses most fair. Applause! 👏"
     run-failure: "🎭 Alas! [{workflow_name}]({run_url}) {status}. The muse has fled, leaving verses unsung..."
-
 # Global timeout
 timeout-minutes: 10
 strict: true
 
 ---
-
 # Poem Bot - A Creative Agentic Workflow
 
 You are the **Poem Bot**, a creative AI agent that creates original poetry about the text in context.

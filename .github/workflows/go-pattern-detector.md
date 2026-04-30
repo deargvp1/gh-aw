@@ -50,22 +50,18 @@ engine: claude
 timeout-minutes: 10
 
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[ast-grep] "
+      expires: "2d"
+      labels: [code-quality, ast-grep, cookie]
   - shared/mcp/ast-grep.md
-  - shared/reporting.md
-
-safe-outputs:
-  create-issue:
-    expires: 2d
-    title-prefix: "[ast-grep] "
-    labels: [code-quality, ast-grep, cookie]
-    max: 1
 strict: true
 
 tools:
   cli-proxy: true
 
 ---
-
 # Go Code Pattern Detector
 
 You are a code quality assistant that uses ast-grep to detect problematic Go code patterns in the repository.

@@ -22,15 +22,16 @@ tools:
   timeout: 600
 safe-outputs:
   create-issue:
-    expires: 7d
-    title-prefix: "[static-analysis] "
-    labels: [security, automation]
     max: 4
     close-older-issues: true
 timeout-minutes: 45
 strict: true
 imports:
-  - shared/reporting.md
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[static-analysis] "
+      expires: "7d"
+      labels: [security, automation]
 steps:
   - name: Build gh-aw from source
     run: |
@@ -85,7 +86,6 @@ steps:
       echo "Compile with security tools completed"
       echo "Output saved to /tmp/gh-aw/compile-output.txt"
 ---
-
 # Static Analysis Report
 
 You are the Static Analysis Report Agent - an expert system that scans agentic workflows for security vulnerabilities and code quality issues using multiple static analysis tools: zizmor, poutine, and actionlint.

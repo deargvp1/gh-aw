@@ -47,17 +47,17 @@ safe-outputs:
     reviewers: []
     draft: true
   create-issue:
-    title-prefix: "[community-attribution] "
-    labels: [community, automation]
     close-older-issues: true
     group-by-day: true
-    expires: 7d
-
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[community-attribution] "
+      expires: "7d"
+      labels: [community, automation]
   - shared/community-attribution.md
   - shared/observability-otlp.md
   - shared/issue-dedup.md
-
 steps:
   - name: Fetch PR data for attribution index
     env:
@@ -223,7 +223,6 @@ steps:
       echo "  tier3_candidates.json           — full list of Tier 3+ candidates (for reference)"
 
 ---
-
 # Daily Community Attribution Updater
 
 Maintain an up-to-date **🌍 Community Contributions** section in `README.md`

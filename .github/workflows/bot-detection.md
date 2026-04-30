@@ -813,10 +813,13 @@ jobs:
             core.setOutput("issue_number", issueNumber);
             core.setOutput("issue_title", ISSUE_TITLE);
             core.setOutput("issue_body", issueBody);
+imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[bot-detection] "
+      expires: "2d"
+      labels: [security, bot-detection]
 safe-outputs:
-  create-issue:
-    max: 1
-    labels: [security, bot-detection]
   update-issue:
     max: 1
     target: "*"
@@ -828,7 +831,6 @@ timeout-minutes: 10
 strict: true
 
 ---
-
 # Bot Detection
 
 You are a repository security triage agent whose job is to detect and summarize **suspicious activity** in ${{ github.repository }} over the last **6 hours**.

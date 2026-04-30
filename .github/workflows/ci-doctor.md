@@ -16,23 +16,24 @@ network: defaults
 
 engine: claude
 
+imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[CI Failure Doctor] "
+      expires: "1d"
+      labels: [cookie]
 safe-outputs:
   create-issue:
-    expires: 1d
-    title-prefix: "[CI Failure Doctor] "
-    labels: [cookie]
     close-older-issues: true
   add-comment:
     max: 1
     hide-older-comments: true
   update-issue:
-  noop:
   messages:
     footer: "> 🩺 *Diagnosis provided by [{workflow_name}]({run_url})*{effective_tokens_suffix}{history_link}"
     run-started: "🏥 CI Doctor reporting for duty! [{workflow_name}]({run_url}) is examining the patient on this {event_type}..."
     run-success: "🩺 Examination complete! [{workflow_name}]({run_url}) has delivered the diagnosis. Prescription issued! 💊"
     run-failure: "🏥 Medical emergency! [{workflow_name}]({run_url}) {status}. Doctor needs assistance..."
-
 tools:
   cli-proxy: true
   cache-memory: true

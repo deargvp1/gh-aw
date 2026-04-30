@@ -17,18 +17,20 @@ tools:
   edit:
 safe-outputs:
   create-issue:
-    title-prefix: "🚨 [SECURITY]"
-    labels: ["security", "red-team"]
     max: 5
 timeout-minutes: 60
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "🚨 [SECURITY]"
+      expires: "2d"
+      labels: ["security", "red-team"]
   - shared/security-analysis-base.md
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[security-red-team] "
       expires: 3d
 ---
-
 # Daily Security Red Team Agent
 
 You are a specialized **Security Red Team Agent** performing deep security analysis on the codebase. Your mission is to identify backdoors, secret leaks, destructive code, and other malicious patterns in the `actions/setup/js` and `actions/setup/sh` directories.

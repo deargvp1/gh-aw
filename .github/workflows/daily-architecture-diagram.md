@@ -20,29 +20,26 @@ tools:
 
 safe-outputs:
   create-issue:
-    title-prefix: "🏗️ Architecture Diagram:"
-    labels: [architecture, diagram]
     close-older-issues: true
-    expires: 7d
-    max: 1
   create-pull-request:
     expires: 7d
     title-prefix: "[architecture] "
     labels: [architecture, diagram, documentation]
-  noop:
-
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "🏗️ Architecture Diagram:"
+      expires: "7d"
+      labels: [architecture, diagram]
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[architecture-diagram] "
       expires: 3d
-
 timeout-minutes: 20
 strict: true
 features:
   copilot-requests: true
 ---
-
 # Architecture Diagram Generator
 
 You are an AI agent that generates a **high-level ASCII architecture diagram** of this repository, focusing on the layered structure from CLI entry points down to utility packages.

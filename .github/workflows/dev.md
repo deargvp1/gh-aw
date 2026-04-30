@@ -15,17 +15,17 @@ permissions:
   issues: read
   pull-requests: read
 
-safe-outputs:
-  create-issue:
-    expires: 7d
-    title-prefix: "[Daily Report] "
+imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[Daily Report] "
+      expires: "7d"
 features:
   copilot-requests: true
 
 tools:
   cli-proxy: true
 ---
-
 # Daily Status Report
 
 Generate a daily status report for the gh-aw project, focusing on documentation quality.

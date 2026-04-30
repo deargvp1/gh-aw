@@ -19,17 +19,16 @@ tools:
   web-fetch:
   bash:
     - "*"
-safe-outputs:
-  create-issue:
-    expires: 2d
-    title-prefix: "[cli-consistency] "
-    labels: [automation, cli, documentation, cookie]
-    max: 1
+imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[cli-consistency] "
+      expires: "2d"
+      labels: [automation, cli, documentation, cookie]
 timeout-minutes: 20
 features:
   copilot-requests: true
 ---
-
 # CLI Consistency Checker
 
 Perform a comprehensive inspection of the `gh-aw` CLI tool to identify inconsistencies, typos, bugs, or documentation gaps.

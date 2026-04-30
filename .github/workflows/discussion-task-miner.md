@@ -23,11 +23,8 @@ network:
 
 safe-outputs:
   create-issue:
-    title-prefix: "[Code Quality] "
-    labels: [code-quality, automation, task-mining]
     max: 5
     group: true
-    expires: 1d
   add-comment:
     max: 3
   messages:
@@ -35,7 +32,6 @@ safe-outputs:
     run-started: "🔍 Discussion Task Miner starting! [{workflow_name}]({run_url}) is scanning discussions for code quality improvements..."
     run-success: "✅ Task mining complete! [{workflow_name}]({run_url}) has identified actionable code quality tasks. 📊"
     run-failure: "⚠️ Task mining interrupted! [{workflow_name}]({run_url}) {status}. Please review the logs..."
-
 tools:
   cli-proxy: true
   github:
@@ -48,18 +44,20 @@ tools:
     - "date *"
 
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[Code Quality] "
+      expires: "1d"
+      labels: [code-quality, automation, task-mining]
   - shared/github-guard-policy.md
   - uses: shared/repo-memory-standard.md
     with:
       branch-name: "memory/discussion-task-miner"
       description: "Track processed discussions and extracted tasks"
   - shared/jqschema.md
-  - shared/reporting.md
-
 features:
   copilot-requests: true
 ---
-
 # Discussion Task Miner - Code Quality Improvement Agent
 
 You are a task mining agent that analyzes AI-generated discussions to discover actionable code quality improvement opportunities.

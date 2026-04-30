@@ -12,16 +12,17 @@ engine: copilot
 tools:
   github:
     toolsets: [repos, actions]
+imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[Incident] "
+      expires: "7d"
+      labels: [incident, deployment-failure]
 safe-outputs:
   create-issue:
-    expires: 7d
-    title-prefix: "[Incident] "
-    labels: [incident, deployment-failure]
     close-older-issues: true
-  noop:
 timeout-minutes: 10
 ---
-
 # Deployment Incident Monitor
 
 A deployment to **${{ github.event.deployment.environment }}** has failed with state `${{ github.event.deployment_status.state }}`.

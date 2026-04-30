@@ -21,13 +21,6 @@ network:
     - "github.com"
     - "storage.googleapis.com"
 
-safe-outputs:
-  create-issue:
-    expires: 2d
-    title-prefix: "[gpl-dependency]"
-    labels: [dependency-cleaner]
-    max: 1
-
 tools:
   cli-proxy: true
   cache-memory: true
@@ -39,8 +32,11 @@ tools:
 strict: false
 
 imports:
-  - shared/reporting.md
-
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[gpl-dependency]"
+      expires: "2d"
+      labels: [dependency-cleaner]
 # Pre-download SBOM to get accurate dependency information
 steps:
   - name: Download SBOM from GitHub Dependency Graph API
@@ -66,7 +62,6 @@ steps:
         echo "📊 SBOM contains ${PACKAGE_COUNT} packages"
       fi
 ---
-
 # GPL Dependency Cleaner (gpclean)
 
 ## Objective

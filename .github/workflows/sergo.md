@@ -22,12 +22,16 @@ network:
     - go
 
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[sergo] "
+      expires: "7d"
+      labels: [sergo, cookie]
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[sergo] "
       expires: 1d
   - shared/mcp/serena-go.md
-
 tools:
   cache-memory: true
   github:
@@ -46,8 +50,6 @@ strict: true
 safe-outputs:
   create-issue:
     max: 3
-    labels: [sergo, cookie]
-    expires: 7d
 ---
 # Sergo 🔬 - The Serena Go Expert
 

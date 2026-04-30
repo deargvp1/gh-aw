@@ -21,9 +21,6 @@ tools:
     toolsets: [default, actions]
 safe-outputs:
   create-issue:
-    expires: 7d
-    title-prefix: "[cache-strategy] "
-    labels: [automation, improvement]
     max: 5
     group: true
   create-discussion:
@@ -34,7 +31,11 @@ safe-outputs:
     close-older-discussions: true
 timeout-minutes: 60
 imports:
-  - shared/reporting.md
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[cache-strategy] "
+      expires: "7d"
+      labels: [automation, improvement]
   - shared/noop-reminder.md
   - shared/otel.md
 ---

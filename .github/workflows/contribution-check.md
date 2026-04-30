@@ -22,14 +22,16 @@ tools:
     toolsets: [pull_requests, repos, issues]
     allowed-repos: all
     min-integrity: none
+imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[Contribution Check Report]"
+      expires: "1d"
+      labels: [contribution-report]
 safe-outputs:
   create-issue:
-    title-prefix: "[Contribution Check Report]"
-    labels:
-      - contribution-report
     close-older-issues: true
     group-by-day: true
-    expires: 1d
   add-labels:
     allowed: [spam, needs-work, outdated, lgtm]
     max: 4

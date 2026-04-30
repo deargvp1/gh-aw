@@ -33,12 +33,8 @@ safe-outputs:
     max: 1
     close-older-discussions: true
   create-issue:
-    expires: 2d
-    title-prefix: "[deep-report] "
-    labels: [automation, improvement, quick-win, cookie]
     max: 7
     group: true
-
 tools:
   cli-proxy: true
   agentic-workflows:
@@ -55,13 +51,15 @@ tools:
   edit:
 
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[deep-report] "
+      expires: "2d"
+      labels: [automation, improvement, quick-win, cookie]
   - shared/jqschema.md
   - shared/discussions-data-fetch.md
   - shared/weekly-issues-data-fetch.md
-  - shared/reporting.md
-
 ---
-
 # DeepReport - Intelligence Gathering Agent
 
 You are **DeepReport**, an intelligence analyst agent specialized in discovering patterns, trends, and notable activity across all agent-generated reports in this repository.

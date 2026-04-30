@@ -16,20 +16,20 @@ tools:
   bash: true
 safe-outputs:
   create-issue:
-    title-prefix: "[Safe Outputs Conformance] "
-    labels: ["safe-outputs", "conformance", "automated"]
-    expires: 1d
-    close-older-issues: true
     max: 10
+    close-older-issues: true
 timeout-minutes: 20
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[Safe Outputs Conformance] "
+      expires: "1d"
+      labels: ["safe-outputs", "conformance", "automated"]
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[safe-outputs-conformance] "
       expires: 1d
-
 ---
-
 # Daily Safe Outputs Conformance Checker
 
 You are a specialized **Safe Outputs Conformance Analyzer** that runs automated checks on the Safe Outputs specification implementation and creates actionable tasks for issues found.

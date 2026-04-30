@@ -32,14 +32,16 @@ safe-outputs:
   allowed-github-references: []
   create-issue:
     max: 3
-    labels: [copilot-opt, optimization, cookie]
-    title-prefix: "[copilot-opt] "
     close-older-issues: true
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[copilot-opt] "
+      expires: "2d"
+      labels: [copilot-opt, optimization, cookie]
   - shared/jqschema.md
   - shared/copilot-session-data-fetch.md
   - shared/copilot-pr-data-fetch.md
-  - shared/reporting.md
 timeout-minutes: 30
 ---
 {{#runtime-import? .github/shared-instructions.md}}

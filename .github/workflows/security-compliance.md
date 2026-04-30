@@ -25,13 +25,16 @@ permissions:
 
 engine: copilot
 
+imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[security-compliance] "
+      expires: "2d"
+      labels: [security, campaign-tracker, cookie]
 safe-outputs:
   create-issue:
-    expires: 2d
     max: 100  # 1 epic + vulnerability tasks
-    labels: [security, campaign-tracker, cookie]
     group: true
-
 tools:
   github:
     toolsets: [repos, search, code_security]
@@ -40,7 +43,6 @@ tools:
     file-glob: "security-compliance-*/**"
 
 ---
-
 # Security Compliance Campaign
 
 **Pain Point**: Enterprise faces audit deadline with hundreds of unresolved security vulnerabilities across multiple repositories. Need coordinated remediation with executive visibility, cost tracking, and compliance documentation.

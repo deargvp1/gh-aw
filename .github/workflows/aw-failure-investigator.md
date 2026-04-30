@@ -19,9 +19,6 @@ tools:
   bash: ["*"]
 safe-outputs:
   create-issue:
-    expires: 7d
-    title-prefix: "[aw-failures] "
-    labels: [agentic-workflows, automation, cookie]
     max: 2
     group: true
   update-issue:
@@ -29,12 +26,14 @@ safe-outputs:
     max: 10
   link-sub-issue:
     max: 10
-  noop:
 timeout-minutes: 60
 imports:
-  - shared/reporting.md
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[aw-failures] "
+      expires: "7d"
+      labels: [agentic-workflows, automation, cookie]
 ---
-
 # [aw] Failure Investigator (6h)
 
 Investigate agentic workflow failures from the last 6 hours and produce actionable issue tracking with sub-issues.

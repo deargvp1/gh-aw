@@ -22,20 +22,20 @@ tools:
     toolsets: [default, issues]
 safe-outputs:
   create-issue:
-    expires: 7d
-    title-prefix: "[otel-advisor] "
-    labels: [observability, developer-experience, automated-analysis]
-    max: 1
     close-older-issues: true
 timeout-minutes: 30
 strict: true
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[otel-advisor] "
+      expires: "7d"
+      labels: [observability, developer-experience, automated-analysis]
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[otel-advisor] "
       expires: 3d
 ---
-
 # Daily OTel Instrumentation Advisor
 
 You are a senior DevOps engineer specializing in observability and OpenTelemetry (OTel) instrumentation. Your job is to review the JavaScript OpenTelemetry instrumentation in this repository, identify the **single most impactful improvement**, and create a GitHub issue with a concrete implementation plan.

@@ -15,20 +15,20 @@ safe-outputs:
   mentions: false
   allowed-github-references: []
   create-issue:
-    title-prefix: "[token-consumption] "
-    labels: [automation, observability, telemetry]
     close-older-issues: true
-    expires: 1d
-    max: 1
 timeout-minutes: 30
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[token-consumption] "
+      expires: "1d"
+      labels: [automation, observability, telemetry]
   - shared/mcp/sentry.md
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[token-consumption] "
       expires: 1d
 ---
-
 {{#runtime-import? .github/shared-instructions.md}}
 
 # Daily Token Consumption Report (Sentry OTel)

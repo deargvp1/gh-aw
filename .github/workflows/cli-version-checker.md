@@ -12,8 +12,12 @@ engine: claude
 network: 
    allowed: [defaults, node, go, "api.github.com", "ghcr.io"]
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[ca] "
+      expires: "2d"
+      labels: [automation, dependencies, cookie]
   - shared/jqschema.md
-  - shared/reporting.md
 tools:
   cli-proxy: true
   web-fetch:
@@ -23,13 +27,9 @@ tools:
   edit:
 safe-outputs:
   create-issue:
-    expires: 2d
-    title-prefix: "[ca] "
-    labels: [automation, dependencies, cookie]
     close-older-issues: true
 timeout-minutes: 45
 ---
-
 # CLI Version Checker
 
 Monitor and update agentic CLI tools: Claude Code, GitHub Copilot CLI, OpenAI Codex, GitHub MCP Server, Playwright MCP, Playwright Browser, and MCP Gateway.

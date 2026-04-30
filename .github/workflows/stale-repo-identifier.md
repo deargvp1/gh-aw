@@ -25,12 +25,16 @@ strict: true
 timeout-minutes: 45
 
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[Stale Repository] "
+      expires: "2d"
+      labels: [stale-repository, automated-analysis, cookie]
   - shared/github-guard-policy.md
   - uses: shared/daily-audit-charts.md
     with:
       title-prefix: "[stale-repo-identifier] "
   - shared/jqschema.md
-
 network:
   allowed:
     - defaults
@@ -38,9 +42,6 @@ network:
 
 safe-outputs:
   create-issue:
-    expires: 2d
-    title-prefix: "[Stale Repository] "
-    labels: [stale-repository, automated-analysis, cookie]
     max: 10
     group: true
   upload-artifact:
@@ -56,7 +57,6 @@ safe-outputs:
     run-started: "🔍 Stale Repository Identifier starting! [{workflow_name}]({run_url}) is analyzing repository activity..."
     run-success: "✅ Analysis complete! [{workflow_name}]({run_url}) has finished analyzing stale repositories."
     run-failure: "⚠️ Analysis interrupted! [{workflow_name}]({run_url}) {status}."
-
 tools:
   github:
     read-only: true
@@ -95,7 +95,6 @@ steps:
       echo "Stale repositories data saved"
       echo "Total stale repositories: $(jq 'length' /tmp/stale-repos-data/inactive-repos.json)"
 ---
-
 # Stale Repository Identifier 🔍
 
 You are an expert repository analyst that deeply investigates potentially stale repositories to determine if they are truly inactive and produces comprehensive activity reports.

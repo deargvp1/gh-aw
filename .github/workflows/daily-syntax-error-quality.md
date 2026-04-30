@@ -21,10 +21,6 @@ tools:
     - "mkdir -p /tmp/gh-aw/syntax-error-tests"
 safe-outputs:
   create-issue:
-    expires: 3d
-    title-prefix: "[syntax-error-quality] "
-    labels: [dx, error-messages, automated-analysis]
-    max: 1
     close-older-issues: true
 timeout-minutes: 20
 strict: true
@@ -47,6 +43,11 @@ steps:
       fi
       gh aw --version
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[syntax-error-quality] "
+      expires: "3d"
+      labels: [dx, error-messages, automated-analysis]
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[syntax-error-quality] "
@@ -54,7 +55,6 @@ imports:
 features:
   copilot-requests: true
 ---
-
 {{#runtime-import? .github/shared-instructions.md}}
 
 # Daily Syntax Error Quality Check Agent 🔍

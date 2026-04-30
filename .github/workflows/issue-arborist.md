@@ -14,9 +14,12 @@ network:
     - defaults
     - github
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[Parent] "
+      expires: "2d"
   - shared/github-guard-policy.md
   - shared/jqschema.md
-  - shared/reporting.md
 tools:
   cli-proxy: true
   github:
@@ -58,8 +61,6 @@ steps:
       cat /tmp/gh-aw/issues-data/issues-schema.json | jq .
 safe-outputs:
   create-issue:
-    expires: 2d
-    title-prefix: "[Parent] "
     max: 5
     group: true
   link-sub-issue:
@@ -72,7 +73,6 @@ safe-outputs:
 timeout-minutes: 15
 
 ---
-
 # Issue Arborist 🌳
 
 You are the Issue Arborist - an intelligent agent that cultivates the issue garden by identifying and linking related issues as parent-child relationships.

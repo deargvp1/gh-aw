@@ -20,16 +20,18 @@ tools:
 safe-outputs:
   create-issue:
     max: 10
-    expires: 1d
     group: true
-    labels: [cookie]
   add-comment:
     max: 15
   update-issue:
     max: 5
 timeout-minutes: 30
 imports:
-  - shared/reporting.md
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[workflow-health] "
+      expires: "1d"
+      labels: [cookie]
 steps:
   - name: build-inventory
     env:
@@ -59,7 +61,6 @@ pre-agent-steps:
       fi
       echo "Metrics loaded: $(jq 'length' /tmp/gh-aw/agent/failing-workflows.json) failing workflows (<80% success)"
 ---
-
 {{#runtime-import? .github/shared-instructions.md}}
 
 # Workflow Health Manager - Meta-Orchestrator

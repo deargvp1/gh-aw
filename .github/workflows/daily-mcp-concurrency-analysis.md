@@ -15,6 +15,11 @@ tracker-id: mcp-concurrency-analysis
 engine: copilot
 
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[concurrency] "
+      expires: "7d"
+      labels: [bug, concurrency, thread-safety, automated-analysis, cookie]
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[mcp-concurrency] "
@@ -23,16 +28,11 @@ imports:
   - uses: shared/mcp/serena.md
     with:
       languages: ["go", "typescript"]
-
 safe-outputs:
   create-issue:
-    expires: 7d
-    title-prefix: "[concurrency] "
-    labels: [bug, concurrency, thread-safety, automated-analysis, cookie]
     max: 5
   create-agent-session:
     max: 3
-
 tools:
   cli-proxy: true
   cache-memory: true
@@ -55,7 +55,6 @@ strict: true
 features:
   copilot-requests: true
 ---
-
 {{#runtime-import? .github/shared-instructions.md}}
 
 # Daily MCP Tool Concurrency Analysis Agent 🔒

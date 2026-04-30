@@ -13,19 +13,17 @@ permissions:
 engine: claude
 
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[refactor] "
+      expires: "2d"
+      labels: [refactoring, code-quality, automated-analysis, cookie]
   - shared/go-source-analysis.md
-
 safe-outputs:
   close-issue:
     required-title-prefix: "[refactor] "
     target: "*"
     max: 10
-  create-issue:
-    expires: 2d
-    title-prefix: "[refactor] "
-    labels: [refactoring, code-quality, automated-analysis, cookie]
-    max: 1
-
 tools:
   github:
     toolsets: [default, issues]
@@ -34,7 +32,6 @@ tools:
 timeout-minutes: 20
 strict: true
 ---
-
 # Semantic Function Clustering and Refactoring
 
 You are an AI agent that analyzes Go code to identify potential refactoring opportunities by clustering functions semantically and detecting outliers or duplicates.

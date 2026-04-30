@@ -26,11 +26,8 @@ safe-outputs:
   missing-tool:
     create-issue: true
   create-issue:
-    title-prefix: "[aw-compat] "
-    labels: [automation, compatibility, gh-aw]
-    close-older-issues: true
     max: 6
-    expires: 7d
+    close-older-issues: true
 timeout-minutes: 60
 strict: true
 network:
@@ -39,10 +36,13 @@ network:
     - github
     - go
 imports:
-  - shared/reporting.md
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[aw-compat] "
+      expires: "7d"
+      labels: [automation, compatibility, gh-aw]
   - shared/otel.md
 ---
-
 # Daily AW Cross-Repo Compilation Agent
 
 You are a compatibility auditor for GitHub Agentic Workflows (`gh-aw`).

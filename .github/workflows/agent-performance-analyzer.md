@@ -18,13 +18,15 @@ tools:
     file-glob: "**"
     max-file-size: 102400  # 100KB
 imports:
-  - shared/reporting.md
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[agent-performance] "
+      expires: "2d"
+      labels: [cookie]
 safe-outputs:
   create-issue:
-    expires: 2d
     max: 5
     group: true
-    labels: [cookie]
   create-discussion:
     expires: 1d
     max: 2
@@ -34,7 +36,6 @@ timeout-minutes: 30
 features:
   copilot-requests: true
 ---
-
 {{#runtime-import? .github/shared-instructions.md}}
 
 # Agent Performance Analyzer - Meta-Orchestrator

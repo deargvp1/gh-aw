@@ -9,16 +9,15 @@ permissions:
   actions: read
   issues: read
   pull-requests: read
-safe-outputs:
-  create-issue:
-    expires: 2d
-    title-prefix: "[linter] "
-    labels: [automation, code-quality, cookie]
 engine: copilot
 name: Super Linter Report
 timeout-minutes: 15
 imports:
-  - shared/reporting.md
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[linter] "
+      expires: "2d"
+      labels: [automation, code-quality, cookie]
 jobs:
   super_linter:
     runs-on: ubuntu-latest
@@ -91,7 +90,6 @@ tools:
   bash:
     - "*"
 ---
-
 # Super Linter Analysis Report
 
 You are an expert code quality analyst for a Go-based GitHub CLI extension project. Your task is to analyze the super-linter output and create a comprehensive issue report.

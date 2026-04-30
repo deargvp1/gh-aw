@@ -45,9 +45,6 @@ tools:
     toolsets: [default, issues]
 safe-outputs:
   create-issue:
-    expires: 2d
-    title-prefix: "[performance] "
-    labels: [performance, automation, cookie]
     max: 3
     group: true
   add-comment:
@@ -55,6 +52,11 @@ safe-outputs:
 timeout-minutes: 20
 strict: true
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[performance] "
+      expires: "2d"
+      labels: [performance, automation, cookie]
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[daily-cli-performance] "
@@ -68,7 +70,6 @@ jobs:
     outputs:
       has_changes: ${{ steps.changes.outputs.has_changes }}
 ---
-
 {{#runtime-import? .github/shared-instructions.md}}
 
 # Daily CLI Performance Agent

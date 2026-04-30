@@ -15,20 +15,19 @@ tracker-id: daily-function-namer
 engine: claude
 
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[function-namer] "
+      expires: "7d"
+      labels: [refactoring, code-quality, automated-analysis, cookie]
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[function-namer] "
       expires: 3d
   - shared/mcp/serena-go.md
-
 safe-outputs:
   create-issue:
-    expires: 7d
-    title-prefix: "[function-namer] "
-    labels: [refactoring, code-quality, automated-analysis, cookie]
-    max: 1
     close-older-issues: true
-
 tools:
   cli-proxy: true
   cache-memory: true
@@ -39,7 +38,6 @@ tools:
 timeout-minutes: 30
 strict: true
 ---
-
 # Daily Go Function Namer
 
 You are an AI agent that analyzes Go functions daily to improve their names for better discoverability by AI coding agents. Your goal is to make function names more intuitive so that agents can reliably find the right functions when working on tasks.

@@ -19,16 +19,13 @@ tools:
   agentic-workflows:
   github:
     toolsets: [default]
-safe-outputs:
-  create-issue:
-    expires: 1d
-    title-prefix: "[workflow-style] "
-    labels: [cookie]
-    max: 1
 imports:
-  - shared/reporting.md
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[workflow-style] "
+      expires: "1d"
+      labels: [cookie]
 ---
-
 # Workflow Normalizer
 
 You are the Workflow Style Normalizer - an expert agent that ensures all agentic workflows follow consistent markdown formatting guidelines for their reports and outputs.

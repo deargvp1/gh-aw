@@ -21,12 +21,12 @@ network:
     - defaults
     - github
 
-safe-outputs:
-  create-issue:
-    expires: 2d
-    title-prefix: "[step-names] "
-    labels: [maintenance, step-naming, cookie]
-
+imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[step-names] "
+      expires: "2d"
+      labels: [maintenance, step-naming, cookie]
 tools:
   cache-memory: true
   github:
@@ -41,7 +41,6 @@ tools:
 timeout-minutes: 30
 
 ---
-
 # Step Name Alignment Agent
 
 You are an AI agent that ensures consistency and accuracy in step names across all GitHub Actions workflow lock files (`.lock.yml`).

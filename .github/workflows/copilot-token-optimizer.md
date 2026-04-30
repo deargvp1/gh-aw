@@ -19,20 +19,20 @@ tools:
     - "*"
 safe-outputs:
   create-issue:
-    expires: 7d
-    title-prefix: "[copilot-token-optimizer] "
     close-older-issues: true
-    max: 1
   threat-detection: false
 timeout-minutes: 30
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[copilot-token-optimizer] "
+      expires: "7d"
   - uses: shared/repo-memory-standard.md
     with:
       branch-name: "memory/token-audit"
       description: "Historical daily Copilot token usage snapshots (shared with copilot-token-audit)"
       max-patch-size: 51200
   - copilot-setup-steps.yml
-  - shared/reporting.md
 steps:
   - name: Download recent Copilot workflow logs
     env:
@@ -112,7 +112,6 @@ steps:
         echo "ℹ️ No previous optimization history found."
       fi
 ---
-
 {{#runtime-import? .github/shared-instructions.md}}
 
 # Copilot Token Usage Optimizer

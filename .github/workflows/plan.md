@@ -17,11 +17,14 @@ tools:
     toolsets: [default, discussions]
     allowed-repos: all
     min-integrity: none
+imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[plan] "
+      expires: "2d"
+      labels: [plan, ai-generated, cookie]
 safe-outputs:
   create-issue:
-    expires: 2d
-    title-prefix: "[plan] "
-    labels: [plan, ai-generated, cookie]
     max: 5  # Maximum 5 sub-issues per group
     group: true
   close-discussion:
@@ -29,7 +32,6 @@ safe-outputs:
 timeout-minutes: 10
 
 ---
-
 # Planning Assistant
 
 You are an expert planning assistant for GitHub Copilot coding agent. Your task is to analyze an issue or discussion and break it down into a sequence of actionable work items that can be assigned to GitHub Copilot coding agent.

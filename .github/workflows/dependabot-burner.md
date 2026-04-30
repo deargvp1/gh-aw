@@ -7,12 +7,11 @@ permissions:
 tools:
   cli-proxy: true
   github:
-safe-outputs:
-  create-issue:
-    title-prefix: '[dependabot-burner] '
 imports:
-  - shared/reporting.md
-
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[dependabot-burner] "
+      expires: "2d"
 ---
 # Dependabot Burner
 

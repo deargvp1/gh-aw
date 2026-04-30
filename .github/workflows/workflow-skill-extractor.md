@@ -33,14 +33,14 @@ safe-outputs:
     max: 1
     close-older-discussions: true
   create-issue:
-    expires: 2d
-    title-prefix: "[refactoring] "
-    labels: [refactoring, shared-component, improvement, cookie]
     max: 3
     group: true
-
 imports:
-  - shared/reporting.md
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[refactoring] "
+      expires: "2d"
+      labels: [refactoring, shared-component, improvement, cookie]
 steps:
   - name: Build workflow index
     uses: actions/github-script@v9
@@ -102,7 +102,6 @@ steps:
         fs.writeFileSync('/tmp/gh-aw/agent/workflow-index.json', JSON.stringify(index, null, 2) + '\n', 'utf8');
         core.info(`Indexed ${index.length} workflows`);
 ---
-
 # Workflow Skill Extractor
 
 You are an AI workflow analyst specialized in identifying reusable skills in GitHub Agentic Workflows.

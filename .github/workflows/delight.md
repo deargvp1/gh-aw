@@ -23,8 +23,6 @@ network:
 
 safe-outputs:
   create-issue:
-    expires: 2d
-    labels: [delight, cookie]
     max: 2
     group: true
   messages:
@@ -32,7 +30,6 @@ safe-outputs:
     run-started: "📊 Delight Agent starting! [{workflow_name}]({run_url}) is analyzing user-facing aspects for improvement opportunities..."
     run-success: "✅ Analysis complete! [{workflow_name}]({run_url}) has identified targeted improvements for user experience."
     run-failure: "⚠️ Analysis interrupted! [{workflow_name}]({run_url}) {status}. Please review the logs..."
-
 tools:
   cli-proxy: true
   github:
@@ -51,6 +48,11 @@ tools:
 timeout-minutes: 30
 
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[delight] "
+      expires: "2d"
+      labels: [delight, cookie]
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[delight] "
@@ -58,7 +60,6 @@ imports:
     with:
       branch-name: "memory/delight"
       description: "Track delight findings and historical patterns"
-
 pre-agent-steps:
   - name: Sample files and load memory
     run: |

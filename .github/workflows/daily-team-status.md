@@ -13,15 +13,15 @@ permissions:
 tracker-id: daily-team-status
 network: defaults
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[team-status] "
+      expires: "1d"
+      labels: [automation, daily-report]
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[team-status] "
       expires: 1d
-safe-outputs:
-  create-issue:
-    expires: 1d
-    title-prefix: "[team-status] "
-    labels: [automation, daily-report]
 description: |
   This workflow created daily team status reporter creating upbeat activity summaries.
   Gathers recent repository activity (issues, PRs, releases, code changes)
@@ -34,7 +34,6 @@ tools:
   github: null
 
 ---
-
 {{#runtime-import? .github/shared-instructions.md}}
 
 {{#runtime-import .github/shared/editorial.md}}

@@ -45,22 +45,22 @@ safe-outputs:
     skip-archive: true
     defaults:
       if-no-files: ignore
-  create-issue:
-    expires: 2d
-    labels: [cookie]
-
 network:
   allowed:
     - node
 
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[multi-device-docs] "
+      expires: "2d"
+      labels: [cookie]
   - shared/docs-server-lifecycle.md
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[multi-device-docs] "
       expires: 3d
 ---
-
 {{#runtime-import? .github/shared-instructions.md}}
 
 # Multi-Device Documentation Testing

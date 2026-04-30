@@ -25,14 +25,6 @@ safe-outputs:
     expires: 3d
     title-prefix: "[docs] "
     labels: [documentation, automation]
-
-  create-issue:
-    expires: 3d
-    title-prefix: "[doc-healer] "
-    labels: [documentation, automation]
-    assignees: [copilot]
-  noop:
-
 tools:
   cli-proxy: true
   cache-memory: true
@@ -50,13 +42,17 @@ tools:
 timeout-minutes: 45
 
 imports:
+  - uses: shared/daily-issue-base.md
+    with:
+      title-prefix: "[doc-healer] "
+      expires: "3d"
+      labels: [documentation, automation]
+      assignees: [copilot]
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[doc-healer] "
       expires: 3d
-
 ---
-
 {{#runtime-import? .github/shared-instructions.md}}
 
 # Daily Documentation Healer
