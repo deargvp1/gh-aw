@@ -66,6 +66,13 @@ func ValidatePermissions(permissions *Permissions, githubTool ValidatableTool, p
 		toolsets = parsedToolsets[0]
 		permissionsValidationLog.Printf("Validating with pre-parsed toolsets: %v, read-only: %v", toolsets, readOnly)
 	} else {
+		// When toolsets is a GitHub Actions expression, GetToolsets() returns "".
+		// In that case we skip compile-time permission validation: the actual toolsets
+		// are only known at runtime, so we cannot determine required permissions here.
+		if config, ok := githubTool.(*GitHubToolConfig); ok && config != nil && config.ToolsetExpr != "" {
+			permissionsValidationLog.Printf("Skipping permission validation: toolsets is a runtime expression: %s", config.ToolsetExpr)
+			return result
+		}
 		toolsetsStr := githubTool.GetToolsets()
 		permissionsValidationLog.Printf("Validating toolsets: %s, read-only: %v", toolsetsStr, readOnly)
 		toolsets = ParseGitHubToolsets(toolsetsStr)

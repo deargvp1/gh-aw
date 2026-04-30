@@ -26,6 +26,18 @@ tools:
   edit:
 ```
 
+The edit tool also accepts a boolean or a GitHub Actions expression string (for `workflow_call` reusable workflows):
+
+```yaml wrap
+tools:
+  edit: true                      # Always enabled
+  edit: false                     # Explicitly disabled
+  edit: ${{ inputs.enable-edit }} # Enabled at runtime by caller
+```
+
+> [!NOTE]
+> When `tools.edit` is an expression, file-path access (`--allow-all-paths`) is still granted at compile time. Only write permission itself is gated at runtime when the expression resolves to `"true"`.
+
 ### GitHub Tools (`github:`)
 
 Configure GitHub API operations including toolsets, remote/local modes, and authentication.
@@ -35,6 +47,17 @@ tools:
   github:
     toolsets: [repos, issues]
 ```
+
+The `toolsets` field also accepts a GitHub Actions expression string, enabling reusable workflows to expose toolset selection to callers:
+
+```yaml wrap
+tools:
+  github:
+    toolsets: ${{ inputs.github-toolsets }}  # Comma-separated list at runtime
+```
+
+> [!NOTE]
+> When `toolsets` is an expression, compile-time toolset validation and required-permissions checks are skipped. Ensure the compiled workflow has sufficient `permissions:` for the toolsets that callers may provide. The GitHub MCP server enforces toolset restrictions at runtime.
 
 See **[GitHub Tools Reference](/gh-aw/reference/github-tools/)** for complete configuration options.
 
@@ -51,6 +74,16 @@ tools:
 ```
 
 Use wildcards like `git:*` for command families or `:*` for unrestricted access.
+
+The `bash` field also accepts a GitHub Actions expression string for reusable workflow parameterization:
+
+```yaml wrap
+tools:
+  bash: ${{ inputs.bash-allowlist }}  # Comma-separated commands at runtime
+```
+
+> [!NOTE]
+> When `bash` is an expression, the resolved value must be a comma-separated list of command names (e.g., `"git,npm,echo"`). Shell access is **fail-closed**: if the expression resolves to an empty string or is unset, no shell commands are permitted. Newline-separated command lists are also accepted.
 
 ### Web Tools
 
@@ -156,6 +189,67 @@ tools:
 
 > [!NOTE]
 > Expression values are passed through environment variables in the compiled workflow. TOML-based engine configs (Codex MCP gateway) fall back to engine defaults when an expression is used, since TOML has no expression syntax.
+
+## Parameterizing Tool Configuration in Reusable Workflows
+
+For `workflow_call` reusable workflows, you can expose selected tool policies as inputs. This allows callers to choose their bash allowlist, GitHub MCP toolsets, or edit tool availability without maintaining separate workflow files.
+
+### Supported Expression Fields
+
+The following tool fields accept GitHub Actions expression strings in addition to their literal types:
+
+| Field | Expression Example | Resolved Format |
+|---|---|---|
+| `tools.bash` | `${{ inputs.bash-allowlist }}` | Comma- or newline-separated command list |
+| `tools.edit` | `${{ inputs.enable-edit }}` | `"true"` to enable, anything else to disable |
+| `tools.github.toolsets` | `${{ inputs.github-toolsets }}` | Comma-separated toolset names |
+
+### Example: Reusable Workflow with Tool Inputs
+
+```yaml wrap
+# Reusable workflow: .github/workflows/my-workflow.md
+on:
+  workflow_call:
+    inputs:
+      bash-allowlist:
+        type: string
+        description: Comma-separated list of allowed bash commands (e.g. "git,npm,echo")
+      github-toolsets:
+        type: string
+        description: Comma-separated list of GitHub MCP toolsets (e.g. "repos,issues")
+      enable-edit:
+        type: boolean
+        description: Whether to enable the edit tool
+        default: false
+permissions:
+  contents: read
+engine: copilot
+tools:
+  bash: ${{ inputs.bash-allowlist }}
+  github:
+    toolsets: ${{ inputs.github-toolsets }}
+  edit: ${{ inputs.enable-edit }}
+```
+
+### Security Model
+
+Expression-based tool configuration maintains fail-closed behavior:
+
+- **`tools.bash`**: If the expression resolves to empty or is not provided, no shell commands are permitted. If the expression resolves to a list, only those commands are allowed.
+- **`tools.edit`**: Only enabled when the expression resolves exactly to `"true"`. Any other value (including empty) keeps the edit tool disabled.
+- **`tools.github.toolsets`**: The GitHub MCP server enforces toolset restrictions at runtime. Compile-time permission validation is skipped for expressions; ensure the workflow has sufficient `permissions:` for the toolsets callers may provide.
+
+### Literal Configs Remain Valid
+
+All existing literal tool configurations continue to work unchanged:
+
+```yaml wrap
+tools:
+  bash: ["git", "npm"]          # Literal allowlist
+  edit:                          # Always enabled
+  github:
+    toolsets: [repos, issues]   # Literal toolsets
+```
 
 ## Custom MCP Servers (`mcp-servers:`)
 

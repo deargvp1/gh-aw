@@ -285,7 +285,7 @@ func buildCopilotDynamicToolArgsPreamble(hasBashExpr, hasEditExpr bool) string {
 		preamble.WriteString("  while IFS= read -r _cmd; do\n")
 		// Trim leading and trailing whitespace from each command
 		preamble.WriteString("    _cmd=\"${_cmd#\"${_cmd%%[![:space:]]*}\"}\"\n")
-		preamble.WriteString("    _cmd=\"${_cmd%\"${_cmd##*[![:space:]]}\"}\" \n")
+		preamble.WriteString("    _cmd=\"${_cmd%\"${_cmd##*[![:space:]]}\"}\"\n")
 		preamble.WriteString("    [ -z \"$_cmd\" ] && continue\n")
 		preamble.WriteString("    _bash_tool_args+=(\"--allow-tool\" \"shell($_cmd)\")\n")
 		preamble.WriteString("  done < <(printf '%s\\n' \"${GH_AW_BASH_ALLOWLIST}\" | tr ',' '\\n')\n")
