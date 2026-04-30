@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-04-30T12:50:17.718Z",
-  "run_id": "25166243843",
+  "run_date": "2026-04-30T18:45:16.479Z",
+  "run_id": "25183098551",
   "fork_prs": 0,
-  "agent_prs_found": 16,
-  "agent_prs_excluded": 16,
-  "notes": "16 open PRs found. All are same-repo branches (head.repo == base.repo = github/gh-aw), not forks. Per policy, only fork PRs are triaged. No fork PRs to triage.",
+  "agent_prs_found": 2,
+  "agent_prs_excluded": 2,
+  "notes": "2 open PRs found via API (#29269, #29223). Both are same-repo branches (head.repo == base.repo = github/gh-aw), not forks. Per policy, only fork PRs are triaged. No fork PRs to triage.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -17,28 +17,14 @@
     "by_action": {}
   },
   "pr_list": [
-    {"number": 29303, "title": "[dead-code] chore: remove dead functions — 1 function removed", "draft": true, "same_repo": true},
-    {"number": 29291, "title": "[caveman] Optimize instruction verbosity — developer.instructions.md, agentic-chat.md", "draft": false, "same_repo": true},
-    {"number": 29288, "title": "[docs] Update documentation for --stdin flag in logs and audit commands", "draft": false, "same_repo": true},
-    {"number": 29283, "title": "[spec-enforcer] Enforce specifications for stringutil, styles, testutil", "draft": false, "same_repo": true},
-    {"number": 29280, "title": "[docs] Update glossary - daily scan", "draft": false, "same_repo": true},
-    {"number": 29277, "title": "[architecture] Update architecture diagram - 2026-04-30", "draft": true, "same_repo": true},
-    {"number": 29273, "title": "Fix: Remove top-level anyOf from add_reviewer MCP tool schema", "draft": true, "same_repo": true},
-    {"number": 29270, "title": "feat: auto-inject create-issue safe output when no safe outputs are explicitly configured", "draft": true, "same_repo": true},
-    {"number": 29269, "title": "feat: add disable_agentic_workflow label-triggered job to maintenance workflow", "draft": true, "same_repo": true},
-    {"number": 29264, "title": "fix: inject threat-detection CAUTION alert at top of markdown content", "draft": false, "same_repo": true},
-    {"number": 29259, "title": "fix(copilot-driver): fall back to fresh run when --continue auth fails mid-stream", "draft": false, "same_repo": true},
-    {"number": 29257, "title": "feat: allow safe-outputs.threat-detection to be controlled by workflow_call inputs", "draft": true, "same_repo": true},
-    {"number": 29254, "title": "fix(gemini): add --gemini-api-target routing fix and accept ADR-26060", "draft": true, "same_repo": true},
-    {"number": 29236, "title": "feat: add github_ref constraint on import-schema inputs with action pin resolution", "draft": false, "same_repo": true},
-    {"number": 29223, "title": "feat: enable checksum validation by default in install-gh-aw.sh", "draft": false, "same_repo": true},
-    {"number": 29222, "title": "feat: compiler emits AWF JSON config file instead of CLI flag soup", "draft": false, "same_repo": true}
+    {"number": 29269, "title": "feat: add label-triggered jobs (disable workflow, apply safe outputs) to maintenance workflow", "draft": false, "same_repo": true},
+    {"number": 29223, "title": "feat: enable checksum validation by default in install-gh-aw.sh", "draft": false, "same_repo": true}
   ],
   "previous_run": {
-    "run_id": "25152262440",
-    "run_date": "2026-04-30T07:08:58.991Z",
+    "run_id": "25166243843",
+    "run_date": "2026-04-30T12:50:17.718Z",
     "fork_prs": 0,
-    "agent_prs_found": 9,
-    "agent_prs_excluded": 9
+    "agent_prs_found": 16,
+    "agent_prs_excluded": 16
   }
 }
