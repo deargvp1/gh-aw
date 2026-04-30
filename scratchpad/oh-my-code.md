@@ -917,7 +917,7 @@ Review the PR and check for security issues...
 
 ## 8. Developer Experience
 
-### 8.1 oh-my-opencode: Power User Paradise
+### 8.1 oh-my-opencode: Interactive Development Configuration
 
 **Installation**:
 ```bash
@@ -951,13 +951,13 @@ User: "ultrawork - Refactor authentication to use OAuth2"
 **Key Features**:
 - **Zero config**: Works out of box with sensible defaults
 - **Battery included**: All tools, agents, hooks pre-configured
-- **Magic word**: Just type `ultrawork` for full power
+- **Magic word**: Type `ultrawork` to activate all features
 - **Real-time**: See agents working in parallel
 - **Interactive**: Ask questions, get design feedback
 - **Persistent**: Work continues across sessions
 
 **Learning Curve**: 
-- Beginner: Use magic word `ultrawork` (zero learning)
+- Beginner: Use magic word `ultrawork` (no additional setup)
 - Intermediate: Configure agents, models (30 minutes)
 - Advanced: Custom agents, hooks, MCPs (1-2 hours)
 
