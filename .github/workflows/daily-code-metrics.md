@@ -12,6 +12,7 @@ engine: claude
 tools:
   cli-proxy: true
   repo-memory:
+    # non-standard: uses branch-prefix (daily rotation) instead of branch-name, and has an increased max-patch-size to handle history.jsonl growth; shared/repo-memory-standard.md does not support branch-prefix
     branch-prefix: daily
     description: "Historical code quality and health metrics"
     file-glob: ["*.json", "*.jsonl", "*.csv", "*.md"]

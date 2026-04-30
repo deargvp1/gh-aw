@@ -14,6 +14,7 @@ tools:
   github:
     toolsets: [default]
   repo-memory:
+    # non-standard: scoped to the metrics/ subdirectory glob (metrics/**) to enforce writes only under that path; shared/repo-memory-standard.md uses the canonical root-level 4-extension glob
     branch-name: memory/meta-orchestrators
     file-glob: "metrics/**"
 timeout-minutes: 15

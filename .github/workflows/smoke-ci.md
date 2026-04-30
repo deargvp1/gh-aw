@@ -34,6 +34,7 @@ tools:
   cache-memory: true
   comment-memory: true
   repo-memory:
+    # non-standard: intentionally restricted to *.md for smoke-testing markdown file storage in repo-memory; shared/repo-memory-standard.md uses the canonical 4-extension glob
     branch-name: memory/smoke-ci
     description: "Smoke CI persisted repo-memory entries"
     file-glob:

@@ -35,6 +35,7 @@ engine: copilot
 tools:
   cli-proxy: true
   repo-memory:
+    # non-standard: requires *.txt in the file-glob for benchmark text output and uses a 128KB max-file-size; shared/repo-memory-standard.md uses the canonical 4-extension glob (no *.txt)
     branch-name: memory/cli-performance
     description: "Historical CLI compilation performance benchmark results"
     file-glob: ["*.json", "*.jsonl", "*.txt"]

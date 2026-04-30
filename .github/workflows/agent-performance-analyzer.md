@@ -13,12 +13,12 @@ tools:
   agentic-workflows:
   github:
     toolsets: [default, actions, repos]
-  repo-memory:
-    branch-name: memory/meta-orchestrators
-    file-glob: "**"
-    max-file-size: 102400  # 100KB
 imports:
   - shared/reporting.md
+  - uses: shared/repo-memory-standard.md
+    with:
+      branch-name: "memory/meta-orchestrators"
+      description: "Historical agent performance metrics and analysis data"
 safe-outputs:
   create-issue:
     expires: 2d

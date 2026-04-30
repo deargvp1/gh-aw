@@ -12,13 +12,13 @@ imports:
   - uses: shared/pr-review-base.md
     with:
       min-integrity: approved
+  - uses: shared/repo-memory-standard.md
+    with:
+      branch-name: "memory/pr-triage"
+      description: "Historical PR triage data and categorization results"
 tools:
   github:
     toolsets: [pull_requests, repos, issues, labels]
-  repo-memory:
-    branch-name: memory/pr-triage
-    file-glob: "**"
-    max-file-size: 102400  # 100KB
 safe-outputs:
   add-labels:
     max: 100

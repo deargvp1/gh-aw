@@ -31,6 +31,7 @@ tools:
       - repos
       - pull_requests
   repo-memory:
+    # non-standard: uses wiki: true for wiki-based storage; shared/repo-memory-standard.md does not support wiki mode
     wiki: true
     description: "Agent of the Week history – tracks which workflows have been featured so we rotate fairly"
 

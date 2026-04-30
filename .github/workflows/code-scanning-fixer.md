@@ -23,6 +23,7 @@ tools:
     github-token: "${{ secrets.GITHUB_TOKEN }}"
     toolsets: [context, pull_requests]
   repo-memory:
+    # non-standard: array of campaign entries with ids; shared/repo-memory-standard.md does not support multi-entry arrays
     - id: campaigns
       branch-name: memory/campaigns
       file-glob: [security-alert-burndown/**]

@@ -26,6 +26,7 @@ tools:
     mode: "local"
     toolsets: [issues]
   repo-memory:
+    # non-standard: uses wiki: true for wiki-based storage; shared/repo-memory-standard.md does not support wiki mode
     wiki: true
     description: "All-time Community Contributors list"
   bash:

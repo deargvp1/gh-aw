@@ -36,6 +36,7 @@ tools:
   github:
     toolsets: [repos, search, code_security]
   repo-memory:
+    # non-standard: campaign-specific file-glob scoped to a subdirectory; shared/repo-memory-standard.md uses the canonical 4-extension glob
     branch-name: memory/campaigns
     file-glob: "security-compliance-*/**"
 

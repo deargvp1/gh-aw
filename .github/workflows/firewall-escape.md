@@ -47,6 +47,7 @@ tools:
       - discussions
   cache-memory: true
   repo-memory:
+    # non-standard: uses max-file-count: 50 (not supported by shared/repo-memory-standard.md) and a 512KB max-file-size for storing extensive escape-attempt history
     branch-name: memory/firewall-escape
     description: "Persistent storage for firewall escape attempt history and strategies"
     max-file-size: 524288  # 512KB

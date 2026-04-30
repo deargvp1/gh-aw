@@ -12,11 +12,6 @@ tools:
   edit:
   github:
     toolsets: [default, actions]
-  repo-memory:
-    branch-name: memory/meta-orchestrators
-    file-glob: "**"
-    max-file-size: 102400  # 100KB
-    max-patch-size: 51200  # 5x the default limit (default: 10240)
 safe-outputs:
   create-issue:
     max: 10
@@ -30,6 +25,11 @@ safe-outputs:
 timeout-minutes: 30
 imports:
   - shared/reporting.md
+  - uses: shared/repo-memory-standard.md
+    with:
+      branch-name: "memory/meta-orchestrators"
+      description: "Historical workflow health and failure metrics"
+      max-patch-size: 51200  # 5x the default limit to handle larger diffs
 steps:
   - name: build-inventory
     env:

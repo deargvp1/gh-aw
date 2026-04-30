@@ -65,6 +65,7 @@ steps:
 tools:
   cache-memory: true
   repo-memory:
+    # non-standard: uses wiki: true for wiki-based storage; shared/repo-memory-standard.md does not support wiki mode
     wiki: true
     description: "Technical documentation library"
   github:

@@ -38,6 +38,7 @@ tools:
   cli-proxy: true
   cache-memory: true
   repo-memory:
+    # non-standard: uses wiki: true for wiki-based storage; shared/repo-memory-standard.md does not support wiki mode
     wiki: true
     description: "Project glossary and terminology reference"
   github:

@@ -27,6 +27,7 @@ imports:
 tools:
   cli-proxy: true
   repo-memory:
+    # non-standard: requires *.txt in the file-glob for tracking processed test file paths and uses a 50KB max-file-size; shared/repo-memory-standard.md uses the canonical 4-extension glob (no *.txt)
     branch-name: memory/testify-expert
     description: "Tracks processed test files to avoid duplicates"
     file-glob: ["*.json", "*.txt"]

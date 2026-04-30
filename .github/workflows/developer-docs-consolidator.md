@@ -33,6 +33,7 @@ tools:
   cache-memory:
     key: developer-docs-cache
   repo-memory:
+    # non-standard: uses wiki: true for wiki-based storage; shared/repo-memory-standard.md does not support wiki mode
     wiki: true
     description: "Consolidated developer documentation and instructions"
   github:

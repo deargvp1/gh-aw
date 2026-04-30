@@ -43,6 +43,7 @@ tools:
   cli-proxy: true
   agentic-workflows:
   repo-memory:
+    # non-standard: intentionally restricted to *.md only (workflow stores and reads markdown exclusively) and uses a 1MB max-file-size for large reports; shared/repo-memory-standard.md uses the canonical 4-extension glob
     branch-name: memory/deep-report
     description: "Long-term insights, patterns, and trend data"
     file-glob: ["*.md"]

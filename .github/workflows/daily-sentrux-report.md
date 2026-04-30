@@ -20,6 +20,7 @@ tools:
   bash: true
   cli-proxy: true
   repo-memory:
+    # non-standard: uses branch-prefix (daily rotation) instead of branch-name, and has a non-standard file-glob (*.json, *.jsonl only) and reduced max-file-size; shared/repo-memory-standard.md does not support branch-prefix
     branch-prefix: daily
     description: "Historical sentrux quality signal and architecture metrics"
     file-glob: ["*.json", "*.jsonl"]
