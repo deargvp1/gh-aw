@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-04-30T18:45:16.479Z",
-  "run_id": "25183098551",
+  "run_date": "2026-05-01T01:13:38.670Z",
+  "run_id": "25197443613",
   "fork_prs": 0,
-  "agent_prs_found": 2,
-  "agent_prs_excluded": 2,
-  "notes": "2 open PRs found via API (#29269, #29223). Both are same-repo branches (head.repo == base.repo = github/gh-aw), not forks. Per policy, only fork PRs are triaged. No fork PRs to triage.",
+  "agent_prs_found": 6,
+  "agent_prs_excluded": 6,
+  "notes": "6 open PRs found (#29411, #29410, #29409, #29408, #29406, #29223). All are same-repo branches (head.repo == base.repo = github/gh-aw), not forks. Per policy, only fork PRs are triaged. No fork PRs to triage.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -17,14 +17,18 @@
     "by_action": {}
   },
   "pr_list": [
-    {"number": 29269, "title": "feat: add label-triggered jobs (disable workflow, apply safe outputs) to maintenance workflow", "draft": false, "same_repo": true},
-    {"number": 29223, "title": "feat: enable checksum validation by default in install-gh-aw.sh", "draft": false, "same_repo": true}
+    {"number": 29411, "title": "fix: add COPILOT_PROVIDER_* to strict-mode allowlist, skip token validation in BYOK mode, and document Copilot BYOK", "same_repo": true},
+    {"number": 29410, "title": "perf: eliminate redundant file read and frontmatter re-parse in buildJobs", "same_repo": true},
+    {"number": 29409, "title": "perf: optimize YAML generation hot paths (-7% latency, -10% allocations)", "same_repo": true},
+    {"number": 29408, "title": "perf: reduce BenchmarkValidation allocations 73% (11 -> 3 allocs/op)", "same_repo": true},
+    {"number": 29406, "title": "fix(mcp): transform raw schema validation errors into helpful Did you mean? messages", "same_repo": true},
+    {"number": 29223, "title": "feat: enable checksum validation by default in install-gh-aw.sh", "same_repo": true}
   ],
   "previous_run": {
-    "run_id": "25166243843",
-    "run_date": "2026-04-30T12:50:17.718Z",
+    "run_id": "25183098551",
+    "run_date": "2026-04-30T18:45:16.479Z",
     "fork_prs": 0,
-    "agent_prs_found": 16,
-    "agent_prs_excluded": 16
+    "agent_prs_found": 2,
+    "agent_prs_excluded": 2
   }
 }
