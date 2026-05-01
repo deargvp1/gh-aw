@@ -1,1 +1,2 @@
 {"date":"2026-04-29","quality_signal":5315,"health":{"coupling":0.04,"cycles":2,"god_files":0,"distance_main_seq":0.34,"complex_fn":802},"files":4184,"bottleneck":"complexity","rules_violations":null}
+{"date":"2026-05-01","quality_signal":5249,"health":{"coupling":0.04025,"cycles":2,"god_files":0,"max_depth":8,"complex_fn":809},"files":4262,"bottleneck":"complexity","rules_violations":null}
