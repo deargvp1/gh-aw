@@ -1,0 +1,32 @@
+{
+  "date": "2026-05-02",
+  "files_analyzed": {
+    "documentation": [
+      "docs/src/content/docs/troubleshooting/debug-ghe.md",
+      "docs/src/content/docs/blog/2026-01-13-meet-the-workflows-campaigns.md"
+    ],
+    "cli": ["gh aw (source Short: fields)"],
+    "messages": [
+      ".github/workflows/refactoring-cadence.md",
+      ".github/workflows/draft-pr-cleanup.md"
+    ],
+    "validation": ["pkg/workflow/glob_validation.go"]
+  },
+  "overall_quality": "professional",
+  "quality_highlights": [
+    "docs/src/content/docs/troubleshooting/debug-ghe.md - excellent structure with TIP callout, cause/fix pairs",
+    ".github/workflows/draft-pr-cleanup.md - consistent emoji signaling"
+  ],
+  "single_file_improvements": [
+    {
+      "file": ".github/workflows/refactoring-cadence.md",
+      "priority": "high",
+      "issue": "run-failure uses wrench emoji (same as run-started); should use error emoji"
+    },
+    {
+      "file": "docs/src/content/docs/blog/2026-01-13-meet-the-workflows-campaigns.md",
+      "priority": "medium",
+      "issue": "Quick Start links use possibly incorrect hostname; should use relative path"
+    }
+  ]
+}
