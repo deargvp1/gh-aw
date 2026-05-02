@@ -1,57 +1,36 @@
-# Workflow Health — 2026-04-30T23:33Z (PM update)
+# Workflow Health — 2026-05-02T05:30Z
 
-Score: 72/100 (↓-5 from morning 77). 205 workflows. Run: §25194518483
+Score: 68/100 (↓4 from 72). 207 workflows. Run: §25244683354
 
 ## KEY FINDINGS
 
 ### Compilation Status
-- 205/205 lock files present ✅
+- 207/207 lock files present ✅
 - 0 missing lock files ✅
 
-### Today's Full Day Failures (Apr 30)
-AM batch (10:43-11:51): 8 failures - codex crash + 7 safe_outputs
-Afternoon: GitHub MCP Structural Analysis (agent timeout, claude killed)
-           Super Linter Report (Node.js crash)
-           CI: 6 failures (integration tests throughout day)
-Evening: CJS test failure (CI-related)
-
-**Category 1: Codex engine crash (P0 ongoing)**
-- Daily Fact About gh-aw — `codex: command not found` (#29088)
-
-**Category 2: Safe outputs failures (7 workflows)**
-- Daily Rendering Scripts Verifier
-- Developer Documentation Consolidator
-- Daily AstroStyleLite Markdown Spellcheck
-- Instructions Janitor
-- Daily AW Cross-Repo Compile Check
-- Daily Community Attribution Updater
-- Daily Issues Report Generator (new)
-
-**Category 3: CI failures (P1 escalated)**
-- CI integration tests: 6 failures today (50% of CI runs)
-- CJS tests: 1 failure
-
-**Category 4: Agent timeout (new)**
-- GitHub MCP Structural Analysis — claude process killed
-
-**Category 5: Super Linter (P2)**
-- Super Linter Report failure - Node.js runtime crash
-
 ### P0 Issues (Active)
-- **Codex binary missing** (#29088): Daily Fact About gh-aw fails daily
+- **Smoke Engine Failures** (#29459 OPEN): Gemini API_KEY_INVALID + Crush EROFS + Claude timeout (newly added today). 3/7 smoke engines broken.
 
-### P1 Issues (Carry forward + CI escalated)
-- **CI integration tests failing** (6 runs today 50% fail rate) — ESCALATED
-- **Documentation Unbloat claude auth** (#28659) OPEN
-- **GitHub Remote MCP Authentication Test** (#27965) OPEN day 10
-- **MCP gateway session timeout** (#23153) OPEN
-- **awf-api-proxy sidecar unhealthy** (#27888) OPEN
-- **GitHub App rate limit** (#27251) OPEN
-- **CODEX_HOME collision** (#27512) OPEN
+### P1 Issues (Active)
+- **CI/CGO/CJS build failures** (NEW): push `refactor: flatten nested if in validateStrictSandboxCustomization` broke May 2 builds. 50% CI fail rate.
+- **MCP gateway session timeout** (#23153 OPEN): Ongoing structural risk for long workflows.
 
 ### P2 Issues
-- **Safe Outputs SEC-004** (#27235)
-- **Node.js 20 deprecation** in CI (deadline Sep 16, 2026)
+- Node.js 20 deprecation in CI (deadline Sep 16, 2026)
 
-### Dashboard Issue
-- Apr 30 AM dashboard: #29304 (updated this run)
+### Issues Resolved Since Apr 30 ✅ (MAJOR IMPROVEMENT)
+- #29088 Codex binary missing (Daily Fact) → CLOSED
+- #28659 Documentation Unbloat claude auth → CLOSED
+- #27965 GitHub Remote MCP Auth Test → CLOSED
+- #27888 awf-api-proxy sidecar unhealthy → CLOSED
+- #27251 GitHub App rate limit exhaustion → CLOSED
+- #27512 CODEX_HOME variable collision → CLOSED
+
+### Actions Taken This Run
+- Created dashboard issue: [aw] Workflow Health Dashboard — 2026-05-02
+- Added comment to #29459 with Claude smoke failure data
+
+### Trends
+- P1 backlog reduced from 13 → 2 active items (massive improvement)
+- New: CI/CGO/CJS build broken today from recent refactor
+- Smoke test reliability declining (3/7 engines broken)
