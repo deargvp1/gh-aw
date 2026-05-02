@@ -565,6 +565,14 @@ describe("add_reaction_and_edit_comment.cjs", () => {
     });
   });
 
+  describe("addDiscussionReaction() - direct unit tests", () => {
+    it("should throw for invalid reaction type not in DISCUSSION_REACTION_MAP", async () => {
+      const { addDiscussionReaction } = await loadModule();
+      await expect(addDiscussionReaction("D_kwDOABcD1M4AaBbC", "invalid_reaction")).rejects.toThrow("Invalid reaction type for GraphQL");
+      expect(mockGithub.graphql).not.toHaveBeenCalled();
+    });
+  });
+
   describe("addReaction()", () => {
     it("should add reaction via REST API and set output", async () => {
       mockGithub.request.mockResolvedValueOnce({ data: { id: 789 } });

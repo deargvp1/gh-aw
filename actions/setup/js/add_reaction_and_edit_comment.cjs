@@ -305,13 +305,13 @@ async function addCommentWithWorkflowLink(endpoint, runUrl, eventName, invocatio
     const trackerId = process.env.GH_AW_TRACKER_ID || "";
 
     // Build comment body from parts, sanitizing first to preserve workflow markers
-    const commentParts = [
+    const commentParts = /** @type {string[]} */ [
       sanitizeContent(workflowLinkText),
-      ...(lockForAgent && (eventName === "issues" || eventName === "issue_comment") ? ["🔒 This issue has been locked while the workflow is running to prevent concurrent modifications."] : []),
-      ...(workflowId ? [generateWorkflowIdMarker(workflowId)] : []),
-      ...(trackerId ? [`<!-- gh-aw-tracker-id: ${trackerId} -->`] : []),
+      lockForAgent && (eventName === "issues" || eventName === "issue_comment") && "🔒 This issue has been locked while the workflow is running to prevent concurrent modifications.",
+      workflowId && generateWorkflowIdMarker(workflowId),
+      trackerId && `<!-- gh-aw-tracker-id: ${trackerId} -->`,
       "<!-- gh-aw-comment-type: reaction -->",
-    ];
+    ].filter(Boolean);
     const commentBody = commentParts.join("\n\n");
 
     if (eventName === "discussion") {
