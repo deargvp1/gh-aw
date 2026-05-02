@@ -44,7 +44,7 @@ Without this, the dev server may fail with a Node.js version error and the agent
 The `npm run preview` command serves the pre-built static output. However, Astro's Starlight documentation site uses hybrid routing which requires the development server (`astro dev`) to correctly serve all pages at the `/gh-aw/` base URL. Using `npm run preview` returns 404 for `/gh-aw/` paths.
 
 **Why `--host 0.0.0.0 --port 4321` is required:**
-The agent runs inside a Docker container. Playwright also runs in its own container with `--network host`, meaning its `localhost` is the Docker host — not the agent container. Binding to `0.0.0.0` makes the server accessible on the agent container's bridge IP (e.g. `172.30.x.x`). The `--port 4321` flag prevents port conflicts if a previous server instance is still shutting down.
+The agent runs inside a Docker container. Playwright also runs in its own Docker container, so its `localhost` is not the agent container. Binding to `0.0.0.0` makes the server reachable via `host.docker.internal` from the Playwright container. The `--port 4321` flag prevents port conflicts if a previous server instance is still shutting down.
 
 ## Waiting for Server Readiness
 
@@ -66,24 +66,13 @@ This will:
 
 ## Playwright Browser Access
 
-**Important**: Playwright runs in a container with `--network host`, so its `localhost` is the Docker host's localhost — not the agent container. To access the docs server from Playwright browser tools, use the agent container's bridge network IP instead of `localhost`.
+**Important**: Playwright runs in a Docker container, so its `localhost` is not the agent container. To access the docs server from Playwright browser tools, use `host.docker.internal` as the hostname instead of `localhost`.
 
-Get the container's bridge IP (this uses route lookup — `1.1.1.1` is never actually contacted, it only determines which interface handles outbound traffic):
-
-```bash
-SERVER_IP=$(ip -4 route get 1.1.1.1 2>/dev/null | awk '{print $7; exit}')
-# Fallback if route lookup fails
-if [ -z "$SERVER_IP" ]; then
-  SERVER_IP=$(hostname -I | awk '{print $1}')
-fi
-echo "Playwright server URL: http://${SERVER_IP}:4321/gh-aw/"
-```
-
-Then use `http://${SERVER_IP}:4321/gh-aw/` (not `http://localhost:4321/gh-aw/`) when navigating with Playwright tools.
+Use `http://host.docker.internal:4321/gh-aw/` (not `http://localhost:4321/gh-aw/`) when navigating with Playwright tools.
 
 The `curl` readiness check and bash commands still use `localhost:4321` since they run inside the agent container where the server is local.
 
-**⚠️ Playwright Connectivity Fallback**: In some network configurations, the Playwright container may not be able to reach the agent container's bridge IP (e.g., `net::ERR_CONNECTION_TIMED_OUT`). If a `browser_navigate` or `browser_run_code` call times out or returns a connection error:
+**⚠️ Playwright Connectivity Fallback**: If a `browser_navigate` call returns a connection error or times out:
 - **Do not spend time debugging the network or trying alternative IPs** — this is a known network isolation constraint in some AWF configurations
 - **Fall back to curl and bash tools** to fetch and analyze page content:
   ```bash
@@ -122,7 +111,7 @@ This will:
 
 - The server runs on `http://localhost:4321` (agent container's localhost)
 - Documentation is accessible at `http://localhost:4321/gh-aw/` for curl/bash
-- For Playwright browser tools, use the container bridge IP (see "Playwright Browser Access" section above)
+- For Playwright browser tools, use `http://host.docker.internal:4321/gh-aw/` (see "Playwright Browser Access" section above)
 - Always clean up the server when done to avoid orphan processes
 - If the server fails to start, check `/tmp/preview.log` for errors
 - Node.js >= 22 is required; ensure `runtimes: node: version: "22"` is set in the workflow frontmatter

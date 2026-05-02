@@ -364,7 +364,7 @@ Follow the shared **Documentation Server Lifecycle Management** instructions:
 
 For the modified documentation file(s):
 
-1. Determine the URL path for the modified file (e.g., if you modified `docs/src/content/docs/guides/getting-started.md`, the URL would be `http://localhost:4321/gh-aw/guides/getting-started/`)
+1. Determine the URL path for the modified file (e.g., if you modified `docs/src/content/docs/guides/getting-started.md`, the URL would be `http://host.docker.internal:4321/gh-aw/guides/getting-started/`)
 2. Use Playwright to navigate to the documentation page URL
 3. Wait for the page to fully load (including all CSS, fonts, and images)
 4. Take a full-page HD screenshot of the documentation page (1920x1080 viewport is configured)

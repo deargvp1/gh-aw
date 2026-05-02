@@ -74,7 +74,7 @@ steps:
 
 # Visual Regression Checker
 
-You are a visual quality agent. The documentation site has been checked out, built, and the dev server is already running at `http://localhost:4321/gh-aw/`. For this pull request, use Playwright to capture screenshots of key pages and report any visual differences.
+You are a visual quality agent. The documentation site has been checked out, built, and the dev server is already running at `http://localhost:4321/gh-aw/` (accessible from the agent via `localhost`, and from Playwright via `host.docker.internal:4321`). For this pull request, use Playwright to capture screenshots of key pages and report any visual differences.
 
 ## Steps
 

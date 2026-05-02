@@ -65,7 +65,7 @@ Please follow these steps:
 3. Verify the server is running by making a curl request to test accessibility
 
 ## Step 3: Take Screenshot with Playwright
-1. Use Playwright to navigate to `http://localhost:4321/gh-aw/`
+1. Use Playwright to navigate to `http://host.docker.internal:4321/gh-aw/`
 2. Wait for the page to fully load
 3. Take a full-page screenshot of the documentation homepage
 4. Save the screenshot to a file (e.g., `/tmp/gh-aw/docs-screenshot.png`)

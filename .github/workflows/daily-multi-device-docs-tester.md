@@ -126,29 +126,21 @@ The Astro development server uses Vite, which loads many JavaScript modules per 
 
 **Example Usage:**
 
-```bash
-# First, get the container's bridge IP (needed for Playwright - see shared lifecycle instructions)
-SERVER_IP=$(ip -4 route get 1.1.1.1 2>/dev/null | awk '{print $7; exit}')
-if [ -z "$SERVER_IP" ]; then SERVER_IP=$(hostname -I | awk '{print $1}'); fi
-echo "Playwright server URL: http://${SERVER_IP}:4321/gh-aw/"
-```
-
 ```javascript
 // Use browser_run_code to execute Playwright commands.
-// IMPORTANT: Replace 172.30.0.20 below with the actual SERVER_IP from the bash command above.
-// Do NOT use "localhost" — Playwright runs with --network host so its localhost differs.
+// Use "host.docker.internal" to reach the docs server — Playwright runs in Docker so its localhost differs.
 // ALWAYS use waitUntil: 'domcontentloaded' to prevent timeout on the Vite dev server.
 mcp__playwright__browser_run_code({
   code: `async (page) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto('http://172.30.0.20:4321/gh-aw/', { waitUntil: 'domcontentloaded', timeout: 30000 });  // substitute actual SERVER_IP
+    await page.goto('http://host.docker.internal:4321/gh-aw/', { waitUntil: 'domcontentloaded', timeout: 30000 });
     return { url: page.url(), title: await page.title() };
   }`
 })
 ```
 
 For each device viewport, use Playwright MCP tools to:
-- Set viewport size and navigate to `http://${SERVER_IP}:4321/gh-aw/` (substitute the bridge IP you obtained above, NOT localhost)
+- Set viewport size and navigate to `http://host.docker.internal:4321/gh-aw/`
 - Take screenshots and run accessibility audits
 - Test interactions (navigation, search, buttons)
 - Check for layout issues (overflow, truncation, broken layouts)
