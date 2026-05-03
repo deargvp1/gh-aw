@@ -12,7 +12,7 @@
 // The generated config file follows the AWF config file format:
 //
 //	{
-//	  "$schema": "https://github.com/github/gh-aw-firewall/schemas/awf-config.v1.json",
+//	  "$schema": "https://github.com/github/gh-aw-firewall/releases/download/v0.25.35/awf-config.schema.json",
 //	  "network": {
 //	    "allowDomains": ["github.com", "api.github.com"],
 //	    "blockDomains": ["ads.example.com"]
@@ -48,6 +48,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/github/gh-aw/pkg/constants"
 	"github.com/github/gh-aw/pkg/logger"
 )
 
@@ -110,6 +111,25 @@ type AWFContainerConfig struct {
 	ImageTag string `json:"imageTag,omitempty"`
 }
 
+// buildAWFConfigSchemaURL returns the release-pinned JSON schema URL for the AWF config file.
+// The URL is versioned so that schema validation tools always reference the exact schema
+// that matches the AWF binary being used. When DefaultFirewallVersion is bumped the URL
+// automatically tracks the new release.
+//
+// If firewallConfig carries an explicit version (e.g. sandbox.agent.version) that version
+// is used; otherwise DefaultFirewallVersion is used.
+func buildAWFConfigSchemaURL(firewallConfig *FirewallConfig) string {
+	version := string(constants.DefaultFirewallVersion)
+	if firewallConfig != nil && firewallConfig.Version != "" {
+		version = firewallConfig.Version
+	}
+	// Ensure version has the 'v' prefix required by GitHub release tag URLs.
+	if !strings.HasPrefix(version, "v") {
+		version = "v" + version
+	}
+	return fmt.Sprintf("https://github.com/github/gh-aw-firewall/releases/download/%s/awf-config.schema.json", version)
+}
+
 // BuildAWFConfigJSON generates a compact JSON config file for AWF from the provided
 // command configuration. The JSON is single-line (no indentation) for safe embedding
 // in a shell printf command.
@@ -119,8 +139,11 @@ type AWFContainerConfig struct {
 func BuildAWFConfigJSON(config AWFCommandConfig) (string, error) {
 	awfConfigLog.Printf("Building AWF config JSON: engine=%s, allowed_domains=%q", config.EngineName, config.AllowedDomains)
 
+	// Resolve firewall config once — used for both the schema URL and the container image tag.
+	firewallConfig := getFirewallConfig(config.WorkflowData)
+
 	awfConfig := AWFConfigFile{
-		Schema: "https://github.com/github/gh-aw-firewall/schemas/awf-config.v1.json",
+		Schema: buildAWFConfigSchemaURL(firewallConfig),
 	}
 
 	// ── Network section ──────────────────────────────────────────────────────
@@ -173,7 +196,6 @@ func BuildAWFConfigJSON(config AWFCommandConfig) (string, error) {
 	awfConfig.APIProxy = apiProxy
 
 	// ── Container section ─────────────────────────────────────────────────────
-	firewallConfig := getFirewallConfig(config.WorkflowData)
 	awfImageTag := buildAWFImageTagWithDigests(getAWFImageTag(firewallConfig), config.WorkflowData)
 	if awfImageTag != "" {
 		awfConfig.Container = &AWFContainerConfig{
