@@ -299,7 +299,6 @@ The MCP Scripts subsystem provides inline custom tool definitions (JavaScript, s
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `GetActionPin` | `func(actionRepo string) string` | Returns the pinned SHA for an action |
-| `GetActionPinByRepo` | `func(string) (ActionPin, bool)` | Looks up a pin by repo |
 | `DetectActionMode` | `func(version string) ActionMode` | Detects the action reference mode |
 | `ParseTagRefTSV` | `func(line string) (sha, objType string, err error)` | Parses tab-separated tag ref output into SHA and object type |
 | `ExtractActionsFromLockFile` | `func(lockFilePath string) ([]ActionUsage, error)` | Extracts action usages from a lock file |
