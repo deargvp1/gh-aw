@@ -204,6 +204,7 @@ func TestBuildAWFConfigSchemaURL(t *testing.T) {
 		name           string
 		firewallConfig *FirewallConfig
 		wantContains   string
+		wantURL        string // exact URL match, takes precedence over wantContains when set
 	}{
 		{
 			name:           "nil config uses DefaultFirewallVersion",
@@ -225,11 +226,21 @@ func TestBuildAWFConfigSchemaURL(t *testing.T) {
 			firewallConfig: &FirewallConfig{Enabled: true, Version: "0.24.0"},
 			wantContains:   "v0.24.0",
 		},
+		{
+			name:           "latest version uses /releases/latest/download/ URL",
+			firewallConfig: &FirewallConfig{Enabled: true, Version: "latest"},
+			wantURL:        "https://github.com/github/gh-aw-firewall/releases/latest/download/awf-config.schema.json",
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			url := buildAWFConfigSchemaURL(tt.firewallConfig)
+
+			if tt.wantURL != "" {
+				assert.Equal(t, tt.wantURL, url, "schema URL should match the expected URL exactly")
+				return
+			}
 
 			assert.Contains(t, url, tt.wantContains, "schema URL should contain the expected version")
 			assert.Contains(t, url, "https://github.com/github/gh-aw-firewall/releases/download/", "schema URL should use the release download path")

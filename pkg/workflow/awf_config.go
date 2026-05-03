@@ -12,7 +12,7 @@
 // The generated config file follows the AWF config file format:
 //
 //	{
-//	  "$schema": "https://github.com/github/gh-aw-firewall/releases/download/v0.25.35/awf-config.schema.json",
+//	  "$schema": "https://github.com/github/gh-aw-firewall/releases/download/vX.Y.Z/awf-config.schema.json",
 //	  "network": {
 //	    "allowDomains": ["github.com", "api.github.com"],
 //	    "blockDomains": ["ads.example.com"]
@@ -122,6 +122,11 @@ func buildAWFConfigSchemaURL(firewallConfig *FirewallConfig) string {
 	version := string(constants.DefaultFirewallVersion)
 	if firewallConfig != nil && firewallConfig.Version != "" {
 		version = firewallConfig.Version
+	}
+	// Special-case "latest": the GitHub Releases /latest/download/ shortcut serves
+	// assets from the most recent release without requiring a tag in the path.
+	if strings.EqualFold(version, "latest") {
+		return "https://github.com/github/gh-aw-firewall/releases/latest/download/awf-config.schema.json"
 	}
 	// Ensure version has the 'v' prefix required by GitHub release tag URLs.
 	if !strings.HasPrefix(version, "v") {
