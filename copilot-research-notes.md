@@ -47,3 +47,23 @@
   - UNUSED: grumpy-reviewer, w3c-specification-writer, create-safe-output-type, custom-engine-implementation, interactive-agent-designer
 - **engine.model**: 6 workflows using model overrides
 - **network config**: 104 workflows (good adoption)
+
+### 2026-05-03 (Run 25270216421)
+- 209 total MD workflows; 91 Copilot (simple form only)
+- **startup-timeout**: 0 (13th consecutive run — CRITICAL persistent gap)
+- **tool-timeout**: 0 (13th run)
+- **engine.version**: 0 (persistent)
+- **engine.model**: 11 workflows (gpt-5, gpt-5-mini, gpt-4.1-mini, gpt-5.4-mini, claude variants)
+- **bare mode**: 9 workflows (up from 8)
+- **max-continuations**: 2 workflows (test-quality-sentinel:40, smoke-copilot:2)
+- **sandbox AWF**: 15 workflows (up from 11, trending up)
+- **sandbox SRT**: 0 (never used)
+- **cache-memory**: 19 copilot workflows
+- **repo-memory**: 14 copilot workflows
+- **web-fetch**: 7, **web-search**: 0 in copilot workflows
+- **mcp-scripts**: 1
+- **gh-proxy mode**: 105 across all workflows
+- **specific toolsets**: ~10 workflows
+- **imports (agentic-workflows)**: 40 workflows
+- 5 unused custom agent files (same 5 since April)
+- Discussion created: "Copilot CLI Deep Research - 2026-05-03"
