@@ -85,9 +85,6 @@ func BuiltinModelAliases() map[string][]string {
 			"openai/gpt-5*codex*",
 		},
 		"reasoning": {
-			"copilot/o1*",
-			"copilot/o3*",
-			"copilot/o4*",
 			"openai/o1*",
 			"openai/o3*",
 			"openai/o4*",
