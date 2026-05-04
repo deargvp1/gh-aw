@@ -41,13 +41,8 @@ steps:
       mkdir -p /tmp/gh-aw/agent
       # Run compilation validation and capture output
       gh aw compile --validate > /tmp/gh-aw/agent/compile-validate.txt 2>&1 || true
-      # List executable workflow files, excluding shared imports, smoke/test workflows, and examples
-      find .github/workflows -maxdepth 1 -type f -name '*.md' \
-        ! -name 'smoke-*.md' \
-        ! -name 'test-*.md' \
-        ! -name 'example*.md' \
-        | sort > /tmp/gh-aw/agent/workflow-list.txt || true
-      echo "Inventory complete: $(wc -l < /tmp/gh-aw/agent/workflow-list.txt | tr -d ' ') workflows found"
+      # Build executable workflow inventory using the shared helper
+      bash "${RUNNER_TEMP}/gh-aw/actions/list_executable_workflows.sh"
 pre-agent-steps:
   - name: Load Metrics
     run: |
@@ -72,15 +67,7 @@ pre-agent-steps:
 
 You are a workflow health manager responsible for monitoring and maintaining the health of all 120+ agentic workflows in this repository.
 
-## Important Note: Workflow Exclusions
-
-**DO NOT** include any of the following in workflow inventory or missing lock-file checks:
-- `.github/workflows/shared/` include files
-- `smoke-*.md` workflows
-- `test-*.md` workflows
-- `example*.md` workflow files
-
-Only executable non-shared, non-smoke, non-test, non-example workflows in the root `.github/workflows/` directory should have corresponding `.lock.yml` files.
+{{#runtime-import shared/executable-workflow-exclusions.md}}
 
 ## Your Role
 
@@ -91,7 +78,7 @@ As a meta-orchestrator for workflow health, you oversee the operational health o
 ### 1. Workflow Discovery and Inventory
 
 **Discover all workflows:**
-- Read `/tmp/gh-aw/agent/workflow-list.txt` for all executable `.md` workflow files (pre-computed, excluding `shared/`, `smoke-*`, `test-*`, and `example*`)
+- Read `/tmp/gh-aw/agent/workflow-list.txt` for all executable `.md` workflow files (pre-computed)
 - Categorize workflows:
   - Agentic workflows
   - GitHub Actions workflows (`.yml`)
@@ -107,7 +94,6 @@ As a meta-orchestrator for workflow health, you oversee the operational health o
 **Check compilation status:**
 - Read `/tmp/gh-aw/agent/compile-validate.txt` for compilation results (pre-computed, do not re-run `gh aw compile --validate`)
 - Verify each **executable workflow** has a corresponding `.lock.yml` file
-- **EXCLUDE** shared include files in `.github/workflows/shared/`, `smoke-*.md`, `test-*.md`, and `example*.md`
 - Identify workflows that failed to compile
 - Flag workflows with compilation warnings
 
@@ -265,7 +251,7 @@ The Metrics Collector workflow runs daily and stores performance metrics in a st
 ### Phase 1: Discovery (pre-computed)
 
 Pre-computed data is available in `/tmp/gh-aw/agent/` and is the authoritative source for this phase:
-- `workflow-list.txt` — all executable `.md` workflow files (one per line, excluding `shared/`, `smoke-*`, `test-*`, and `example*`)
+- `workflow-list.txt` — all executable `.md` workflow files (one per line)
 - `compile-validate.txt` — output from `gh aw compile --validate`
 
 1. **Read the pre-computed inventory** from the files above; do not scan `.github/workflows/` or re-run discovery from scratch.
