@@ -1,0 +1,18 @@
+<svg width="700" height="440" xmlns="http://www.w3.org/2000/svg" style="background:white;font-family:sans-serif">
+<text x="350" y="38" font-size="18" font-weight="bold" text-anchor="middle" fill="#222">PR Sentiment Breakdown</text>
+<text x="350" y="58" font-size="13" text-anchor="middle" fill="#666">Last 24 hours — 65 merged Copilot PRs</text>
+<path d="M280,220 L280.0,60.0 A160,160 0 0,1 436.2,185.5 Z" fill="#4CAF50" opacity="0.85"/>
+<text x="345.1" y="138.9" font-size="13" font-weight="bold" text-anchor="middle" fill="white">22%</text>
+<path d="M280,220 L436.2,185.5 A160,160 0 0,1 407.1,317.1 Z" fill="#9E9E9E" opacity="0.85"/>
+<text x="381.5" y="242.4" font-size="13" font-weight="bold" text-anchor="middle" fill="white">14%</text>
+<path d="M280,220 L407.1,317.1 A160,160 0 1,1 280.0,60.0 Z" fill="#F44336" opacity="0.85"/>
+<text x="186.8" y="266.1" font-size="13" font-weight="bold" text-anchor="middle" fill="white">65%</text>
+<rect x="510" y="148" width="20" height="20" fill="#4CAF50" opacity="0.85"/>
+<text x="538" y="163" font-size="14" fill="#333">Positive: 14 (21.5%)</text>
+<rect x="510" y="188" width="20" height="20" fill="#9E9E9E" opacity="0.85"/>
+<text x="538" y="203" font-size="14" fill="#333">Neutral: 9 (13.8%)</text>
+<rect x="510" y="228" width="20" height="20" fill="#F44336" opacity="0.85"/>
+<text x="538" y="243" font-size="14" fill="#333">Negative: 42 (64.6%)</text>
+
+<text x="280" y="420" font-size="12" text-anchor="middle" fill="#888">Avg polarity: -0.376</text>
+</svg>

@@ -1,0 +1,98 @@
+<svg width="900" height="480" xmlns="http://www.w3.org/2000/svg" style="background:white;font-family:sans-serif">
+<text x="450" y="38" font-size="18" font-weight="bold" text-anchor="middle" fill="#222">Sentiment Timeline of Merged PRs (Last 24h)</text>
+<line x1="70" y1="60" x2="70" y2="400" stroke="#999"/>
+<line x1="70" y1="400" x2="860" y2="400" stroke="#999"/>
+<line x1="65" y1="400.0" x2="70" y2="400.0" stroke="#999"/>
+<text x="62.0" y="404.0" font-size="10" text-anchor="end" fill="#555">-1</text>
+<line x1="70" y1="400.0" x2="860" y2="400.0" stroke="#eee"/>
+<line x1="65" y1="315.0" x2="70" y2="315.0" stroke="#999"/>
+<text x="62.0" y="319.0" font-size="10" text-anchor="end" fill="#555">-0.5</text>
+<line x1="70" y1="315.0" x2="860" y2="315.0" stroke="#eee"/>
+<line x1="65" y1="230.0" x2="70" y2="230.0" stroke="#999"/>
+<text x="62.0" y="234.0" font-size="10" text-anchor="end" fill="#555">0</text>
+<line x1="70" y1="230.0" x2="860" y2="230.0" stroke="#eee"/>
+<line x1="65" y1="145.0" x2="70" y2="145.0" stroke="#999"/>
+<text x="62.0" y="149.0" font-size="10" text-anchor="end" fill="#555">0.5</text>
+<line x1="70" y1="145.0" x2="860" y2="145.0" stroke="#eee"/>
+<line x1="65" y1="60.0" x2="70" y2="60.0" stroke="#999"/>
+<text x="62.0" y="64.0" font-size="10" text-anchor="end" fill="#555">1</text>
+<line x1="70" y1="60.0" x2="860" y2="60.0" stroke="#eee"/>
+<line x1="70" y1="230.0" x2="860" y2="230.0" stroke="#000" stroke-opacity="0.2" stroke-dasharray="4,4"/>
+<circle cx="70.0" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="82.3" cy="230.0" r="5" fill="#9E9E9E" opacity="0.7"/>
+<circle cx="94.7" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="107.0" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="119.4" cy="286.7" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="131.7" cy="60.0" r="5" fill="#4CAF50" opacity="0.7"/>
+<circle cx="144.1" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="156.4" cy="315.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="168.8" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="181.1" cy="254.3" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="193.4" cy="230.0" r="5" fill="#9E9E9E" opacity="0.7"/>
+<circle cx="205.8" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="218.1" cy="230.0" r="5" fill="#9E9E9E" opacity="0.7"/>
+<circle cx="230.5" cy="230.0" r="5" fill="#9E9E9E" opacity="0.7"/>
+<circle cx="242.8" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="255.2" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="267.5" cy="60.0" r="5" fill="#4CAF50" opacity="0.7"/>
+<circle cx="279.8" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="292.2" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="304.5" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="316.9" cy="230.0" r="5" fill="#9E9E9E" opacity="0.7"/>
+<circle cx="329.2" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="341.6" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="353.9" cy="315.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="366.2" cy="145.0" r="5" fill="#4CAF50" opacity="0.7"/>
+<circle cx="378.6" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="390.9" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="403.3" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="415.6" cy="230.0" r="5" fill="#9E9E9E" opacity="0.7"/>
+<circle cx="428.0" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="440.3" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="452.7" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="465.0" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="477.3" cy="173.3" r="5" fill="#4CAF50" opacity="0.7"/>
+<circle cx="489.7" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="502.0" cy="332.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="514.4" cy="286.7" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="526.7" cy="332.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="539.1" cy="60.0" r="5" fill="#4CAF50" opacity="0.7"/>
+<circle cx="551.4" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="563.8" cy="145.0" r="5" fill="#4CAF50" opacity="0.7"/>
+<circle cx="576.1" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="588.4" cy="362.2" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="600.8" cy="332.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="613.1" cy="230.0" r="5" fill="#9E9E9E" opacity="0.7"/>
+<circle cx="625.5" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="637.8" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="650.2" cy="230.0" r="5" fill="#9E9E9E" opacity="0.7"/>
+<circle cx="662.5" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="674.8" cy="60.0" r="5" fill="#4CAF50" opacity="0.7"/>
+<circle cx="687.2" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="699.5" cy="145.0" r="5" fill="#4CAF50" opacity="0.7"/>
+<circle cx="711.9" cy="60.0" r="5" fill="#4CAF50" opacity="0.7"/>
+<circle cx="724.2" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="736.6" cy="286.7" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="748.9" cy="286.7" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="761.2" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="773.6" cy="205.7" r="5" fill="#4CAF50" opacity="0.7"/>
+<circle cx="785.9" cy="60.0" r="5" fill="#4CAF50" opacity="0.7"/>
+<circle cx="798.3" cy="60.0" r="5" fill="#4CAF50" opacity="0.7"/>
+<circle cx="810.6" cy="400.0" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="823.0" cy="286.7" r="5" fill="#F44336" opacity="0.7"/>
+<circle cx="835.3" cy="60.0" r="5" fill="#4CAF50" opacity="0.7"/>
+<circle cx="847.7" cy="230.0" r="5" fill="#9E9E9E" opacity="0.7"/>
+<circle cx="860.0" cy="60.0" r="5" fill="#4CAF50" opacity="0.7"/>
+<polyline points="70.0,343.3 82.3,357.5 94.7,343.3 107.0,275.3 119.4,309.3 131.7,292.3 144.1,292.3 156.4,285.9 168.8,319.9 181.1,319.9 193.4,302.9 205.8,268.9 218.1,298.0 230.5,332.0 242.8,264.0 255.2,298.0 267.5,332.0 279.8,332.0 292.2,298.0 304.5,366.0 316.9,366.0 329.2,349.0 341.6,298.0 353.9,332.0 366.2,332.0 378.6,332.0 390.9,315.0 403.3,366.0 415.6,366.0 428.0,366.0 440.3,366.0 452.7,354.7 465.0,354.7 477.3,341.1 489.7,318.4 502.0,304.8 514.4,282.1 526.7,282.1 539.1,244.7 551.4,267.4 563.8,273.4 576.1,327.8 588.4,293.8 600.8,344.8 613.1,344.8 625.5,318.4 637.8,332.0 650.2,298.0 662.5,298.0 674.8,247.0 687.2,213.0 699.5,213.0 711.9,258.3 724.2,235.7 736.6,286.7 748.9,315.8 761.2,247.8 773.6,202.5 785.9,225.1 798.3,202.5 810.6,173.3 823.0,207.3 835.3,207.3 847.7,159.2 860.0,116.7" fill="none" stroke="#1976D2" stroke-width="2.5"/>
+
+<text x="450" y="470" font-size="13" text-anchor="middle" fill="#444">PRs in chronological order</text>
+<text x="18" y="230" font-size="13" text-anchor="middle" fill="#444" transform="rotate(-90,18,230)">Sentiment Polarity</text>
+<circle cx="650" cy="25" r="5" fill="#4CAF50" opacity="0.7"/>
+<text x="660" y="30" font-size="11" fill="#444">Positive</text>
+<circle cx="710" cy="25" r="5" fill="#9E9E9E" opacity="0.7"/>
+<text x="720" y="30" font-size="11" fill="#444">Neutral</text>
+<circle cx="770" cy="25" r="5" fill="#F44336" opacity="0.7"/>
+<text x="780" y="30" font-size="11" fill="#444">Negative</text>
+<line x1="820" y1="23" x2="840" y2="23" stroke="#1976D2" stroke-width="2.5"/>
+<text x="845" y="28" font-size="11" fill="#1976D2">Rolling avg</text>
+</svg>
