@@ -187,5 +187,14 @@
     "total_tokens_analyzed": 2439064,
     "estimated_savings_per_run": 1100000,
     "recommendations_count": 4
+  },
+  {
+    "date": "2026-05-04",
+    "workflow_name": "Copilot PR Conversation NLP Analysis",
+    "workflow_file": "copilot-pr-nlp-analysis",
+    "runs_audited": 1,
+    "total_tokens_analyzed": 1972132,
+    "estimated_savings_per_run": 1050000,
+    "recommendations_count": 4
   }
 ]
