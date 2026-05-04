@@ -15,7 +15,7 @@ permissions:
   issues: read
 engine:
   id: claude
-  max-turns: 12
+  max-turns: 15
 safe-outputs:
   add-comment:
     max: 2
@@ -320,6 +320,11 @@ Use `push-to-pull-request-branch` to commit the draft ADR to `docs/adr/{NNNN}-{k
 Ensure the `docs/adr/` directory exists before writing:
 ```bash
 mkdir -p ${{ github.workspace }}/docs/adr
+```
+
+Call the tool via JSON stdin (required syntax):
+```bash
+printf '{"pull_request_number":{PR_NUMBER},"message":"docs(adr): add draft ADR-{NNNN} for {title}","branch":"{branch_name}"}' | safeoutputs push_to_pull_request_branch .
 ```
 
 ### Post a Blocking Comment
