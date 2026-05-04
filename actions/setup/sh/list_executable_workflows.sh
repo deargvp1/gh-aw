@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-set +o histexpand
-
 set -euo pipefail
 
 WORKFLOW_DIR="${1:-.github/workflows}"
