@@ -1,4 +1,4 @@
-# gh-aw-metadata: {"schema_version":"v3","frontmatter_hash":"41d3e8b15b335c2c5a9a594852fe73f23b426cc660e9d3b0854b603453392bf3","strict":true,"agent_id":"copilot"}
+# gh-aw-metadata: {"schema_version":"v3","frontmatter_hash":"97fa2c77fabcace9a7dc3b65ddc4a26119398ceba167c577358954420eb67b85","strict":true,"agent_id":"copilot"}
 # gh-aw-manifest: {"version":1,"secrets":["COPILOT_GITHUB_TOKEN","GH_AW_GITHUB_MCP_SERVER_TOKEN","GH_AW_GITHUB_TOKEN","GITHUB_TOKEN"],"actions":[{"repo":"actions/cache/restore","sha":"27d5ce7f107fe9357f9df03efb73ab90386fccae","version":"v5.0.5"},{"repo":"actions/cache/save","sha":"27d5ce7f107fe9357f9df03efb73ab90386fccae","version":"v5.0.5"},{"repo":"actions/checkout","sha":"de0fac2e4500dabe0009e67214ff5f5447ce83dd","version":"v6.0.2"},{"repo":"actions/download-artifact","sha":"3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c","version":"v8.0.1"},{"repo":"actions/github-script","sha":"3a2844b7e9c422d3c10d287c895573f7108da1b3","version":"v9"},{"repo":"actions/setup-go","sha":"4a3601121dd01d1626a1e23e37211e3254c1c06c","version":"v6.4.0"},{"repo":"actions/setup-node","sha":"48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e","version":"v6.4.0"},{"repo":"actions/setup-python","sha":"a309ff8b426b58ec0e2a45f0f869d46889d02405","version":"v6.2.0"},{"repo":"actions/upload-artifact","sha":"043fb46d1a93c77aae656e7c1c64a875d1fc6a0a","version":"v7.0.1"},{"repo":"docker/build-push-action","sha":"bcafcacb16a39f128d818304e6c9c0c18556b85f","version":"v7.1.0"},{"repo":"docker/setup-buildx-action","sha":"4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd","version":"v4.0.0"}],"containers":[{"image":"ghcr.io/github/gh-aw-firewall/agent:0.25.40","digest":"sha256:14ff567e8d9d4c2fbc5e55c973488381c71d7e0fdbe72d30ee7b8a738fd86504","pinned_image":"ghcr.io/github/gh-aw-firewall/agent:0.25.40@sha256:14ff567e8d9d4c2fbc5e55c973488381c71d7e0fdbe72d30ee7b8a738fd86504"},{"image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.25.40","digest":"sha256:2883ca3e5ae9f330cafdd9345bfd4ae17fc8da36c96d4c9a1f76e922b4c45280","pinned_image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.25.40@sha256:2883ca3e5ae9f330cafdd9345bfd4ae17fc8da36c96d4c9a1f76e922b4c45280"},{"image":"ghcr.io/github/gh-aw-firewall/squid:0.25.40","digest":"sha256:b084f4a2c771f584ee68084ced52fa6b3245197a1889645d817462d307d3ac51","pinned_image":"ghcr.io/github/gh-aw-firewall/squid:0.25.40@sha256:b084f4a2c771f584ee68084ced52fa6b3245197a1889645d817462d307d3ac51"},{"image":"ghcr.io/github/gh-aw-mcpg:v0.3.6","digest":"sha256:2bb8eef86006a4c5963c55616a9c51c32f27bfdecb023b8aa6f91f6718d9171c","pinned_image":"ghcr.io/github/gh-aw-mcpg:v0.3.6@sha256:2bb8eef86006a4c5963c55616a9c51c32f27bfdecb023b8aa6f91f6718d9171c"},{"image":"ghcr.io/github/github-mcp-server:v1.0.3","digest":"sha256:2ac27ef03461ef2b877031b838a7d1fd7f12b12d4ace7796d8cad91446d55959","pinned_image":"ghcr.io/github/github-mcp-server:v1.0.3@sha256:2ac27ef03461ef2b877031b838a7d1fd7f12b12d4ace7796d8cad91446d55959"},{"image":"node:lts-alpine","digest":"sha256:d1b3b4da11eefd5941e7f0b9cf17783fc99d9c6fc34884a665f40a06dbdfc94f","pinned_image":"node:lts-alpine@sha256:d1b3b4da11eefd5941e7f0b9cf17783fc99d9c6fc34884a665f40a06dbdfc94f"}]}
 #    ___                   _   _      
 #   / _ \                 | | (_)     
@@ -192,9 +192,9 @@ jobs:
         run: |
           bash "${RUNNER_TEMP}/gh-aw/actions/create_prompt_first.sh"
           {
-          cat << 'GH_AW_PROMPT_d37dc308d923b901_EOF'
+          cat << 'GH_AW_PROMPT_08c17534e3924fa2_EOF'
           <system>
-          GH_AW_PROMPT_d37dc308d923b901_EOF
+          GH_AW_PROMPT_08c17534e3924fa2_EOF
           cat "${RUNNER_TEMP}/gh-aw/prompts/xpia.md"
           cat "${RUNNER_TEMP}/gh-aw/prompts/temp_folder_prompt.md"
           cat "${RUNNER_TEMP}/gh-aw/prompts/markdown.md"
@@ -202,15 +202,15 @@ jobs:
           cat "${RUNNER_TEMP}/gh-aw/prompts/cache_memory_prompt.md"
           cat "${RUNNER_TEMP}/gh-aw/prompts/repo_memory_prompt.md"
           cat "${RUNNER_TEMP}/gh-aw/prompts/safe_outputs_prompt.md"
-          cat << 'GH_AW_PROMPT_d37dc308d923b901_EOF'
+          cat << 'GH_AW_PROMPT_08c17534e3924fa2_EOF'
           <safe-output-tools>
           Tools: create_issue, upload_asset(max:5), missing_tool, missing_data, noop
           
           upload_asset: provide a file path; returns a URL; assets are published after the workflow completes (safeoutputs).
           </safe-output-tools>
-          GH_AW_PROMPT_d37dc308d923b901_EOF
+          GH_AW_PROMPT_08c17534e3924fa2_EOF
           cat "${RUNNER_TEMP}/gh-aw/prompts/mcp_cli_tools_prompt.md"
-          cat << 'GH_AW_PROMPT_d37dc308d923b901_EOF'
+          cat << 'GH_AW_PROMPT_08c17534e3924fa2_EOF'
           <github-context>
           The following GitHub context information is available for this workflow:
           {{#if __GH_AW_GITHUB_ACTOR__ }}
@@ -239,13 +239,13 @@ jobs:
           {{/if}}
           </github-context>
           
-          GH_AW_PROMPT_d37dc308d923b901_EOF
+          GH_AW_PROMPT_08c17534e3924fa2_EOF
           cat "${RUNNER_TEMP}/gh-aw/prompts/github_mcp_tools_with_safeoutputs_prompt.md"
-          cat << 'GH_AW_PROMPT_d37dc308d923b901_EOF'
+          cat << 'GH_AW_PROMPT_08c17534e3924fa2_EOF'
           </system>
           {{#runtime-import .github/workflows/shared/python-dataviz.md}}
           {{#runtime-import .github/workflows/copilot-token-audit.md}}
-          GH_AW_PROMPT_d37dc308d923b901_EOF
+          GH_AW_PROMPT_08c17534e3924fa2_EOF
           } > "$GH_AW_PROMPT"
       - name: Interpolate variables and render templates
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
@@ -452,7 +452,7 @@ jobs:
       - env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         name: Download Copilot workflow logs
-        run: "set -euo pipefail\nmkdir -p /tmp/gh-aw/token-audit\nLOGS_JSON=/tmp/gh-aw/token-audit/copilot-logs.json\nCONTEXT_JSON=/tmp/gh-aw/token-audit/download-context.json\n\nwrite_context() {\n  local requested_window=\"$1\"\n  local effective_window=\"$2\"\n  local period_days=\"$3\"\n  local bootstrap=\"$4\"\n  local total_runs=\"$5\"\n  local completed_runs=\"$6\"\n\n  jq -n \\\n    --arg requested_window \"$requested_window\" \\\n    --arg effective_window \"$effective_window\" \\\n    --argjson period_days \"$period_days\" \\\n    --argjson bootstrap \"$bootstrap\" \\\n    --argjson total_runs \"$total_runs\" \\\n    --argjson completed_runs \"$completed_runs\" \\\n    '{\n      requested_window: $requested_window,\n      effective_window: $effective_window,\n      period_days: $period_days,\n      bootstrap: $bootstrap,\n      total_runs: $total_runs,\n      completed_runs: $completed_runs\n    }' > \"$CONTEXT_JSON\"\n}\n\ndownload_logs() {\n  local window=\"$1\"\n  local count=\"$2\"\n\n  gh aw logs \\\n    --engine copilot \\\n    --start-date \"$window\" \\\n    --json \\\n    -c \"$count\" \\\n    > \"$LOGS_JSON\"\n}\n\nsummarize_logs() {\n  jq '[.runs[] | select(.status == \"completed\")] | length' \"$LOGS_JSON\"\n}\n\n# Download last 24 hours of Copilot logs as JSON\n# Allow partial results — gh aw logs streams incrementally, so even if\n# it hits an API rate limit partway through, the JSON written so far is\n# still valid and should be processed by the agent.\nLOGS_EXIT=0\ndownload_logs -1d 100 || LOGS_EXIT=$?\n\nif [ -s \"$LOGS_JSON\" ]; then\n  TOTAL=$(jq '.runs | length' \"$LOGS_JSON\")\n  COMPLETED=$(summarize_logs)\n\n  if [ \"$COMPLETED\" -eq 0 ]; then\n    echo \"ℹ️ No completed Copilot workflow runs found in the last 24 hours; widening the bootstrap window to 90 days.\"\n    LOGS_EXIT=0\n    download_logs -90d 250 || LOGS_EXIT=$?\n    TOTAL=$(jq '.runs | length' \"$LOGS_JSON\")\n    COMPLETED=$(summarize_logs)\n    write_context \"-1d\" \"-90d\" 90 true \"$TOTAL\" \"$COMPLETED\"\n    echo \"✅ Downloaded $TOTAL Copilot workflow runs from the 90-day bootstrap window ($COMPLETED completed)\"\n  else\n    write_context \"-1d\" \"-1d\" 1 false \"$TOTAL\" \"$COMPLETED\"\n    echo \"✅ Downloaded $TOTAL Copilot workflow runs (last 24 hours; $COMPLETED completed)\"\n  fi\n\n  if [ \"$LOGS_EXIT\" -ne 0 ]; then\n    echo \"⚠️ gh aw logs exited with code $LOGS_EXIT (partial results — likely API rate limit)\"\n  fi\nelse\n  echo \"❌ No log data downloaded (exit code $LOGS_EXIT)\"\n  echo '{\"runs\":[],\"summary\":{}}' > \"$LOGS_JSON\"\n  write_context \"-1d\" \"-1d\" 1 false 0 0\nfi\n"
+        run: "set -euo pipefail\nmkdir -p /tmp/gh-aw/token-audit\nLOGS_JSON=/tmp/gh-aw/token-audit/copilot-logs.json\nCONTEXT_JSON=/tmp/gh-aw/token-audit/download-context.json\n\n# Write download window metadata for the downstream audit script and report.\n# Args: requested_window effective_window period_days bootstrap total_runs completed_runs\nwrite_context() {\n  local requested_window=\"$1\"\n  local effective_window=\"$2\"\n  local period_days=\"$3\"\n  local bootstrap=\"$4\"\n  local total_runs=\"$5\"\n  local completed_runs=\"$6\"\n\n  jq -n \\\n    --arg requested_window \"$requested_window\" \\\n    --arg effective_window \"$effective_window\" \\\n    --argjson period_days \"$period_days\" \\\n    --argjson bootstrap \"$bootstrap\" \\\n    --argjson total_runs \"$total_runs\" \\\n    --argjson completed_runs \"$completed_runs\" \\\n    '{\n      requested_window: $requested_window,\n      effective_window: $effective_window,\n      period_days: $period_days,\n      bootstrap: $bootstrap,\n      total_runs: $total_runs,\n      completed_runs: $completed_runs\n    }' > \"$CONTEXT_JSON\"\n}\n\n# Download Copilot logs for a relative time window (for example -1d or -90d).\n# Args: window count\ndownload_logs() {\n  local window=\"$1\"\n  local count=\"$2\"\n\n  gh aw logs \\\n    --engine copilot \\\n    --start-date \"$window\" \\\n    --json \\\n    -c \"$count\" \\\n    > \"$LOGS_JSON\"\n}\n\n# Count completed runs in the currently downloaded logs payload.\nsummarize_logs() {\n  jq '[.runs[] | select(.status == \"completed\")] | length' \"$LOGS_JSON\"\n}\n\n# Download last 24 hours of Copilot logs as JSON\n# Allow partial results — gh aw logs streams incrementally, so even if\n# it hits an API rate limit partway through, the JSON written so far is\n# still valid and should be processed by the agent.\nLOGS_EXIT=0\ndownload_logs -1d 100 || LOGS_EXIT=$?\n\nif [ -s \"$LOGS_JSON\" ]; then\n  TOTAL=$(jq '.runs | length' \"$LOGS_JSON\")\n  COMPLETED=$(summarize_logs)\n\n  if [ \"$COMPLETED\" -eq 0 ]; then\n    echo \"ℹ️ No completed Copilot workflow runs found in the last 24 hours; widening the bootstrap window to 90 days.\"\n    LOGS_EXIT=0\n    download_logs -90d 250 || LOGS_EXIT=$?\n    TOTAL=$(jq '.runs | length' \"$LOGS_JSON\")\n    COMPLETED=$(summarize_logs)\n    write_context \"-1d\" \"-90d\" 90 true \"$TOTAL\" \"$COMPLETED\"\n    echo \"✅ Downloaded $TOTAL Copilot workflow runs from the 90-day bootstrap window ($COMPLETED completed)\"\n  else\n    write_context \"-1d\" \"-1d\" 1 false \"$TOTAL\" \"$COMPLETED\"\n    echo \"✅ Downloaded $TOTAL Copilot workflow runs (last 24 hours; $COMPLETED completed)\"\n  fi\n\n  if [ \"$LOGS_EXIT\" -ne 0 ]; then\n    echo \"⚠️ gh aw logs exited with code $LOGS_EXIT (partial results — likely API rate limit)\"\n  fi\nelse\n  echo \"❌ No log data downloaded (exit code $LOGS_EXIT)\"\n  echo '{\"runs\":[],\"summary\":{}}' > \"$LOGS_JSON\"\n  write_context \"-1d\" \"-1d\" 1 false 0 0\nfi\n"
 
       # Cache memory file share configuration from frontmatter processed below
       - name: Create cache-memory directory
@@ -570,9 +570,9 @@ jobs:
           mkdir -p "${RUNNER_TEMP}/gh-aw/safeoutputs"
           mkdir -p /tmp/gh-aw/safeoutputs
           mkdir -p /tmp/gh-aw/mcp-logs/safeoutputs
-          cat > "${RUNNER_TEMP}/gh-aw/safeoutputs/config.json" << GH_AW_SAFE_OUTPUTS_CONFIG_1197b06af3b19223_EOF
+          cat > "${RUNNER_TEMP}/gh-aw/safeoutputs/config.json" << GH_AW_SAFE_OUTPUTS_CONFIG_44250359b055d2aa_EOF
           {"create_issue":{"close_older_issues":true,"expires":168,"labels":["agentic-workflows","agentic-ops"],"max":1,"title_prefix":"[aw-ops] "},"create_report_incomplete_issue":{},"missing_data":{},"missing_tool":{},"noop":{"max":1,"report-as-issue":"true"},"push_repo_memory":{"memories":[{"dir":"/tmp/gh-aw/repo-memory/default","id":"default","max_file_count":100,"max_file_size":10240,"max_patch_size":10240}]},"report_incomplete":{},"upload_asset":{"allowed-exts":[".png",".jpg",".jpeg",".svg"],"branch":"assets/${GITHUB_WORKFLOW}","max":5,"max-size":10240}}
-          GH_AW_SAFE_OUTPUTS_CONFIG_1197b06af3b19223_EOF
+          GH_AW_SAFE_OUTPUTS_CONFIG_44250359b055d2aa_EOF
       - name: Generate Safe Outputs Tools
         env:
           GH_AW_TOOLS_META_JSON: |
@@ -786,7 +786,7 @@ jobs:
           
           mkdir -p /home/runner/.copilot
           GH_AW_NODE=$(which node 2>/dev/null || command -v node 2>/dev/null || echo node)
-          cat << GH_AW_MCP_CONFIG_28b6e3b83007247d_EOF | "$GH_AW_NODE" "${RUNNER_TEMP}/gh-aw/actions/start_mcp_gateway.cjs"
+          cat << GH_AW_MCP_CONFIG_bdf0986ffefded96_EOF | "$GH_AW_NODE" "${RUNNER_TEMP}/gh-aw/actions/start_mcp_gateway.cjs"
           {
             "mcpServers": {
               "agenticworkflows": {
@@ -846,7 +846,7 @@ jobs:
               "payloadDir": "${MCP_GATEWAY_PAYLOAD_DIR}"
             }
           }
-          GH_AW_MCP_CONFIG_28b6e3b83007247d_EOF
+          GH_AW_MCP_CONFIG_bdf0986ffefded96_EOF
       - name: Mount MCP servers as CLIs
         id: mount-mcp-clis
         continue-on-error: true

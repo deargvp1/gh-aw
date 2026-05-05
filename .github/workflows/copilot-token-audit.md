@@ -26,6 +26,8 @@ steps:
       LOGS_JSON=/tmp/gh-aw/token-audit/copilot-logs.json
       CONTEXT_JSON=/tmp/gh-aw/token-audit/download-context.json
 
+      # Write download window metadata for the downstream audit script and report.
+      # Args: requested_window effective_window period_days bootstrap total_runs completed_runs
       write_context() {
         local requested_window="$1"
         local effective_window="$2"
@@ -51,6 +53,8 @@ steps:
           }' > "$CONTEXT_JSON"
       }
 
+      # Download Copilot logs for a relative time window (for example -1d or -90d).
+      # Args: window count
       download_logs() {
         local window="$1"
         local count="$2"
@@ -63,6 +67,7 @@ steps:
           > "$LOGS_JSON"
       }
 
+      # Count completed runs in the currently downloaded logs payload.
       summarize_logs() {
         jq '[.runs[] | select(.status == "completed")] | length' "$LOGS_JSON"
       }
@@ -250,7 +255,7 @@ Create a discussion with these sections:
 ```
 ### 📊 Executive Summary
 
-- **Period**: effective download window from `download-context.json` (normally last 24 hours; bootstrap runs may use a wider window)
+- **Period**: format `download-context.json` as a human-readable range using `effective_window` and `period_days` (for example, `last 24 hours (YYYY-MM-DD to YYYY-MM-DD)` or `last 90 days (YYYY-MM-DD to YYYY-MM-DD)`)
 - **Total runs**: N
 - **Total tokens**: N (formatted with commas)
 - **Total cost**: $X.XX
