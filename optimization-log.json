@@ -196,5 +196,14 @@
     "total_tokens_analyzed": 1972132,
     "estimated_savings_per_run": 1050000,
     "recommendations_count": 4
+  },
+  {
+    "date": "2026-05-05",
+    "workflow_name": "Contribution Check",
+    "workflow_file": "contribution-check",
+    "runs_audited": 2,
+    "total_tokens_analyzed": 2925193,
+    "estimated_savings_per_run": 550000,
+    "recommendations_count": 4
   }
 ]
