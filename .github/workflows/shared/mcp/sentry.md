@@ -38,4 +38,9 @@ team:read
 team:write
 event:write
 ```
+
+**Important**: The `org:read` scope is required for `find_organizations` to succeed.
+If you see HTTP 403 errors on `find_organizations` or `find_projects`, the token is
+missing the `org:read` scope. Provision a new token with the correct scopes and
+update the `SENTRY_ACCESS_TOKEN` repository secret.
 -->

@@ -1,8 +1,9 @@
 ---
-description: Daily report of token consumption across all agentic workflows using OTel telemetry stored in Sentry
+description: Daily report of token consumption across all agentic workflows using OTel telemetry stored in Sentry, with fallback to pre-downloaded workflow run logs
 on:
   schedule: daily on weekdays
 permissions:
+  actions: read
   contents: read
   issues: read
   pull-requests: read
@@ -20,9 +21,10 @@ safe-outputs:
     close-older-issues: true
     expires: 1d
     max: 1
-timeout-minutes: 30
+timeout-minutes: 45
 imports:
   - shared/mcp/sentry.md
+  - shared/aw-logs-24h-fetch.md
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[token-consumption] "
@@ -33,7 +35,7 @@ imports:
 
 # Daily Token Consumption Report (Sentry OTel)
 
-You are an observability analyst. Generate a daily token consumption report across all agentic workflows in this repository using OpenTelemetry telemetry in Sentry.
+You are an observability analyst. Generate a daily token consumption report across all agentic workflows in this repository. Use Sentry OTel telemetry as the primary data source. If Sentry is unavailable (HTTP 403 or missing tools), fall back to pre-downloaded workflow run logs.
 
 ## Context
 
@@ -43,19 +45,23 @@ You are an observability analyst. Generate a daily token consumption report acro
 
 ## Mission
 
-1. Query Sentry telemetry for the last 24 hours.
+1. Collect token usage data for the last 24 hours (Sentry first, then log fallback).
 2. Aggregate token usage by workflow.
 3. Identify top token consumers and anomalous usage.
 4. Publish a concise daily GitHub issue report.
 
 ## Data Collection
 
-### Step 1: Discover Sentry Context
+### Primary Source: Sentry OTel
+
+#### Step 1: Discover Sentry Context
 
 1. Call `find_organizations` and select the org for this repository.
 2. Call `find_projects` and select the project that corresponds to `${{ github.repository }}`.
 
-### Step 2: Fetch Telemetry Events
+If either call returns HTTP 403, skip to the **Fallback Data Source** section below.
+
+#### Step 2: Fetch Telemetry Events
 
 Call `search_events` using:
 - `dataset: spans`
@@ -69,7 +75,7 @@ Treat "no usable records" as either:
 - zero events returned after pagination, or
 - events returned but none contain any recognized token fields.
 
-### Step 3: Extract Workflow + Token Fields
+#### Step 3: Extract Workflow + Token Fields
 
 For each event/span, derive:
 
@@ -96,6 +102,37 @@ For each event/span, derive:
   - `prompt_tokens`, `completion_tokens`, `total_tokens`
 
 Normalize missing values to `0`.
+
+### Fallback Data Source: Pre-Downloaded Workflow Logs
+
+Use this fallback when Sentry is unavailable (HTTP 403, missing `search_events` tool, or zero usable records after exhausting Sentry options).
+
+Workflow run logs from the last 24 hours have been pre-downloaded to `/tmp/gh-aw/aw-mcp/logs/`.
+
+#### Collect Token Data from Logs
+
+For each run directory under `/tmp/gh-aw/aw-mcp/logs/`:
+1. Read `aw_info.json` for workflow metadata (`workflow_name`, `run_id`).
+2. Read `agent_usage.json` for token counts (`input_tokens`, `output_tokens`, `cache_read_tokens`, `cache_write_tokens`).
+
+Use bash to aggregate:
+
+```bash
+for dir in /tmp/gh-aw/aw-mcp/logs/run-*/; do
+  aw_info="$dir/aw_info.json"
+  usage="$dir/agent_usage.json"
+  if [ -f "$aw_info" ] && [ -f "$usage" ]; then
+    workflow=$(jq -r '.workflow_name // "unknown-workflow"' "$aw_info")
+    run_id=$(jq -r '.run_id // "unknown"' "$aw_info")
+    input=$(jq -r '.input_tokens // 0' "$usage")
+    output=$(jq -r '.output_tokens // 0' "$usage")
+    cache_read=$(jq -r '.cache_read_tokens // 0' "$usage")
+    echo "{\"workflow\":\"$workflow\",\"run_id\":\"$run_id\",\"input\":$input,\"output\":$output,\"cache_read\":$cache_read}"
+  fi
+done
+```
+
+Total tokens = `input_tokens + output_tokens` (do not add cache tokens to avoid double counting). Note in the report that the data source is local workflow run logs rather than Sentry.
 
 ## Analysis Requirements
 
@@ -152,6 +189,8 @@ Use this body structure:
 <details>
 <summary>Data Quality and Gaps</summary>
 
+- Data source used: Sentry OTel or local workflow run logs (fallback)
+- If fallback was used, explain why (e.g., Sentry HTTP 403 - token missing `org:read` scope)
 - Events missing workflow identifiers
 - Events missing token attributes
 - Any assumptions or fallback fields used
@@ -160,9 +199,11 @@ Use this body structure:
 
 ### Recommendations
 - 2-4 concrete actions to reduce token usage for the highest consumers.
+- If Sentry was unavailable due to a 403 error, recommend granting the `SENTRY_ACCESS_TOKEN` the `org:read` scope to restore full telemetry.
 
 ### References
 - Include up to three relevant links (Sentry query links and/or run links when available).
+- If fallback data source was used, note that Sentry was unavailable.
 
 ## Guardrails
 
@@ -174,7 +215,7 @@ Use this body structure:
 ## Completion Requirement
 
 You must call one safe output tool before finishing:
-- `create_issue` for normal reporting.
-- `noop` only if no valid telemetry could be retrieved.
+- `create_issue` for normal reporting (use even when falling back to local log data).
+- `noop` only if neither Sentry nor local workflow run logs contain any valid token data.
 
 {{#runtime-import shared/noop-reminder.md}}
