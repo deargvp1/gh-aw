@@ -34,7 +34,7 @@ imports:
   - shared/gh.md
   - shared/copilot-pr-analysis-base.md
 
-timeout-minutes: 10
+timeout-minutes: 15
 features:
   copilot-requests: true
 ---
@@ -256,7 +256,7 @@ A successful report:
 - ✅ Attempts to get workflow execution data
 - ✅ Generates a clear, concise report
 - ✅ Creates discussion in "audits" category
-- ✅ Completes within 10-minute timeout
+- ✅ Completes within 15-minute timeout
 
 Begin your analysis now. Use the `gh` mcp-script tool for all GitHub CLI operations.
 
