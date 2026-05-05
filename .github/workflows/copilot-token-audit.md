@@ -54,16 +54,13 @@ steps:
       download_logs() {
         local window="$1"
         local count="$2"
-        local exit_code=0
 
         gh aw logs \
           --engine copilot \
           --start-date "$window" \
           --json \
           -c "$count" \
-          > "$LOGS_JSON" || exit_code=$?
-
-        return "$exit_code"
+          > "$LOGS_JSON"
       }
 
       summarize_logs() {
@@ -168,15 +165,15 @@ The workflow also writes `/tmp/gh-aw/token-audit/download-context.json` with:
 ```json
 {
   "requested_window": "-1d",
-  "effective_window": "-1d or -90d",
-  "period_days": 1 or 90,
-  "bootstrap": true or false,
+  "effective_window": "-1d",
+  "period_days": 1,
+  "bootstrap": false,
   "total_runs": N,
   "completed_runs": N
 }
 ```
 
-Use this metadata when describing the reporting period. If `bootstrap` is `true`, the pre-download step widened the lookback window because the initial 24-hour query returned zero completed runs.
+If `bootstrap` is `true`, the pre-download step widened the lookback window because the initial 24-hour query returned zero completed runs. In that case, expect values such as `"effective_window": "-90d"`, `"period_days": 90`, and `"bootstrap": true`.
 
 ### Repo-memory (historical snapshots)
 
