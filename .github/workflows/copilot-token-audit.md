@@ -23,28 +23,84 @@ steps:
     run: |
       set -euo pipefail
       mkdir -p /tmp/gh-aw/token-audit
+      LOGS_JSON=/tmp/gh-aw/token-audit/copilot-logs.json
+      CONTEXT_JSON=/tmp/gh-aw/token-audit/download-context.json
+
+      write_context() {
+        local requested_window="$1"
+        local effective_window="$2"
+        local period_days="$3"
+        local bootstrap="$4"
+        local total_runs="$5"
+        local completed_runs="$6"
+
+        jq -n \
+          --arg requested_window "$requested_window" \
+          --arg effective_window "$effective_window" \
+          --argjson period_days "$period_days" \
+          --argjson bootstrap "$bootstrap" \
+          --argjson total_runs "$total_runs" \
+          --argjson completed_runs "$completed_runs" \
+          '{
+            requested_window: $requested_window,
+            effective_window: $effective_window,
+            period_days: $period_days,
+            bootstrap: $bootstrap,
+            total_runs: $total_runs,
+            completed_runs: $completed_runs
+          }' > "$CONTEXT_JSON"
+      }
+
+      download_logs() {
+        local window="$1"
+        local count="$2"
+        local exit_code=0
+
+        gh aw logs \
+          --engine copilot \
+          --start-date "$window" \
+          --json \
+          -c "$count" \
+          > "$LOGS_JSON" || exit_code=$?
+
+        return "$exit_code"
+      }
+
+      summarize_logs() {
+        jq '[.runs[] | select(.status == "completed")] | length' "$LOGS_JSON"
+      }
 
       # Download last 24 hours of Copilot logs as JSON
       # Allow partial results — gh aw logs streams incrementally, so even if
       # it hits an API rate limit partway through, the JSON written so far is
       # still valid and should be processed by the agent.
       LOGS_EXIT=0
-      gh aw logs \
-        --engine copilot \
-        --start-date -1d \
-        --json \
-        -c 100 \
-        > /tmp/gh-aw/token-audit/copilot-logs.json || LOGS_EXIT=$?
+      download_logs -1d 100 || LOGS_EXIT=$?
 
-      if [ -s /tmp/gh-aw/token-audit/copilot-logs.json ]; then
-        TOTAL=$(jq '.runs | length' /tmp/gh-aw/token-audit/copilot-logs.json)
-        echo "✅ Downloaded $TOTAL Copilot workflow runs (last 24 hours)"
+      if [ -s "$LOGS_JSON" ]; then
+        TOTAL=$(jq '.runs | length' "$LOGS_JSON")
+        COMPLETED=$(summarize_logs)
+
+        if [ "$COMPLETED" -eq 0 ]; then
+          echo "ℹ️ No completed Copilot workflow runs found in the last 24 hours; widening the bootstrap window to 90 days."
+          LOGS_EXIT=0
+          download_logs -90d 250 || LOGS_EXIT=$?
+          TOTAL=$(jq '.runs | length' "$LOGS_JSON")
+          COMPLETED=$(summarize_logs)
+          write_context "-1d" "-90d" 90 true "$TOTAL" "$COMPLETED"
+          echo "✅ Downloaded $TOTAL Copilot workflow runs from the 90-day bootstrap window ($COMPLETED completed)"
+        else
+          write_context "-1d" "-1d" 1 false "$TOTAL" "$COMPLETED"
+          echo "✅ Downloaded $TOTAL Copilot workflow runs (last 24 hours; $COMPLETED completed)"
+        fi
+
         if [ "$LOGS_EXIT" -ne 0 ]; then
           echo "⚠️ gh aw logs exited with code $LOGS_EXIT (partial results — likely API rate limit)"
         fi
       else
         echo "❌ No log data downloaded (exit code $LOGS_EXIT)"
-        echo '{"runs":[],"summary":{}}' > /tmp/gh-aw/token-audit/copilot-logs.json
+        echo '{"runs":[],"summary":{}}' > "$LOGS_JSON"
+        write_context "-1d" "-1d" 1 false 0 0
       fi
 safe-outputs:
   create-issue:
@@ -105,6 +161,23 @@ Each element of `.runs` is a `RunData` object with (among others):
 | `warning_count` | int | Warnings encountered |
 | `token_usage_summary` | object or null | Firewall-level breakdown by model |
 
+### Download context
+
+The workflow also writes `/tmp/gh-aw/token-audit/download-context.json` with:
+
+```json
+{
+  "requested_window": "-1d",
+  "effective_window": "-1d or -90d",
+  "period_days": 1 or 90,
+  "bootstrap": true or false,
+  "total_runs": N,
+  "completed_runs": N
+}
+```
+
+Use this metadata when describing the reporting period. If `bootstrap` is `true`, the pre-download step widened the lookback window because the initial 24-hour query returned zero completed runs.
+
 ### Repo-memory (historical snapshots)
 
 Previous snapshots live at `/tmp/gh-aw/repo-memory/default/`. Each daily snapshot is stored as a JSON file named `YYYY-MM-DD.json` with the schema below.
@@ -113,18 +186,20 @@ Previous snapshots live at `/tmp/gh-aw/repo-memory/default/`. Each daily snapsho
 
 Write a Python script to `/tmp/gh-aw/python/process_audit.py` and run it. The script must:
 
-1. Load `/tmp/gh-aw/token-audit/copilot-logs.json` and extract `.runs`.
-2. Filter to `status == "completed"` runs only.
-3. Group by `workflow_name` and compute per-workflow aggregates:
+1. Load `/tmp/gh-aw/token-audit/download-context.json` and `/tmp/gh-aw/token-audit/copilot-logs.json`.
+2. Extract `.runs` from `copilot-logs.json`.
+3. Use `period_days` from `download-context.json` in the snapshot output and report text.
+4. Filter to `status == "completed"` runs only.
+5. Group by `workflow_name` and compute per-workflow aggregates:
    - `run_count`, `total_tokens`, `avg_tokens`, `total_cost`, `avg_cost`, `total_turns`, `avg_turns`, `total_action_minutes`, `error_count`, `warning_count`
-4. Compute an overall summary: total runs, total tokens, total cost, total action minutes.
-5. Sort workflows descending by `total_tokens`.
-6. Save the result to `/tmp/gh-aw/python/data/audit_snapshot.json` with this shape:
+6. Compute an overall summary: total runs, total tokens, total cost, total action minutes.
+7. Sort workflows descending by `total_tokens`.
+8. Save the result to `/tmp/gh-aw/python/data/audit_snapshot.json` with this shape:
 
 ```json
 {
   "date": "YYYY-MM-DD",
-  "period_days": 30,
+  "period_days": N,
   "overall": {
     "total_runs": N,
     "total_tokens": N,
@@ -178,7 +253,7 @@ Create a discussion with these sections:
 ```
 ### 📊 Executive Summary
 
-- **Period**: last 24 hours (YYYY-MM-DD to YYYY-MM-DD)
+- **Period**: effective download window from `download-context.json` (normally last 24 hours; bootstrap runs may use a wider window)
 - **Total runs**: N
 - **Total tokens**: N (formatted with commas)
 - **Total cost**: $X.XX
