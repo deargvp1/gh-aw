@@ -189,14 +189,13 @@ Previous snapshots live at `/tmp/gh-aw/repo-memory/default/`. Each daily snapsho
 Write a Python script to `/tmp/gh-aw/python/process_audit.py` and run it. The script must:
 
 1. Load `/tmp/gh-aw/token-audit/download-context.json` and `/tmp/gh-aw/token-audit/copilot-logs.json`.
-2. Extract `.runs` from `copilot-logs.json`.
-3. Use `period_days` from `download-context.json` in the snapshot output and report text.
-4. Filter to `status == "completed"` runs only.
-5. Group by `workflow_name` and compute per-workflow aggregates:
+2. Extract `.runs` from `copilot-logs.json` and use `period_days` from `download-context.json` in the snapshot output and report text.
+3. Filter to `status == "completed"` runs only.
+4. Group by `workflow_name` and compute per-workflow aggregates:
    - `run_count`, `total_tokens`, `avg_tokens`, `total_cost`, `avg_cost`, `total_turns`, `avg_turns`, `total_action_minutes`, `error_count`, `warning_count`
-6. Compute an overall summary: total runs, total tokens, total cost, total action minutes.
-7. Sort workflows descending by `total_tokens`.
-8. Save the result to `/tmp/gh-aw/python/data/audit_snapshot.json` with this shape:
+5. Compute an overall summary: total runs, total tokens, total cost, total action minutes.
+6. Sort workflows descending by `total_tokens`.
+7. Save the result to `/tmp/gh-aw/python/data/audit_snapshot.json` with this shape:
 
 ```json
 {
@@ -255,7 +254,7 @@ Create a discussion with these sections:
 ```
 ### 📊 Executive Summary
 
-- **Period**: format `download-context.json` as a human-readable range using `effective_window` and `period_days` (for example, `last 24 hours (YYYY-MM-DD to YYYY-MM-DD)` or `last 90 days (YYYY-MM-DD to YYYY-MM-DD)`)
+- **Period**: read `effective_window` and `period_days` from `download-context.json`, then render them as a human-readable range (for example, `last 24 hours (YYYY-MM-DD to YYYY-MM-DD)` or `last 90 days (YYYY-MM-DD to YYYY-MM-DD)`)
 - **Total runs**: N
 - **Total tokens**: N (formatted with commas)
 - **Total cost**: $X.XX
