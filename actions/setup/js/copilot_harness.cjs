@@ -371,11 +371,12 @@ function installCopilotSteeringHooks(resolvedArgs) {
     const hookScriptPath = path.join(__dirname, "copilot_steering_hook.cjs");
 
     if (!fs.existsSync(hookScriptPath)) {
-      log(`warning: steering hook script not found at ${hookScriptPath}; skipping hook installation`);
+      log(`warning: steering hook script missing at ${hookScriptPath}; this may indicate setup action copy/deploy drift, so Copilot steering hooks will be skipped`);
       return;
     }
 
     // Include run ID, PID, and timestamp to avoid collisions across concurrent/serial runner jobs.
+    // This installer runs once per harness process, so exactly one state path is expected per run.
     const runID = process.env.GITHUB_RUN_ID || "local";
     const processStatePath = `${DEFAULT_STEERING_STATE_PATH}.${runID}.${process.pid}.${Date.now()}`;
     process.env.GH_AW_COPILOT_STEERING_STATE_PATH = processStatePath;

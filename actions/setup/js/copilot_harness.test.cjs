@@ -660,6 +660,12 @@ describe("copilot_harness.cjs", () => {
       expect(config.hooks.sessionStart[0].bash).toContain("sessionStart");
       expect(config.hooks.agentStop[0].bash).toContain("agentStop");
     });
+
+    it("quotes node and hook script paths in hook commands", () => {
+      const config = buildSteeringHookConfig("/tmp/with space/copilot_steering_hook.cjs", "/opt/tools/node with space");
+      expect(config.hooks.sessionStart[0].bash).toContain('"/opt/tools/node with space"');
+      expect(config.hooks.sessionStart[0].bash).toContain('"/tmp/with space/copilot_steering_hook.cjs"');
+    });
   });
 
   describe("formatDuration", () => {

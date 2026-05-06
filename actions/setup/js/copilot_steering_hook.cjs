@@ -212,16 +212,21 @@ function readStdinJSON() {
 }
 
 function main() {
-  const eventName = process.argv[2];
-  if (eventName !== "sessionStart" && eventName !== "agentStop") {
-    process.stderr.write(`[copilot-steering-hook] unsupported event: ${eventName || ""}\n`);
-    return;
-  }
+  try {
+    const eventName = process.argv[2];
+    if (eventName !== "sessionStart" && eventName !== "agentStop") {
+      process.stderr.write(`[copilot-steering-hook] unsupported event: ${eventName || ""}\n`);
+      return;
+    }
 
-  const payload = readStdinJSON();
-  const { decision } = handleSteeringEvent(eventName, payload, process.env);
-  if (decision) {
-    process.stdout.write(JSON.stringify(decision));
+    const payload = readStdinJSON();
+    const { decision } = handleSteeringEvent(eventName, payload, process.env);
+    if (decision) {
+      process.stdout.write(JSON.stringify(decision));
+    }
+  } catch (error) {
+    const err = /** @type {Error} */ error;
+    process.stderr.write(`[copilot-steering-hook] unexpected error: ${err.message}\n`);
   }
 }
 
