@@ -27,16 +27,21 @@ pre-agent-steps:
       GH_TOKEN: ${{ github.token }}
     run: |
       set -euo pipefail
-      gh skill install mattpocock/skills --scope user
-      SKILLS_SRC="${HOME}/.local/share/gh/skills"
       SKILLS_DST="${RUNNER_TEMP}/gh-aw/mattpocock-skills"
       mkdir -p "${SKILLS_DST}"
-      cp -r "${SKILLS_SRC}/." "${SKILLS_DST}/"
+      TEMP_CLONE=$(mktemp -d)
+      trap 'rm -rf "${TEMP_CLONE}"' EXIT
+      gh repo clone mattpocock/skills "${TEMP_CLONE}" -- --depth=1 --quiet
+      if [ -d "${TEMP_CLONE}/skills" ]; then
+        cp -r "${TEMP_CLONE}/skills/." "${SKILLS_DST}/"
+      else
+        cp -r "${TEMP_CLONE}/." "${SKILLS_DST}/"
+      fi
       SKILL_COUNT=$(find "${SKILLS_DST}" -name "SKILL.md" | wc -l)
       echo "Installed ${SKILL_COUNT} skill(s):"
       find "${SKILLS_DST}" -name "SKILL.md" | head -20
       if [ "${SKILL_COUNT}" -eq 0 ]; then
-        echo "::error::No SKILL.md files found after installing mattpocock/skills"
+        echo "::error::No SKILL.md files found after cloning mattpocock/skills"
         exit 1
       fi
 tools:
