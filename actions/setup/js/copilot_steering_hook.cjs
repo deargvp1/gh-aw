@@ -11,6 +11,7 @@ const DEFAULT_TIME_CRITICAL_MINUTES = 2;
 const DEFAULT_RUN_WARNING_REMAINING = 2;
 const DEFAULT_RUN_CRITICAL_REMAINING = 1;
 const DEFAULT_STATE_PATH = "/tmp/gh-aw/copilot-steering-state.json";
+const DEFAULT_HOOK_LOG_PATH = "/tmp/gh-aw/copilot-steering-hook.log";
 const MS_PER_MINUTE = 60000;
 
 /**
@@ -41,7 +42,8 @@ function parsePositiveNumber(rawValue, fallback) {
  *   runsWarningRemaining: number,
  *   runsCriticalRemaining: number,
  *   maxRuns: number,
- *   statePath: string
+ *   statePath: string,
+ *   hookLogPath: string
  * }}
  */
 function loadSteeringConfig(env = process.env) {
@@ -53,7 +55,25 @@ function loadSteeringConfig(env = process.env) {
     runsCriticalRemaining: parsePositiveNumber(env.GH_AW_STEERING_RUN_CRITICAL_REMAINING, DEFAULT_RUN_CRITICAL_REMAINING),
     maxRuns: parsePositiveNumber(env.GH_AW_COPILOT_MAX_RUNS, 0),
     statePath: env.GH_AW_COPILOT_STEERING_STATE_PATH || DEFAULT_STATE_PATH,
+    hookLogPath: env.GH_AW_COPILOT_STEERING_LOG_PATH || DEFAULT_HOOK_LOG_PATH,
   };
+}
+
+/**
+ * @param {string} hookLogPath
+ * @param {{
+ *   event: "sessionStart" | "sessionEnd" | "agentStop",
+ *   timestamp: number,
+ *   statePath: string,
+ *   turns: number,
+ *   warningInjected: boolean,
+ *   criticalInjected: boolean,
+ *   decision: "none" | "block"
+ * }} entry
+ */
+function appendHookEventLog(hookLogPath, entry) {
+  fs.mkdirSync(path.dirname(hookLogPath), { recursive: true });
+  fs.appendFileSync(hookLogPath, JSON.stringify(entry) + "\n", "utf8");
 }
 
 /**
@@ -257,7 +277,23 @@ function main() {
     }
 
     const payload = readStdinJSON();
-    const { decision } = handleSteeringEvent(eventName, payload, process.env);
+    const { decision, state } = handleSteeringEvent(eventName, payload, process.env);
+    const config = loadSteeringConfig(process.env);
+    process.stderr.write(`[copilot-steering-hook] event=${eventName} decision=${decision ? decision.decision : "none"} statePath=${config.statePath} hookLogPath=${config.hookLogPath}\n`);
+    try {
+      appendHookEventLog(config.hookLogPath, {
+        event: eventName,
+        timestamp: Date.now(),
+        statePath: config.statePath,
+        turns: state.turns,
+        warningInjected: state.warningInjected,
+        criticalInjected: state.criticalInjected,
+        decision: decision ? decision.decision : "none",
+      });
+    } catch (error) {
+      const err = /** @type {Error} */ error;
+      process.stderr.write(`[copilot-steering-hook] failed to append hook log: ${err.message}\n`);
+    }
     if (decision) {
       process.stdout.write(JSON.stringify(decision));
     }
@@ -272,6 +308,7 @@ if (typeof module !== "undefined" && module.exports) {
     computeSteeringDecision,
     createInitialState,
     handleSteeringEvent,
+    appendHookEventLog,
     loadSteeringConfig,
     parseEventTimestamp,
   };

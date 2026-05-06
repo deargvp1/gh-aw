@@ -19,6 +19,7 @@ const {
   GEMINI_MODEL_NAME_PREFIX,
   parseMaxAutopilotContinues,
   PROMPT_FILE_INLINE_THRESHOLD_BYTES,
+  reportSteeringHookLoadStatus,
   resolvePromptFileArgs,
 } = require("./copilot_harness.cjs");
 
@@ -667,6 +668,28 @@ describe("copilot_harness.cjs", () => {
       const config = buildSteeringHookConfig("/tmp/with space/copilot_steering_hook.cjs", "/opt/tools/node with space");
       expect(config.hooks.sessionStart[0].bash).toContain('"/opt/tools/node with space"');
       expect(config.hooks.sessionStart[0].bash).toContain('"/tmp/with space/copilot_steering_hook.cjs"');
+    });
+
+    it("reports observed hook events when steering hook log has entries", () => {
+      const tempLogPath = path.join(os.tmpdir(), `copilot-steering-hook-log-${Date.now()}.jsonl`);
+      fs.writeFileSync(tempLogPath, '{"event":"sessionStart"}\n{"event":"agentStop"}\n', "utf8");
+      const prevPath = process.env.GH_AW_COPILOT_STEERING_LOG_PATH;
+      const stderrSpy = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+      process.env.GH_AW_COPILOT_STEERING_LOG_PATH = tempLogPath;
+      let joined = "";
+      try {
+        reportSteeringHookLoadStatus();
+        joined = stderrSpy.mock.calls.map(call => String(call[0])).join("");
+      } finally {
+        stderrSpy.mockRestore();
+        if (prevPath === undefined) {
+          delete process.env.GH_AW_COPILOT_STEERING_LOG_PATH;
+        } else {
+          process.env.GH_AW_COPILOT_STEERING_LOG_PATH = prevPath;
+        }
+        fs.rmSync(tempLogPath, { force: true });
+      }
+      expect(joined).toContain("steering hook load check: observed 2 hook event(s)");
     });
   });
 

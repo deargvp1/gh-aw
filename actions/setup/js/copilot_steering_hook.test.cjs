@@ -5,7 +5,7 @@ import os from "os";
 import path from "path";
 
 const require = createRequire(import.meta.url);
-const { createInitialState, handleSteeringEvent, loadSteeringConfig } = require("./copilot_steering_hook.cjs");
+const { appendHookEventLog, createInitialState, handleSteeringEvent, loadSteeringConfig } = require("./copilot_steering_hook.cjs");
 
 describe("copilot_steering_hook.cjs", () => {
   let tempDir = "";
@@ -41,6 +41,25 @@ describe("copilot_steering_hook.cjs", () => {
     expect(config.timeCriticalMinutes).toBe(2);
     expect(config.runsWarningRemaining).toBe(2);
     expect(config.runsCriticalRemaining).toBe(1);
+    expect(config.hookLogPath).toBe("/tmp/gh-aw/copilot-steering-hook.log");
+  });
+
+  it("appends hook event log entries as JSON lines", () => {
+    const env = makeTestEnv();
+    const hookLogPath = path.join(tempDir, "hook.log");
+    appendHookEventLog(hookLogPath, {
+      event: "sessionStart",
+      timestamp: 1234,
+      statePath,
+      turns: 0,
+      warningInjected: false,
+      criticalInjected: false,
+      decision: "none",
+    });
+    const content = fs.readFileSync(hookLogPath, "utf8").trim();
+    const parsed = JSON.parse(content);
+    expect(parsed.event).toBe("sessionStart");
+    expect(parsed.decision).toBe("none");
   });
 
   it("initializes state on sessionStart without emitting a decision", () => {

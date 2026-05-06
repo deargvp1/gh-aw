@@ -69,6 +69,7 @@ const PROMPT_FILE_INLINE_THRESHOLD_BYTES = 100 * 1024;
 const PROMPT_FILE_INLINE_THRESHOLD_LABEL = "100KB";
 const STEERING_HOOK_CONFIG_FILENAME = "gh-aw-steering.json";
 const DEFAULT_STEERING_STATE_PATH = "/tmp/gh-aw/copilot-steering-state.json";
+const DEFAULT_STEERING_HOOK_LOG_PATH = "/tmp/gh-aw/sandbox/agent/logs/copilot-steering-hook.log";
 const DEFAULT_MAX_AUTOPILOT_RUNS = 1;
 
 // Pattern to detect transient CAPIError 400 in copilot output
@@ -388,7 +389,9 @@ function installCopilotSteeringHooks(resolvedArgs) {
     const stateDir = path.join(path.dirname(DEFAULT_STEERING_STATE_PATH), "steering-hooks");
     fs.mkdirSync(stateDir, { recursive: true });
     const processStatePath = path.join(stateDir, `copilot-steering-${runID}-${process.pid}-${Date.now()}.json`);
+    const hookLogPath = process.env.GH_AW_COPILOT_STEERING_LOG_PATH || DEFAULT_STEERING_HOOK_LOG_PATH;
     process.env.GH_AW_COPILOT_STEERING_STATE_PATH = processStatePath;
+    process.env.GH_AW_COPILOT_STEERING_LOG_PATH = hookLogPath;
     process.env.GH_AW_COPILOT_MAX_RUNS = String(computeMaxAutopilotRuns(resolvedArgs));
     process.env.GH_AW_TIMEOUT_MINUTES = process.env.GH_AW_TIMEOUT_MINUTES || "30";
     process.env.GH_AW_STEERING_TIME_WARNING_MINUTES = process.env.GH_AW_STEERING_TIME_WARNING_MINUTES || "5";
@@ -400,9 +403,35 @@ function installCopilotSteeringHooks(resolvedArgs) {
     const hookConfig = buildSteeringHookConfig(hookScriptPath, process.execPath);
     fs.writeFileSync(hookConfigPath, JSON.stringify(hookConfig, null, 2) + "\n", "utf8");
     log(`installed steering hook config: ${hookConfigPath}`);
+    log("steering hooks attached: " + `events=sessionStart,sessionEnd,agentStop ` + `statePath=${processStatePath} ` + `hookLogPath=${hookLogPath}`);
   } catch (error) {
     const err = /** @type {Error} */ error;
     log(`warning: failed to install steering hook config: ${err.message}`);
+  }
+}
+
+function reportSteeringHookLoadStatus() {
+  const hookLogPath = process.env.GH_AW_COPILOT_STEERING_LOG_PATH || "";
+  if (!hookLogPath) {
+    log("warning: steering hook load check skipped because GH_AW_COPILOT_STEERING_LOG_PATH is not set");
+    return;
+  }
+
+  try {
+    if (!fs.existsSync(hookLogPath)) {
+      log(`warning: steering hook load check found no hook log file at ${hookLogPath}`);
+      return;
+    }
+    const raw = fs.readFileSync(hookLogPath, "utf8").trim();
+    const lines = raw ? raw.split("\n").filter(Boolean) : [];
+    if (lines.length === 0) {
+      log(`warning: steering hook load check found empty hook log file at ${hookLogPath}`);
+      return;
+    }
+    log(`steering hook load check: observed ${lines.length} hook event(s) in ${hookLogPath}`);
+  } catch (error) {
+    const err = /** @type {Error} */ error;
+    log(`warning: steering hook load check failed for ${hookLogPath}: ${err.message}`);
   }
 }
 
@@ -586,6 +615,7 @@ async function main() {
   // Fetch AWF API proxy reflection data and persist to disk for post-run step summary.
   // This is best-effort: failures are logged but do not affect the agent exit code.
   await fetchAWFReflect({ logger: log });
+  reportSteeringHookLoadStatus();
 
   cleanupCopilotSteeringState();
   log(`done: exitCode=${lastExitCode} totalDuration=${formatDuration(Date.now() - driverStartTime)}`);
@@ -609,6 +639,7 @@ if (typeof module !== "undefined" && module.exports) {
     fetchAWFReflect,
     fetchModelsFromUrl,
     buildSteeringHookConfig,
+    reportSteeringHookLoadStatus,
     computeMaxAutopilotRuns,
     resolvePromptFileArgs,
     parseMaxAutopilotContinues,
