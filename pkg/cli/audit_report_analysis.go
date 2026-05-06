@@ -364,5 +364,20 @@ func generatePerformanceMetrics(processedRun ProcessedRun, metrics MetricsData, 
 		pm.NetworkRequests = processedRun.FirewallAnalysis.TotalRequests
 	}
 
+	// Aggregate tool call count (total across all tools)
+	for _, t := range toolUsage {
+		pm.TotalToolCalls += t.CallCount
+	}
+
+	// Per-turn efficiency metrics
+	if metrics.Turns > 0 {
+		if metrics.EstimatedCost > 0 {
+			pm.CostPerTurn = metrics.EstimatedCost / float64(metrics.Turns)
+		}
+		if metrics.TokenUsage > 0 {
+			pm.TokensPerTurn = metrics.TokenUsage / metrics.Turns
+		}
+	}
+
 	return pm
 }

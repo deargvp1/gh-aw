@@ -107,16 +107,28 @@ func renderPerformanceMetrics(metrics *PerformanceMetrics) {
 		fmt.Fprintf(os.Stderr, "  Cost Efficiency: %s\n", efficiencyDisplay)
 	}
 
+	if metrics.CostPerTurn > 0 {
+		fmt.Fprintf(os.Stderr, "  Cost per Turn:     $%.4f\n", metrics.CostPerTurn)
+	}
+
+	if metrics.TokensPerTurn > 0 {
+		fmt.Fprintf(os.Stderr, "  Tokens per Turn:   %s\n", console.FormatNumber(metrics.TokensPerTurn))
+	}
+
 	if metrics.AvgToolDuration != "" {
-		fmt.Fprintf(os.Stderr, "  Average Tool Duration: %s\n", metrics.AvgToolDuration)
+		fmt.Fprintf(os.Stderr, "  Avg Tool Duration: %s\n", metrics.AvgToolDuration)
 	}
 
 	if metrics.MostUsedTool != "" {
-		fmt.Fprintf(os.Stderr, "  Most Used Tool: %s\n", metrics.MostUsedTool)
+		fmt.Fprintf(os.Stderr, "  Most Used Tool:    %s\n", metrics.MostUsedTool)
+	}
+
+	if metrics.TotalToolCalls > 0 {
+		fmt.Fprintf(os.Stderr, "  Total Tool Calls:  %s\n", console.FormatNumber(metrics.TotalToolCalls))
 	}
 
 	if metrics.NetworkRequests > 0 {
-		fmt.Fprintf(os.Stderr, "  Network Requests: %d\n", metrics.NetworkRequests)
+		fmt.Fprintf(os.Stderr, "  Network Requests:  %d\n", metrics.NetworkRequests)
 	}
 
 	fmt.Fprintln(os.Stderr)

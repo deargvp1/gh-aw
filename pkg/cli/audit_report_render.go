@@ -25,6 +25,12 @@ func renderConsole(data AuditData, logsPath string) {
 	fmt.Fprintln(os.Stderr, console.FormatSectionHeader("Workflow Run Audit Report"))
 	fmt.Fprintln(os.Stderr)
 
+	// Compact at-a-glance summary – optimized for LLM tokenizer efficiency.
+	// Renders a dense multi-line block covering identity, token economics, tool
+	// activity and key signals so downstream agents can orient without parsing
+	// all subsequent sections.
+	renderCompactRunSummary(data)
+
 	// Overview Section - use new rendering system
 	fmt.Fprintln(os.Stderr, console.FormatSectionHeader("Overview"))
 	fmt.Fprintln(os.Stderr)
@@ -111,11 +117,20 @@ func renderConsole(data AuditData, logsPath string) {
 		renderPromptAnalysis(data.PromptAnalysis)
 	}
 
-	// Session Analysis Section
+	// Session Analysis Section – suppress fields already captured in the compact
+	// summary (WallTime duplicates Overview.Duration; TokensPerMinute duplicates
+	// PerformanceMetrics.TokensPerMinute).
 	if data.SessionAnalysis != nil {
 		fmt.Fprintln(os.Stderr, console.FormatSectionHeader("Session & Agent Performance"))
 		fmt.Fprintln(os.Stderr)
-		renderSessionAnalysis(data.SessionAnalysis)
+		sessionDisplay := *data.SessionAnalysis
+		if data.Overview.Duration != "" {
+			sessionDisplay.WallTime = "" // already shown in Overview + compact summary
+		}
+		if data.PerformanceMetrics != nil && data.PerformanceMetrics.TokensPerMinute > 0 {
+			sessionDisplay.TokensPerMinute = 0 // already shown in Performance Metrics + compact summary
+		}
+		renderSessionAnalysis(&sessionDisplay)
 	}
 
 	// MCP Server Health Section
@@ -139,10 +154,19 @@ func renderConsole(data AuditData, logsPath string) {
 		renderExperimentData(data.Experiments)
 	}
 
-	// Metrics Section - use new rendering system
+	// Metrics Section – suppress token fields when the detailed Token Usage
+	// section (FirewallTokenUsage) is already rendered above to avoid duplication.
 	fmt.Fprintln(os.Stderr, console.FormatSectionHeader("Metrics"))
 	fmt.Fprintln(os.Stderr)
-	renderMetrics(data.Metrics)
+	metricsDisplay := data.Metrics
+	if data.FirewallTokenUsage != nil && data.FirewallTokenUsage.TotalRequests > 0 {
+		// Token detail is covered by the Token Usage section; zero out to suppress
+		// duplicate display while preserving other metrics (cost, turns, errors).
+		metricsDisplay.TokenUsage = 0
+		metricsDisplay.EffectiveTokens = 0
+		metricsDisplay.AmbientContext = nil
+	}
+	renderMetrics(metricsDisplay)
 
 	// Jobs Section - use new table rendering
 	if len(data.Jobs) > 0 {
@@ -219,10 +243,18 @@ func renderConsole(data AuditData, logsPath string) {
 		renderRedactedDomainsAnalysis(data.RedactedDomainsAnalysis)
 	}
 
-	// Tool Usage Section - use new table rendering
+	// Tool Usage Section – show aggregate counts in header, then detail table.
+	// When MCPToolUsage has full server-level data, note that MCP tools appear
+	// with additional context in the MCP Tool Usage section below.
 	if len(data.ToolUsage) > 0 {
 		fmt.Fprintln(os.Stderr, console.FormatSectionHeader("Tool Usage"))
 		fmt.Fprintln(os.Stderr)
+		totalCalls := 0
+		for _, t := range data.ToolUsage {
+			totalCalls += t.CallCount
+		}
+		fmt.Fprintf(os.Stderr, "  %d tool type(s), %s total call(s)\n\n",
+			len(data.ToolUsage), console.FormatNumber(totalCalls))
 		renderToolUsageTable(data.ToolUsage)
 	}
 

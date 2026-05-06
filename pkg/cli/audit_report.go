@@ -78,6 +78,10 @@ type PerformanceMetrics struct {
 	AvgToolDuration string  `json:"avg_tool_duration,omitempty"`
 	MostUsedTool    string  `json:"most_used_tool,omitempty"`
 	NetworkRequests int     `json:"network_requests,omitempty"`
+	// Computed aggregates for LLM comprehension
+	TotalToolCalls int     `json:"total_tool_calls,omitempty"` // sum of all tool call counts
+	CostPerTurn    float64 `json:"cost_per_turn,omitempty"`    // estimated_cost / turns
+	TokensPerTurn  int     `json:"tokens_per_turn,omitempty"`  // token_usage / turns
 }
 
 // OverviewData contains basic information about the workflow run
