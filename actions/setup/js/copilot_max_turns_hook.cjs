@@ -184,7 +184,9 @@ module.exports = {
 };
 
 if (require.main === module) {
-  main().catch(() => {
+  main().catch(error => {
+    const err = /** @type {Error} */ error;
+    process.stderr.write(`[copilot-max-turns-hook] ${err.message}\n`);
     process.exit(0);
   });
 }

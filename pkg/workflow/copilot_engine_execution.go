@@ -593,7 +593,8 @@ func buildCopilotMaxTurnsHookSetup(workflowData *WorkflowData) string {
 		return ""
 	}
 
-	return `mkdir -p .github/hooks
+	hookScriptPath := SetupActionDestinationShell + "/copilot_max_turns_hook.cjs"
+	return fmt.Sprintf(`mkdir -p .github/hooks
 cat > .github/hooks/gh-aw-max-turns.json <<'GH_AW_COPILOT_MAX_TURNS_HOOKS_EOF'
 {
   "version": 1,
@@ -601,27 +602,27 @@ cat > .github/hooks/gh-aw-max-turns.json <<'GH_AW_COPILOT_MAX_TURNS_HOOKS_EOF'
     "sessionStart": [
       {
         "type": "command",
-        "bash": "node \"${RUNNER_TEMP}/gh-aw/actions/copilot_max_turns_hook.cjs\"",
+        "bash": "node %s",
         "timeoutSec": 5
       }
     ],
     "agentStop": [
       {
         "type": "command",
-        "bash": "node \"${RUNNER_TEMP}/gh-aw/actions/copilot_max_turns_hook.cjs\"",
+        "bash": "node %s",
         "timeoutSec": 5
       }
     ],
     "preToolUse": [
       {
         "type": "command",
-        "bash": "node \"${RUNNER_TEMP}/gh-aw/actions/copilot_max_turns_hook.cjs\"",
+        "bash": "node %s",
         "timeoutSec": 5
       }
     ]
   }
 }
-GH_AW_COPILOT_MAX_TURNS_HOOKS_EOF`
+GH_AW_COPILOT_MAX_TURNS_HOOKS_EOF`, shellEscapeArg(hookScriptPath), shellEscapeArg(hookScriptPath), shellEscapeArg(hookScriptPath))
 }
 
 // generateCopilotSessionFileCopyStep generates a step to copy the entire Copilot
