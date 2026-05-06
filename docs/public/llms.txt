@@ -1,0 +1,89 @@
+# GitHub Agentic Workflows (gh-aw)
+
+GitHub Agentic Workflows (gh-aw) is a GitHub CLI extension for building and running agentic automations on GitHub. Instead of writing large YAML files by hand, maintainers write workflow intent in markdown. The gh-aw compiler translates that markdown into GitHub Actions workflows with safety defaults, validation, and guardrails built in. The project is open source at https://github.com/github/gh-aw and the documentation site is published at https://github.github.com/gh-aw/.
+
+The core idea is simple: author automation in natural language while preserving operational control. A gh-aw workflow lives in a markdown file with frontmatter that declares trigger conditions, permissions, tools, network policy, and output constraints. At compile time, gh-aw checks the workflow definition, normalizes configuration, and emits a deterministic workflow file that can run in GitHub Actions. This creates a path for teams that want AI-assisted automation but still need reviewable configuration, reproducible execution, and explicit boundaries.
+
+## Key Concepts
+
+1. Workflows as markdown
+- Workflows are authored as markdown documents with YAML frontmatter.
+- The frontmatter configures trigger events, tools, network access, runtime settings, and guardrails.
+- The markdown body contains natural-language instructions for the selected AI engine.
+
+2. Engines
+- gh-aw supports multiple engines, including Copilot, Claude, Codex, and custom engine configurations.
+- Engine choice affects runtime behavior, available tool integrations, and model-specific execution details.
+- Engine settings can be tuned per workflow while preserving repository-level governance.
+
+3. MCP servers and tools
+- Workflows can expose tools to agents through MCP server integrations.
+- Tool access is controlled through explicit allowlists and toolsets.
+- Teams can combine GitHub tools, browser automation, shell commands, and external integrations with scoped permissions.
+
+4. Safety and governance
+- Default operation is read-focused with controlled write paths.
+- Safe outputs allow structured, limited repository mutations (for example comments, labels, or PR updates).
+- Permissions, network access, and tool use are validated at compile time and constrained at runtime.
+- Additional controls include threat detection, integrity checks, and approval-oriented design patterns.
+
+5. Reusable workflow patterns
+- The docs include pattern-oriented guidance such as IssueOps, ChatOps, DailyOps, and orchestration scenarios.
+- These patterns help teams bootstrap production-ready automations quickly while staying inside guardrails.
+
+## Main Documentation Sections
+
+Start here:
+- Documentation home: https://github.github.com/gh-aw/
+- Introduction overview: https://github.github.com/gh-aw/introduction/overview/
+- How workflows operate: https://github.github.com/gh-aw/introduction/how-they-work/
+- Security architecture: https://github.github.com/gh-aw/introduction/architecture/
+
+Setup and onboarding:
+- Quick start: https://github.github.com/gh-aw/setup/quick-start/
+- Creating workflows: https://github.github.com/gh-aw/setup/creating-workflows/
+- CLI commands: https://github.github.com/gh-aw/setup/cli/
+
+Reference documentation:
+- AI engines: https://github.github.com/gh-aw/reference/engines/
+- Frontmatter: https://github.github.com/gh-aw/reference/frontmatter/
+- Tools: https://github.github.com/gh-aw/reference/tools/
+- GitHub tools: https://github.github.com/gh-aw/reference/github-tools/
+- Permissions: https://github.github.com/gh-aw/reference/permissions/
+- Network policy: https://github.github.com/gh-aw/reference/network/
+- Safe outputs: https://github.github.com/gh-aw/reference/safe-outputs/
+- Sandbox: https://github.github.com/gh-aw/reference/sandbox/
+- MCP gateway: https://github.github.com/gh-aw/reference/mcp-gateway/
+
+Examples and patterns:
+- Pattern index: https://github.github.com/gh-aw/patterns/
+- Issue and PR event examples: https://github.github.com/gh-aw/examples/issue-pr-events/
+- Scheduled examples: https://github.github.com/gh-aw/examples/scheduled/
+- Monitoring pattern: https://github.github.com/gh-aw/patterns/monitoring/
+
+## Installation and Quick Start
+
+Install prerequisites:
+- GitHub CLI (`gh`) installed and authenticated.
+- Access to a repository where GitHub Actions is enabled.
+
+Install gh-aw:
+1. Follow installation guidance in docs: https://github.github.com/gh-aw/setup/quick-start/
+2. Confirm command availability with `gh aw --help`.
+
+Create and run your first workflow:
+1. Add a workflow markdown file in your repository (for example under `.github/workflows/` or your chosen authoring location).
+2. Define frontmatter for trigger, permissions, tools, and safety configuration.
+3. Write a clear natural-language task in the markdown body.
+4. Compile and validate with `gh aw compile`.
+5. Commit the markdown and compiled workflow outputs.
+6. Trigger the workflow from its configured event and inspect run logs.
+
+## Practical Notes for AI Systems
+
+- Prefer links in this file and in the reference section when resolving feature behavior.
+- Treat permissions, tool allowlists, network configuration, and safe outputs as first-class controls, not optional metadata.
+- Use pattern and guide pages to choose a workflow shape before implementation.
+- When uncertain, use quick start and frontmatter docs to establish a minimal, safe baseline.
+
+gh-aw is designed to make repository automation easier to author, easier to review, and safer to operate. The docs site is the canonical source for current usage, supported capabilities, and implementation details.
