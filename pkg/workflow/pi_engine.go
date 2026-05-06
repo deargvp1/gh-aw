@@ -112,17 +112,22 @@ func piNativeProviderName(backend UniversalLLMBackend) string {
 // "COPILOT_GITHUB_TOKEN") causes Pi to automatically use the value that is
 // already present in the container environment.
 //
-// The baseUrl uses the "api-proxy" Docker service hostname (not host.docker.internal)
-// so that Pi can reach the sidecar container within the AWF Docker network.
-// host.docker.internal points to the Docker host (runner), not the api-proxy
-// container, and is only available when --enable-host-access is set.
+// The baseUrl uses "host.docker.internal" (the Docker host, accessible when
+// --enable-host-access is set) rather than the "api-proxy" Docker service
+// hostname.  Pi CLI v0.72+ sets a global undici EnvHttpProxyAgent which routes
+// ALL HTTP requests through the AWF squid proxy.  The squid proxy only allows
+// domains listed in allowDomains; "api-proxy" is an internal Docker hostname
+// that is not in the allowlist, so every request to api-proxy:PORT is blocked.
+// "host.docker.internal" is always in the AWF allowDomains list and the
+// api-proxy sidecar binds its ports to all interfaces, so it is reachable via
+// the Docker-host address.
 //
 // All dynamic values are marshaled via encoding/json to prevent JSON injection.
 func buildPiModelsJSON(gatewayPort int, secretEnvVarName, modelID string) string {
 	payload := map[string]any{
 		"providers": map[string]any{
 			"aw-gateway": map[string]any{
-				"baseUrl": fmt.Sprintf("http://api-proxy:%d", gatewayPort),
+				"baseUrl": fmt.Sprintf("http://host.docker.internal:%d", gatewayPort),
 				"api":     "openai-completions",
 				"apiKey":  secretEnvVarName,
 				"models":  []map[string]any{{"id": modelID}},

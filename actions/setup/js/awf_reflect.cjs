@@ -19,9 +19,13 @@ const fs = require("fs");
 const path = require("path");
 
 // AWF API proxy management endpoint for discovering configured LLM providers and available models.
-// The api-proxy sidecar exposes /reflect on its management port (port 10000) inside the AWF
-// Docker network. From the agent container, the proxy is reachable via the "api-proxy" hostname.
-const AWF_API_PROXY_REFLECT_URL = "http://api-proxy:10000/reflect";
+// Uses "host.docker.internal" (the Docker-host address) rather than the "api-proxy" Docker
+// service hostname.  Pi CLI v0.72+ sets a global undici EnvHttpProxyAgent that routes all HTTP
+// requests through the AWF squid proxy; "api-proxy" is an internal Docker hostname that is not
+// in the allowDomains list and would be blocked.  "host.docker.internal" is always in allowDomains
+// and the api-proxy sidecar binds port 10000 to all interfaces, so it is reachable via the
+// Docker-host address both from inside the AWF agent container and from the runner host.
+const AWF_API_PROXY_REFLECT_URL = "http://host.docker.internal:10000/reflect";
 // Path inside the agent container where the reflect payload is persisted. The directory is
 // co-located with other AWF firewall observability data so it is included in the agent artifact.
 const AWF_REFLECT_OUTPUT_PATH = "/tmp/gh-aw/sandbox/firewall/awf-reflect.json";

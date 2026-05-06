@@ -47,8 +47,11 @@ function extractProviderFromModel(model) {
  * Resolve the expected LLM gateway base URL for a given provider prefix.
  * Returns null when the provider is not one of the well-known AWF sidecar providers.
  *
- * Uses the "api-proxy" Docker service hostname so the URL reflects the actual
- * address used by Pi's models.json routing within the AWF Docker network.
+ * Uses "host.docker.internal" (the Docker-host address) so the URL matches the
+ * address used by Pi's models.json routing.  Pi CLI v0.72+ sets a global undici
+ * EnvHttpProxyAgent that routes all HTTP requests through the AWF squid proxy;
+ * "api-proxy" is an internal Docker hostname not in the allowDomains list and
+ * would be blocked.  "host.docker.internal" is always allowed.
  *
  * @param {string} provider - Lowercase provider prefix (e.g. "copilot", "anthropic").
  * @returns {string|null}
@@ -63,7 +66,7 @@ function resolveGatewayUrl(provider) {
   };
   const port = GATEWAY_PORTS[provider];
   if (!port) return null;
-  return `http://api-proxy:${port}`;
+  return `http://host.docker.internal:${port}`;
 }
 
 /**
