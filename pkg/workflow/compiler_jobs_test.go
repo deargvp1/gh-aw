@@ -2074,6 +2074,47 @@ func TestUpdateCacheMemoryJobUsesMainJobRunsOn(t *testing.T) {
 	}
 }
 
+func TestUpdateCacheMemoryJobUsesFrameworkRunsOnWhenMainJobRunsOnEmpty(t *testing.T) {
+	compiler := NewCompiler()
+	compiler.jobManager = NewJobManager()
+
+	data := &WorkflowData{
+		Name:       "Test Workflow",
+		AI:         "copilot",
+		RunsOn:     "",
+		RunsOnSlim: "ubuntu-slim",
+		CacheMemoryConfig: &CacheMemoryConfig{
+			Caches: []CacheMemoryEntry{
+				{ID: "default"},
+			},
+		},
+		SafeOutputs: &SafeOutputsConfig{
+			ThreatDetection: &ThreatDetectionConfig{},
+		},
+	}
+
+	compiler.stepOrderTracker = NewStepOrderTracker()
+	activationJob, _ := compiler.buildActivationJob(data, false, "", "test.lock.yml")
+	compiler.jobManager.AddJob(activationJob)
+
+	agentJob, _ := compiler.buildMainJob(data, true)
+	compiler.jobManager.AddJob(agentJob)
+
+	compiler.buildSafeOutputsJobs(data, string(constants.AgentJobName), "test.md")
+
+	updateCacheMemoryJob, err := compiler.buildUpdateCacheMemoryJob(data, true)
+	if err != nil {
+		t.Fatalf("buildUpdateCacheMemoryJob() error: %v", err)
+	}
+	if updateCacheMemoryJob == nil {
+		t.Fatal("Expected update_cache_memory job to be created")
+	}
+
+	if updateCacheMemoryJob.RunsOn != "runs-on: ubuntu-slim" {
+		t.Errorf("update_cache_memory RunsOn = %q, want %q", updateCacheMemoryJob.RunsOn, "runs-on: ubuntu-slim")
+	}
+}
+
 // ========================================
 // Edge Case Tests
 // ========================================

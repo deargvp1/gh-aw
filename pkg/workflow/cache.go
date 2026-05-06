@@ -989,18 +989,20 @@ func (c *Compiler) buildUpdateCacheMemoryJob(data *WorkflowData, threatDetection
 		}
 	}
 
+	runsOn := data.RunsOn
+	if strings.TrimSpace(runsOn) == "" {
+		runsOn = c.formatFrameworkJobRunsOn(data)
+	}
+
 	job := &Job{
 		Name:        "update_cache_memory",
 		DisplayName: "", // No display name - job ID is sufficient
-		RunsOn:      c.indentYAMLLines(data.RunsOn, "    "),
+		RunsOn:      runsOn,
 		If:          jobCondition,
 		Permissions: permissions,
 		Needs:       []string{string(constants.AgentJobName), string(constants.DetectionJobName), string(constants.ActivationJobName)},
 		Env:         jobEnv,
 		Steps:       steps,
-	}
-	if strings.TrimSpace(job.RunsOn) == "" {
-		job.RunsOn = c.formatFrameworkJobRunsOn(data)
 	}
 
 	return job, nil
