@@ -1699,6 +1699,62 @@ func TestBuildDetectionEngineExecutionStepEmitsNodeSetupForCopilot(t *testing.T)
 	}
 }
 
+func TestBuildDetectionEngineExecutionStepInstallStepsRespectContinueOnErrorMode(t *testing.T) {
+	compiler := NewCompiler()
+
+	tests := []struct {
+		name             string
+		threatDetection  *ThreatDetectionConfig
+		expectInstallCOE bool
+	}{
+		{
+			name:             "warn mode defaults to continue-on-error on install steps",
+			threatDetection:  &ThreatDetectionConfig{},
+			expectInstallCOE: true,
+		},
+		{
+			name: "strict mode does not force continue-on-error on install steps",
+			threatDetection: &ThreatDetectionConfig{
+				ContinueOnError: func() *bool {
+					v := false
+					return &v
+				}(),
+			},
+			expectInstallCOE: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			data := &WorkflowData{
+				AI: "copilot",
+				SafeOutputs: &SafeOutputsConfig{
+					ThreatDetection: tt.threatDetection,
+				},
+			}
+
+			steps := compiler.buildDetectionEngineExecutionStep(data)
+			s := strings.Join(steps, "")
+
+			installIdx := strings.Index(s, "- name: Install GitHub Copilot CLI")
+			if installIdx == -1 {
+				t.Fatalf("missing install step in detection steps:\n%s", s)
+			}
+
+			nextStepOffset := strings.Index(s[installIdx+1:], "\n      - name:")
+			installStep := s[installIdx:]
+			if nextStepOffset != -1 {
+				installStep = s[installIdx : installIdx+1+nextStepOffset]
+			}
+
+			hasInstallCOE := strings.Contains(installStep, "continue-on-error: true")
+			if hasInstallCOE != tt.expectInstallCOE {
+				t.Errorf("install step continue-on-error = %v, want %v. Step:\n%s", hasInstallCOE, tt.expectInstallCOE, installStep)
+			}
+		})
+	}
+}
+
 func TestInstallStepsContainNodeSetup(t *testing.T) {
 	tests := []struct {
 		name     string

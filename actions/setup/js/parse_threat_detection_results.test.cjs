@@ -249,14 +249,23 @@ describe("parseDetectionLog", () => {
       const { verdict, error } = parseDetectionLog("");
 
       expect(verdict).toBeUndefined();
-      expect(error).toContain("No THREAT_DETECTION_RESULT found");
+      expect(error).toContain("Detection log is empty");
     });
 
     it("should return error when content has only whitespace", () => {
       const { verdict, error } = parseDetectionLog("   \n  \n  ");
 
       expect(verdict).toBeUndefined();
-      expect(error).toContain("No THREAT_DETECTION_RESULT found");
+      expect(error).toContain("Detection log is empty");
+    });
+
+    it("should return specific shell-artifact error when log contains command failure output", () => {
+      const content = "sudo: awf: command not found\n";
+      const { verdict, error } = parseDetectionLog(content);
+
+      expect(verdict).toBeUndefined();
+      expect(error).toContain("shell-command artifact");
+      expect(error).toContain("sudo: awf: command not found");
     });
   });
 

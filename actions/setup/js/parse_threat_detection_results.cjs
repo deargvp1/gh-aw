@@ -26,6 +26,32 @@ const { ERR_SYSTEM, ERR_PARSE, ERR_VALIDATION } = require("./error_codes.cjs");
 const RESULT_PREFIX = "THREAT_DETECTION_RESULT:";
 
 /**
+ * Build a specific parser error when no THREAT_DETECTION_RESULT exists.
+ * Prioritizes actionable diagnostics for common model misbehavior.
+ *
+ * @param {string} content - Raw detection log content
+ * @returns {string} Specific diagnostic error
+ */
+function buildNoResultError(content) {
+  const trimmed = content.trim();
+  if (trimmed.length === 0) {
+    return "Detection log is empty. No THREAT_DETECTION_RESULT was produced by the detection model.";
+  }
+
+  const nonEmptyLines = content
+    .split("\n")
+    .map(line => line.trim())
+    .filter(line => line.length > 0);
+  const shellErrorPattern = /(command not found|not recognized as an internal or external command|No such file or directory|Permission denied)/i;
+  const shellLine = nonEmptyLines.find(line => shellErrorPattern.test(line));
+  if (shellLine) {
+    return `No THREAT_DETECTION_RESULT found in detection log. Detected shell-command artifact instead of verdict JSON: ${shellLine}`;
+  }
+
+  return "No THREAT_DETECTION_RESULT found in detection log. The detection model may have failed to follow the output format.";
+}
+
+/**
  * Extract a complete JSON object from a string that starts with RESULT_PREFIX,
  * using character-by-character brace counting to find the matching closing brace.
  * Tracks string context so that braces inside JSON string values are not counted.
@@ -194,7 +220,7 @@ function parseDetectionLog(content) {
   const matches = streamMatches.length > 0 ? streamMatches : rawMatches;
 
   if (matches.length === 0) {
-    return { error: "No THREAT_DETECTION_RESULT found in detection log. The detection model may have failed to follow the output format." };
+    return { error: buildNoResultError(content) };
   }
 
   // Deduplicate identical results. The detection command writes to the same file

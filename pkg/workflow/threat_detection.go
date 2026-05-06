@@ -663,6 +663,10 @@ func (c *Compiler) buildDetectionEngineExecutionStep(data *WorkflowData) []strin
 	}
 
 	var steps []string
+	continueOnError := true
+	if data.SafeOutputs != nil && data.SafeOutputs.ThreatDetection != nil {
+		continueOnError = data.SafeOutputs.ThreatDetection.IsContinueOnError()
+	}
 
 	// Install the engine in the detection job. The detection job runs on a separate fresh
 	// runner where the agent's installed tools are not available, so we must install them here.
@@ -675,14 +679,20 @@ func (c *Compiler) buildDetectionEngineExecutionStep(data *WorkflowData) []strin
 	// via BuildStandardNpmEngineInstallSteps) — a duplicate would trip
 	// JobManager.ValidateDuplicateSteps and hard-fail the compile.
 	if engineRequiresNodeHarness(engine) && !installStepsContainNodeSetup(installSteps) {
-		for _, line := range GenerateNodeJsSetupStep() {
+		for i, line := range GenerateNodeJsSetupStep() {
 			steps = append(steps, line+"\n")
+			if i == 0 && continueOnError {
+				steps = append(steps, "        continue-on-error: true\n")
+			}
 		}
 	}
 
 	for _, step := range installSteps {
-		for _, line := range step {
+		for i, line := range step {
 			steps = append(steps, line+"\n")
+			if i == 0 && continueOnError {
+				steps = append(steps, "        continue-on-error: true\n")
+			}
 		}
 	}
 
