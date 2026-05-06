@@ -110,14 +110,14 @@ func TestWorkflowContentCandidatePaths(t *testing.T) {
 }
 
 func TestDownloadWorkflowContent_TriesAlternateWorkflowDirectory(t *testing.T) {
-	originalAPIFn := downloadWorkflowContentAPIFn
+	originalAPIFn := downloadWorkflowContentFromAPIFn
 	defer func() {
-		downloadWorkflowContentAPIFn = originalAPIFn
+		downloadWorkflowContentFromAPIFn = originalAPIFn
 	}()
 
 	encodedContent := base64.StdEncoding.EncodeToString([]byte("workflow content"))
 	var requestedPaths []string
-	downloadWorkflowContentAPIFn = func(_ context.Context, repo, path, ref string) ([]byte, error) {
+	downloadWorkflowContentFromAPIFn = func(_ context.Context, repo, path, ref string) ([]byte, error) {
 		assert.Equal(t, "githubnext/agentic-ops", repo, "repo should be preserved")
 		assert.Equal(t, "main", ref, "ref should be preserved")
 		requestedPaths = append(requestedPaths, path)
@@ -139,5 +139,44 @@ func TestDownloadWorkflowContent_TriesAlternateWorkflowDirectory(t *testing.T) {
 		[]string{"workflows/copilot-token-audit.md", ".github/workflows/copilot-token-audit.md"},
 		requestedPaths,
 		"download should try the alternate workflow directory when the original path is missing",
+	)
+}
+
+func TestDownloadWorkflowContent_ReturnsFirstSuccessfulCandidate(t *testing.T) {
+	originalAPIFn := downloadWorkflowContentFromAPIFn
+	defer func() {
+		downloadWorkflowContentFromAPIFn = originalAPIFn
+	}()
+
+	downloadWorkflowContentFromAPIFn = func(_ context.Context, _, path, _ string) ([]byte, error) {
+		assert.Equal(t, "workflows/copilot-token-optimizer.md", path, "first candidate should be used when it succeeds")
+		return []byte(base64.StdEncoding.EncodeToString([]byte("direct hit"))), nil
+	}
+
+	content, err := downloadWorkflowContent(context.Background(), "githubnext/agentic-ops", "workflows/copilot-token-optimizer.md", "main", false)
+	require.NoError(t, err, "first successful candidate should return immediately")
+	assert.Equal(t, []byte("direct hit"), content, "content should be decoded from the first candidate response")
+}
+
+func TestDownloadWorkflowContent_ReturnsLastErrorWhenCandidatesFail(t *testing.T) {
+	originalAPIFn := downloadWorkflowContentFromAPIFn
+	defer func() {
+		downloadWorkflowContentFromAPIFn = originalAPIFn
+	}()
+
+	var requestedPaths []string
+	downloadWorkflowContentFromAPIFn = func(_ context.Context, _, path, _ string) ([]byte, error) {
+		requestedPaths = append(requestedPaths, path)
+		return nil, errors.New("HTTP 404: Not Found")
+	}
+
+	content, err := downloadWorkflowContent(context.Background(), "githubnext/agentic-ops", "workflows/copilot-token-audit.md", "main", false)
+	require.Error(t, err, "all failed candidates should return an error")
+	assert.Nil(t, content, "no content should be returned when every candidate fails")
+	assert.Contains(t, err.Error(), "failed to fetch file content", "error should describe the failed download")
+	assert.Equal(t,
+		[]string{"workflows/copilot-token-audit.md", ".github/workflows/copilot-token-audit.md"},
+		requestedPaths,
+		"all candidate paths should be attempted before returning the final error",
 	)
 }

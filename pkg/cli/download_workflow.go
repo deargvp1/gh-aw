@@ -18,7 +18,7 @@ import (
 
 var downloadLog = logger.New("cli:download_workflow")
 
-var downloadWorkflowContentAPIFn = func(ctx context.Context, repo, path, ref string) ([]byte, error) {
+var downloadWorkflowContentFromAPIFn = func(ctx context.Context, repo, path, ref string) ([]byte, error) {
 	return workflow.RunGHCombinedContext(ctx, "Downloading workflow...", "api", fmt.Sprintf("/repos/%s/contents/%s?ref=%s", repo, path, ref), "--jq", ".content")
 }
 
@@ -168,7 +168,7 @@ func downloadWorkflowContent(ctx context.Context, repo, path, ref string, verbos
 
 	var lastErr error
 	for _, candidatePath := range workflowContentCandidatePaths(path) {
-		output, err := downloadWorkflowContentAPIFn(ctx, repo, candidatePath, ref)
+		output, err := downloadWorkflowContentFromAPIFn(ctx, repo, candidatePath, ref)
 		if err == nil {
 			return decodeBase64FileContent(string(output))
 		}
@@ -211,9 +211,6 @@ func workflowContentCandidatePaths(path string) []string {
 	seen := make(map[string]struct{}, len(candidates))
 	unique := make([]string, 0, len(candidates))
 	for _, candidate := range candidates {
-		if candidate == "" {
-			continue
-		}
 		if _, exists := seen[candidate]; exists {
 			continue
 		}
