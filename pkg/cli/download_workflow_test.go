@@ -118,8 +118,8 @@ func TestDownloadWorkflowContent_TriesAlternateWorkflowDirectory(t *testing.T) {
 	encodedContent := base64.StdEncoding.EncodeToString([]byte("workflow content"))
 	var requestedPaths []string
 	downloadWorkflowContentFromAPIFn = func(_ context.Context, repo, path, ref string) ([]byte, error) {
-		assert.Equal(t, "githubnext/agentic-ops", repo, "repo should be preserved")
-		assert.Equal(t, "main", ref, "ref should be preserved")
+		require.Equal(t, "githubnext/agentic-ops", repo, "repo should be preserved")
+		require.Equal(t, "main", ref, "ref should be preserved")
 		requestedPaths = append(requestedPaths, path)
 
 		if path == "workflows/copilot-token-audit.md" {
@@ -149,7 +149,7 @@ func TestDownloadWorkflowContent_ReturnsFirstSuccessfulCandidate(t *testing.T) {
 	}()
 
 	downloadWorkflowContentFromAPIFn = func(_ context.Context, _, path, _ string) ([]byte, error) {
-		assert.Equal(t, "workflows/copilot-token-optimizer.md", path, "first candidate should be used when it succeeds")
+		require.Equal(t, "workflows/copilot-token-optimizer.md", path, "first candidate should be used when it succeeds")
 		return []byte(base64.StdEncoding.EncodeToString([]byte("direct hit"))), nil
 	}
 
