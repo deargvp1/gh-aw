@@ -214,5 +214,14 @@
     "total_tokens_analyzed": 10444695,
     "estimated_savings_per_run": 1500000,
     "recommendations_count": 5
+  },
+  {
+    "date": "2026-05-06",
+    "workflow_name": "Daily Community Attribution Updater",
+    "workflow_file": "daily-community-attribution",
+    "runs_audited": 5,
+    "total_tokens_analyzed": 20058619,
+    "estimated_savings_per_run": 1700000,
+    "recommendations_count": 4
   }
 ]
