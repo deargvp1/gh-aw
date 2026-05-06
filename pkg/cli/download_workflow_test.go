@@ -118,8 +118,8 @@ func TestDownloadWorkflowContent_TriesAlternateWorkflowDirectory(t *testing.T) {
 	encodedContent := base64.StdEncoding.EncodeToString([]byte("workflow content"))
 	var requestedPaths []string
 	downloadWorkflowContentAPIFn = func(_ context.Context, repo, path, ref string) ([]byte, error) {
-		require.Equal(t, "githubnext/agentic-ops", repo, "repo should be preserved")
-		require.Equal(t, "main", ref, "ref should be preserved")
+		assert.Equal(t, "githubnext/agentic-ops", repo, "repo should be preserved")
+		assert.Equal(t, "main", ref, "ref should be preserved")
 		requestedPaths = append(requestedPaths, path)
 
 		if path == "workflows/copilot-token-audit.md" {

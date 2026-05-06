@@ -191,19 +191,20 @@ func downloadWorkflowContent(ctx context.Context, repo, path, ref string, verbos
 }
 
 func workflowContentCandidatePaths(path string) []string {
-	candidates := []string{path}
+	normalizedPath := filepath.ToSlash(path)
+	candidates := []string{normalizedPath}
 
 	switch {
-	case !strings.Contains(path, "/"):
+	case !strings.Contains(normalizedPath, "/"):
 		candidates = append(candidates,
-			filepath.ToSlash(filepath.Join("workflows", path)),
-			filepath.ToSlash(filepath.Join(".github", "workflows", path)),
+			filepath.ToSlash(filepath.Join("workflows", normalizedPath)),
+			filepath.ToSlash(filepath.Join(".github", "workflows", normalizedPath)),
 		)
-	case strings.HasPrefix(path, "workflows/"):
-		suffix := strings.TrimPrefix(path, "workflows/")
+	case strings.HasPrefix(normalizedPath, "workflows/"):
+		suffix := strings.TrimPrefix(normalizedPath, "workflows/")
 		candidates = append(candidates, filepath.ToSlash(filepath.Join(".github", "workflows", suffix)))
-	case strings.HasPrefix(path, ".github/workflows/"):
-		suffix := strings.TrimPrefix(path, ".github/workflows/")
+	case strings.HasPrefix(normalizedPath, ".github/workflows/"):
+		suffix := strings.TrimPrefix(normalizedPath, ".github/workflows/")
 		candidates = append(candidates, filepath.ToSlash(filepath.Join("workflows", suffix)))
 	}
 
