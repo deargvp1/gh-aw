@@ -228,7 +228,7 @@ function handleSteeringEvent(eventName, payload, env = process.env) {
     } catch {
       // best-effort cleanup only
     }
-    return { state: priorState, decision: null };
+    return { state: createInitialState(timestamp), decision: null };
   }
 
   const result = computeSteeringDecision(priorState, config, timestamp);
