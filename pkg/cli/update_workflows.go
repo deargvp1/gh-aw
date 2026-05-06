@@ -97,7 +97,7 @@ func findWorkflowsWithSource(workflowsDir string, filterNames []string, verbose 
 	var workflows []*workflowWithSource
 
 	if _, err := os.Stat(workflowsDir); err != nil {
-		return nil, fmt.Errorf("failed to read workflows directory: %w", err)
+		return nil, fmt.Errorf("failed to access workflows directory: %w", err)
 	}
 
 	walkErr := filepath.WalkDir(workflowsDir, func(workflowPath string, entry os.DirEntry, walkErr error) error {
@@ -110,6 +110,7 @@ func findWorkflowsWithSource(workflowsDir string, filterNames []string, verbose 
 			return nil
 		}
 
+		// WalkDir returns the full path, but workflow IDs are derived from the markdown filename.
 		workflowName := normalizeWorkflowID(filepath.Base(workflowPath))
 
 		// Filter by name if specified
