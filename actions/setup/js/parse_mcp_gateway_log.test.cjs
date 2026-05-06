@@ -15,6 +15,7 @@ const {
   generateTokenUsageSummary,
   formatDurationMs,
 } = require("./parse_mcp_gateway_log.cjs");
+const { _resetCache: resetEffectiveTokensCache } = require("./effective_tokens.cjs");
 
 describe("parse_mcp_gateway_log", () => {
   // Note: The main() function now checks for gateway.md first before falling back to log files.
@@ -1097,6 +1098,27 @@ not-json
       expect(summary).not.toBeNull();
       // cache_read / (input + cache_read) = 900 / 1000 = 0.9
       expect(summary.cacheEfficiency).toBeCloseTo(0.9);
+    });
+
+    test("applies provider-specific cache multiplier when computing ET", () => {
+      const original = process.env.GH_AW_MODEL_MULTIPLIERS;
+      resetEffectiveTokensCache();
+      process.env.GH_AW_MODEL_MULTIPLIERS = JSON.stringify({
+        token_class_weights: { input: 1.0, cached_input: 0.1, output: 4.0, reasoning: 4.0, cache_write: 1.0 },
+        cache_token_multiplier: { anthropic: 0.1, openai: 0.5 },
+        multipliers: { "gpt-4o": 1.0, "claude-sonnet-4-6": 1.0 },
+      });
+      const content = [
+        JSON.stringify({ provider: "anthropic", model: "claude-sonnet-4-6", input_tokens: 0, output_tokens: 0, cache_read_tokens: 1000, cache_write_tokens: 0, duration_ms: 1 }),
+        JSON.stringify({ provider: "openai", model: "gpt-4o", input_tokens: 0, output_tokens: 0, cache_read_tokens: 1000, cache_write_tokens: 0, duration_ms: 1 }),
+      ].join("\n");
+      const summary = parseTokenUsageJsonl(content);
+      expect(summary).not.toBeNull();
+      expect(summary.byModel["claude-sonnet-4-6"].effectiveTokens).toBe(100);
+      expect(summary.byModel["gpt-4o"].effectiveTokens).toBe(500);
+      resetEffectiveTokensCache();
+      if (original === undefined) delete process.env.GH_AW_MODEL_MULTIPLIERS;
+      else process.env.GH_AW_MODEL_MULTIPLIERS = original;
     });
   });
 

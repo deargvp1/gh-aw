@@ -15,6 +15,10 @@ const TEST_MULTIPLIERS_JSON = JSON.stringify({
     reasoning: 4.0,
     cache_write: 1.0,
   },
+  cache_token_multiplier: {
+    anthropic: 0.1,
+    openai: 0.5,
+  },
   multipliers: {
     "model-a": 2.0,
     "model-b": 1.0,
@@ -160,6 +164,12 @@ describe("effective_tokens", () => {
       // cache_write: w_cache_write = 1.0
       const base = computeBaseWeightedTokens(0, 0, 0, 100, 0);
       expect(base).toBe(100); // 1.0 × 100
+    });
+
+    test("applies per-vendor cache token multiplier", () => {
+      expect(computeBaseWeightedTokens(0, 0, 1000, 0, 0, "anthropic")).toBe(100);
+      expect(computeBaseWeightedTokens(0, 0, 1000, 0, 0, "openai")).toBe(500);
+      expect(computeBaseWeightedTokens(0, 0, 1000, 0, 0, "unknown")).toBe(100);
     });
 
     // T-ET-004: Custom weights are applied when default weights are overridden

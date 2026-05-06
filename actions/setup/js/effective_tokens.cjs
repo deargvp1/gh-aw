@@ -23,7 +23,7 @@
  * Falls back to m=1.0 (reference baseline) for unknown models.
  */
 
-/** @type {{ token_class_weights: { input: number, cached_input: number, output: number, reasoning: number, cache_write: number }, multipliers: Record<string, number> } | null | undefined} */
+/** @type {{ token_class_weights: { input: number, cached_input: number, output: number, reasoning: number, cache_write: number }, multipliers: Record<string, number>, cache_token_multiplier: { anthropic?: number, openai?: number } } | null | undefined} */
 let _parsedMultipliers = undefined; // undefined = not yet parsed; null = parsed but unavailable
 
 /**
@@ -41,9 +41,20 @@ function defaultTokenClassWeights() {
 }
 
 /**
+ * Default per-vendor cache token multipliers.
+ * @returns {{ anthropic: number, openai: number }}
+ */
+function defaultCacheTokenMultiplier() {
+  return {
+    anthropic: 0.1,
+    openai: 0.5,
+  };
+}
+
+/**
  * Loads and parses the model multipliers from the GH_AW_MODEL_MULTIPLIERS env var.
  * Caches the result after first parse (including null when unavailable). Returns null if not available or invalid.
- * @returns {{ token_class_weights: { input: number, cached_input: number, output: number, reasoning: number, cache_write: number }, multipliers: Record<string, number> } | null | undefined}
+ * @returns {{ token_class_weights: { input: number, cached_input: number, output: number, reasoning: number, cache_write: number }, multipliers: Record<string, number>, cache_token_multiplier: { anthropic?: number, openai?: number } } | null | undefined}
  */
 function getMultipliersData() {
   if (_parsedMultipliers !== undefined) {
@@ -76,7 +87,13 @@ function getMultipliersData() {
     for (const [model, mult] of Object.entries(parsed.multipliers || {})) {
       multipliers[model.toLowerCase()] = Number(mult);
     }
-    _parsedMultipliers = { token_class_weights: weights, multipliers };
+    const defaultCache = defaultCacheTokenMultiplier();
+    const parsedCache = parsed.cache_token_multiplier || {};
+    const cache_token_multiplier = {
+      anthropic: Number.isFinite(parsedCache.anthropic) ? Number(parsedCache.anthropic) : defaultCache.anthropic,
+      openai: Number.isFinite(parsedCache.openai) ? Number(parsedCache.openai) : defaultCache.openai,
+    };
+    _parsedMultipliers = { token_class_weights: weights, multipliers, cache_token_multiplier };
     return _parsedMultipliers;
   } catch {
     _parsedMultipliers = null;
@@ -92,6 +109,26 @@ function getMultipliersData() {
 function getTokenClassWeights() {
   const data = getMultipliersData();
   return data ? data.token_class_weights : defaultTokenClassWeights();
+}
+
+/**
+ * Returns cache token weight for the given provider.
+ * @param {string} provider - Provider name
+ * @returns {number}
+ */
+function getCacheTokenMultiplier(provider) {
+  const data = getMultipliersData();
+  if (!provider) {
+    return defaultTokenClassWeights().cached_input;
+  }
+
+  const key = provider.toLowerCase().trim();
+  if (data && data.cache_token_multiplier) {
+    if (key === "anthropic") return data.cache_token_multiplier.anthropic ?? 0.1;
+    if (key === "openai") return data.cache_token_multiplier.openai ?? 0.5;
+  }
+
+  return defaultTokenClassWeights().cached_input;
 }
 
 /**
@@ -150,11 +187,13 @@ function getModelMultiplier(model) {
  * @param {number} cacheReadTokens - Cached input tokens (C)
  * @param {number} cacheWriteTokens - Cache write tokens (W)
  * @param {number} [reasoningTokens=0] - Reasoning tokens (R)
+ * @param {string} [provider=""] - Provider name for cache token multiplier selection
  * @returns {number} Base weighted token count
  */
-function computeBaseWeightedTokens(inputTokens, outputTokens, cacheReadTokens, cacheWriteTokens, reasoningTokens = 0) {
+function computeBaseWeightedTokens(inputTokens, outputTokens, cacheReadTokens, cacheWriteTokens, reasoningTokens = 0, provider = "") {
   const w = getTokenClassWeights();
-  return w.input * (inputTokens || 0) + w.cached_input * (cacheReadTokens || 0) + w.output * (outputTokens || 0) + w.reasoning * (reasoningTokens || 0) + w.cache_write * (cacheWriteTokens || 0);
+  const cacheMultiplier = getCacheTokenMultiplier(provider);
+  return w.input * (inputTokens || 0) + cacheMultiplier * (cacheReadTokens || 0) + w.output * (outputTokens || 0) + w.reasoning * (reasoningTokens || 0) + w.cache_write * (cacheWriteTokens || 0);
 }
 
 /**
@@ -172,10 +211,11 @@ function computeBaseWeightedTokens(inputTokens, outputTokens, cacheReadTokens, c
  * @param {number} cacheReadTokens - Cached input tokens (C)
  * @param {number} cacheWriteTokens - Cache write tokens (W)
  * @param {number} [reasoningTokens=0] - Reasoning tokens (R)
+ * @param {string} [provider=""] - Provider name for cache token multiplier selection
  * @returns {number} Effective token count (exact real value)
  */
-function computeEffectiveTokens(model, inputTokens, outputTokens, cacheReadTokens, cacheWriteTokens, reasoningTokens = 0) {
-  const base = computeBaseWeightedTokens(inputTokens, outputTokens, cacheReadTokens, cacheWriteTokens, reasoningTokens);
+function computeEffectiveTokens(model, inputTokens, outputTokens, cacheReadTokens, cacheWriteTokens, reasoningTokens = 0, provider = "") {
+  const base = computeBaseWeightedTokens(inputTokens, outputTokens, cacheReadTokens, cacheWriteTokens, reasoningTokens, provider);
   if (base === 0) {
     return 0;
   }

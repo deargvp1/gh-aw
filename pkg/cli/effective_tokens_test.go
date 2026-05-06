@@ -166,6 +166,24 @@ func TestCacheTokenMultiplier(t *testing.T) {
 	}
 }
 
+func TestComputeModelEffectiveTokensWithVendorCacheFactor(t *testing.T) {
+	loadedMultipliers = nil
+	initMultipliers()
+
+	multipliers := map[string]float64{
+		"test-model": 1.0,
+	}
+	weights := defaultTokenClassWeights()
+
+	anthropicET := computeModelEffectiveTokensWithWeights("test-model", "anthropic", 0, 0, 1000, 0, multipliers, weights)
+	openaiET := computeModelEffectiveTokensWithWeights("test-model", "openai", 0, 0, 1000, 0, multipliers, weights)
+	unknownET := computeModelEffectiveTokensWithWeights("test-model", "unknown", 0, 0, 1000, 0, multipliers, weights)
+
+	assert.Equal(t, 100, anthropicET, "anthropic cache factor should be 0.1")
+	assert.Equal(t, 500, openaiET, "openai cache factor should be 0.5")
+	assert.Equal(t, 100, unknownET, "unknown vendor should use default cache factor 0.1")
+}
+
 func TestGetModelCostInfo(t *testing.T) {
 	loadedMultipliers = nil
 	initMultipliers()

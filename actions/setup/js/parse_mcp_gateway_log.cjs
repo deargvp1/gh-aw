@@ -109,7 +109,7 @@ function parseTokenUsageJsonl(jsonlContent) {
   // Compute effective tokens per model and aggregate total
   let totalEffectiveTokens = 0;
   for (const [model, usage] of Object.entries(summary.byModel)) {
-    const et = computeEffectiveTokens(model, usage.inputTokens, usage.outputTokens, usage.cacheReadTokens, usage.cacheWriteTokens);
+    const et = computeEffectiveTokens(model, usage.inputTokens, usage.outputTokens, usage.cacheReadTokens, usage.cacheWriteTokens, 0, usage.provider || "");
     usage.effectiveTokens = et;
     totalEffectiveTokens += et;
   }
