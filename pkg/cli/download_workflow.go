@@ -18,6 +18,10 @@ import (
 
 var downloadLog = logger.New("cli:download_workflow")
 
+var downloadWorkflowContentAPIFn = func(ctx context.Context, repo, path, ref string) ([]byte, error) {
+	return workflow.RunGHCombinedContext(ctx, "Downloading workflow...", "api", fmt.Sprintf("/repos/%s/contents/%s?ref=%s", repo, path, ref), "--jq", ".content")
+}
+
 // downloadWorkflowContentViaGit downloads a workflow file using git archive
 func downloadWorkflowContentViaGit(ctx context.Context, repo, path, ref string, verbose bool) ([]byte, error) {
 	if verbose {
@@ -162,25 +166,61 @@ func downloadWorkflowContent(ctx context.Context, repo, path, ref string, verbos
 		fmt.Fprintln(os.Stderr, console.FormatVerboseMessage(fmt.Sprintf("Fetching %s/%s@%s", repo, path, ref)))
 	}
 
-	// Use gh CLI to download the file
-	output, err := workflow.RunGHCombinedContext(ctx, "Downloading workflow...", "api", fmt.Sprintf("/repos/%s/contents/%s?ref=%s", repo, path, ref), "--jq", ".content")
-	if err != nil {
-		// Check if this is an authentication error
+	var lastErr error
+	for _, candidatePath := range workflowContentCandidatePaths(path) {
+		output, err := downloadWorkflowContentAPIFn(ctx, repo, candidatePath, ref)
+		if err == nil {
+			return decodeBase64FileContent(string(output))
+		}
+
 		outputStr := string(output)
 		if gitutil.IsAuthError(outputStr) || gitutil.IsAuthError(err.Error()) {
-			downloadLog.Printf("GitHub API authentication failed, attempting git fallback for %s/%s@%s", repo, path, ref)
-			// Try fallback using git commands
-			content, gitErr := downloadWorkflowContentViaGit(ctx, repo, path, ref, verbose)
-			if gitErr != nil {
-				return nil, fmt.Errorf("failed to fetch file content via GitHub API and git: API error: %w, Git error: %w", err, gitErr)
+			downloadLog.Printf("GitHub API authentication failed, attempting git fallback for %s/%s@%s", repo, candidatePath, ref)
+			content, gitErr := downloadWorkflowContentViaGit(ctx, repo, candidatePath, ref, verbose)
+			if gitErr == nil {
+				return content, nil
 			}
-			return content, nil
+			lastErr = fmt.Errorf("failed to fetch file content via GitHub API and git: API error: %w, Git error: %w", err, gitErr)
+			continue
 		}
-		return nil, fmt.Errorf("failed to fetch file content: %w", err)
+
+		lastErr = err
 	}
 
-	// The content is base64 encoded, decode it
-	return decodeBase64FileContent(string(output))
+	return nil, fmt.Errorf("failed to fetch file content: %w", lastErr)
+}
+
+func workflowContentCandidatePaths(path string) []string {
+	candidates := []string{path}
+
+	switch {
+	case !strings.Contains(path, "/"):
+		candidates = append(candidates,
+			filepath.ToSlash(filepath.Join("workflows", path)),
+			filepath.ToSlash(filepath.Join(".github", "workflows", path)),
+		)
+	case strings.HasPrefix(path, "workflows/"):
+		suffix := strings.TrimPrefix(path, "workflows/")
+		candidates = append(candidates, filepath.ToSlash(filepath.Join(".github", "workflows", suffix)))
+	case strings.HasPrefix(path, ".github/workflows/"):
+		suffix := strings.TrimPrefix(path, ".github/workflows/")
+		candidates = append(candidates, filepath.ToSlash(filepath.Join("workflows", suffix)))
+	}
+
+	seen := make(map[string]struct{}, len(candidates))
+	unique := make([]string, 0, len(candidates))
+	for _, candidate := range candidates {
+		if candidate == "" {
+			continue
+		}
+		if _, exists := seen[candidate]; exists {
+			continue
+		}
+		seen[candidate] = struct{}{}
+		unique = append(unique, candidate)
+	}
+
+	return unique
 }
 
 // decodeBase64FileContent decodes base64-encoded file content returned by the GitHub API.

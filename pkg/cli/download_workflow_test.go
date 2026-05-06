@@ -3,7 +3,10 @@
 package cli
 
 import (
+	"context"
 	"encoding/base64"
+	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -74,4 +77,67 @@ func TestDecodeBase64FileContent(t *testing.T) {
 			assert.Equal(t, tt.expected, string(got), "decoded content should match expected")
 		})
 	}
+}
+
+func TestWorkflowContentCandidatePaths(t *testing.T) {
+	tests := []struct {
+		name     string
+		path     string
+		expected []string
+	}{
+		{
+			name:     "short workflow name tries common workflow directories",
+			path:     "test-workflow.md",
+			expected: []string{"test-workflow.md", "workflows/test-workflow.md", ".github/workflows/test-workflow.md"},
+		},
+		{
+			name:     "root workflows path falls back to github workflows path",
+			path:     "workflows/test-workflow.md",
+			expected: []string{"workflows/test-workflow.md", ".github/workflows/test-workflow.md"},
+		},
+		{
+			name:     "github workflows path falls back to root workflows path",
+			path:     ".github/workflows/test-workflow.md",
+			expected: []string{".github/workflows/test-workflow.md", "workflows/test-workflow.md"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, workflowContentCandidatePaths(tt.path), "candidate paths should match")
+		})
+	}
+}
+
+func TestDownloadWorkflowContent_TriesAlternateWorkflowDirectory(t *testing.T) {
+	originalAPIFn := downloadWorkflowContentAPIFn
+	defer func() {
+		downloadWorkflowContentAPIFn = originalAPIFn
+	}()
+
+	encodedContent := base64.StdEncoding.EncodeToString([]byte("workflow content"))
+	var requestedPaths []string
+	downloadWorkflowContentAPIFn = func(_ context.Context, repo, path, ref string) ([]byte, error) {
+		require.Equal(t, "githubnext/agentic-ops", repo, "repo should be preserved")
+		require.Equal(t, "main", ref, "ref should be preserved")
+		requestedPaths = append(requestedPaths, path)
+
+		if path == "workflows/copilot-token-audit.md" {
+			return nil, errors.New("HTTP 404: Not Found")
+		}
+		if path == ".github/workflows/copilot-token-audit.md" {
+			return []byte(encodedContent), nil
+		}
+
+		return nil, fmt.Errorf("unexpected path: %s", path)
+	}
+
+	content, err := downloadWorkflowContent(context.Background(), "githubnext/agentic-ops", "workflows/copilot-token-audit.md", "main", false)
+	require.NoError(t, err, "alternate workflow directory should be tried after a 404")
+	assert.Equal(t, []byte("workflow content"), content, "downloaded content should match decoded workflow")
+	assert.Equal(t,
+		[]string{"workflows/copilot-token-audit.md", ".github/workflows/copilot-token-audit.md"},
+		requestedPaths,
+		"download should try the alternate workflow directory when the original path is missing",
+	)
 }
