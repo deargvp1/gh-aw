@@ -1,8 +1,14 @@
 name: Label Closed PRs
 
-# Trigger when a pull request is closed (either merged or without merging)
+# Trigger when a pull request is closed (either merged or without merging).
+# Uses pull_request_target so the workflow runs in the context of the base
+# branch — this avoids the GitHub-required approval that `pull_request`
+# produces for PRs authored by bots (e.g. copilot-swe-agent[bot]), which
+# would cause a 100 % `action_required` classification with no jobs ever
+# running.  The script only reads PR metadata and writes labels, so using
+# pull_request_target here is safe.
 on:
-  pull_request:
+  pull_request_target:
     types: [closed]
 
 permissions:
