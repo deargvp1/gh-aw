@@ -13,7 +13,7 @@ const STATE_VERSION = 1;
  */
 function parseMaxTurns(value) {
   if (!value) return null;
-  const parsed = Number.parseInt(value.trim(), 10);
+  const parsed = parseInt(value.trim(), 10);
   if (!Number.isFinite(parsed) || parsed <= 0) return null;
   return parsed;
 }
@@ -187,6 +187,6 @@ if (require.main === module) {
   main().catch(error => {
     const err = /** @type {Error} */ error;
     process.stderr.write(`[copilot-max-turns-hook] ${err.message}\n`);
-    process.exit(0);
+    process.exit(1);
   });
 }

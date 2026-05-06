@@ -208,6 +208,7 @@ func (e *CopilotEngine) GetExecutionSteps(workflowData *WorkflowData, logFile st
 
 	// Conditionally wrap with sandbox (AWF only)
 	var command string
+	maxTurnsHookSetup := buildCopilotMaxTurnsHookSetup(workflowData)
 	if isFirewallEnabled(workflowData) {
 		// Build AWF-wrapped command using helper function - no mkdir needed, AWF handles it
 		// For detection runs use the minimal detection domain list (excludes registry.npmjs.org
@@ -267,7 +268,7 @@ func (e *CopilotEngine) GetExecutionSteps(workflowData *WorkflowData, logFile st
 		if customCommandScriptSetup != "" {
 			pathSetup = customCommandScriptSetup + "\n" + pathSetup
 		}
-		if maxTurnsHookSetup := buildCopilotMaxTurnsHookSetup(workflowData); maxTurnsHookSetup != "" {
+		if maxTurnsHookSetup != "" {
 			pathSetup = maxTurnsHookSetup + "\n" + pathSetup
 		}
 		command = BuildAWFCommand(AWFCommandConfig{
@@ -300,7 +301,7 @@ func (e *CopilotEngine) GetExecutionSteps(workflowData *WorkflowData, logFile st
 		if customCommandScriptSetup != "" {
 			preCommandSetup = customCommandScriptSetup + "\n" + preCommandSetup
 		}
-		if maxTurnsHookSetup := buildCopilotMaxTurnsHookSetup(workflowData); maxTurnsHookSetup != "" {
+		if maxTurnsHookSetup != "" {
 			preCommandSetup = maxTurnsHookSetup + "\n" + preCommandSetup
 		}
 		command = fmt.Sprintf(`set -o pipefail
@@ -594,6 +595,8 @@ func buildCopilotMaxTurnsHookSetup(workflowData *WorkflowData) string {
 	}
 
 	hookScriptPath := SetupActionDestinationShell + "/copilot_max_turns_hook.cjs"
+	// Overwrite the same hook file each run for idempotency. Cleanup is unnecessary
+	// because the workspace is ephemeral per job.
 	return fmt.Sprintf(`mkdir -p .github/hooks
 cat > .github/hooks/gh-aw-max-turns.json <<'GH_AW_COPILOT_MAX_TURNS_HOOKS_EOF'
 {
@@ -603,6 +606,7 @@ cat > .github/hooks/gh-aw-max-turns.json <<'GH_AW_COPILOT_MAX_TURNS_HOOKS_EOF'
       {
         "type": "command",
         "bash": "node %s",
+        "comment": "Fast local turn-state update; 5s avoids blocking the agent if the hook hangs.",
         "timeoutSec": 5
       }
     ],
@@ -610,6 +614,7 @@ cat > .github/hooks/gh-aw-max-turns.json <<'GH_AW_COPILOT_MAX_TURNS_HOOKS_EOF'
       {
         "type": "command",
         "bash": "node %s",
+        "comment": "Fast local turn-state update; 5s avoids blocking the agent if the hook hangs.",
         "timeoutSec": 5
       }
     ],
@@ -617,6 +622,7 @@ cat > .github/hooks/gh-aw-max-turns.json <<'GH_AW_COPILOT_MAX_TURNS_HOOKS_EOF'
       {
         "type": "command",
         "bash": "node %s",
+        "comment": "Fast local turn-state update; 5s avoids blocking the agent if the hook hangs.",
         "timeoutSec": 5
       }
     ]
