@@ -100,7 +100,7 @@ func findWorkflowsWithSource(workflowsDir string, filterNames []string, verbose 
 		return nil, fmt.Errorf("failed to read workflows directory: %w", err)
 	}
 
-	err := filepath.WalkDir(workflowsDir, func(workflowPath string, entry os.DirEntry, walkErr error) error {
+	walkErr := filepath.WalkDir(workflowsDir, func(workflowPath string, entry os.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
 		}
@@ -169,8 +169,8 @@ func findWorkflowsWithSource(workflowsDir string, filterNames []string, verbose 
 		})
 		return nil
 	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to read workflows directory: %w", err)
+	if walkErr != nil {
+		return nil, fmt.Errorf("failed to read workflows directory: %w", walkErr)
 	}
 
 	return workflows, nil
