@@ -105,12 +105,14 @@ func findWorkflowsWithSource(workflowsDir string, filterNames []string, verbose 
 			return walkErr
 		}
 
-		// .lock.yml files never match this suffix check, so only markdown sources are scanned.
+		// Skip directories so WalkDir can keep recursing, and skip non-markdown files
+		// (including .lock.yml files) because only markdown sources are update candidates.
 		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".md") {
 			return nil
 		}
 
-		// WalkDir returns the full path, but workflow IDs are derived from the markdown filename.
+		// Workflow IDs are always derived from the markdown filename so nested directories
+		// do not change how filters and update summaries identify a workflow.
 		workflowName := normalizeWorkflowID(filepath.Base(workflowPath))
 
 		// Filter by name if specified
