@@ -54,6 +54,11 @@ imports:
   - shared/github-guard-policy.md
   - shared/observability-otlp.md
 
+pre-agent-steps:
+  - name: Check claude engine availability
+    run: |
+      claude --version 2>/dev/null || (echo "::warning::Claude engine unavailable — skipping run" && exit 0)
+
 ---
 
 {{#runtime-import? .github/shared-instructions.md}}
