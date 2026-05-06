@@ -214,6 +214,7 @@ function readStdinJSON() {
 function main() {
   const eventName = process.argv[2];
   if (eventName !== "sessionStart" && eventName !== "agentStop") {
+    process.stderr.write(`[copilot-steering-hook] unsupported event: ${String(eventName || "")}\n`);
     return;
   }
 

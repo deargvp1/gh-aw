@@ -374,8 +374,8 @@ function installCopilotSteeringHooks(resolvedArgs) {
       return;
     }
 
-    const statePath = `${DEFAULT_STEERING_STATE_PATH}.${process.pid}`;
-    process.env.GH_AW_COPILOT_STEERING_STATE_PATH = statePath;
+    const processStatePath = `${DEFAULT_STEERING_STATE_PATH}.${process.pid}`;
+    process.env.GH_AW_COPILOT_STEERING_STATE_PATH = processStatePath;
     process.env.GH_AW_COPILOT_MAX_RUNS = String(computeMaxAutopilotRuns(resolvedArgs));
     process.env.GH_AW_TIMEOUT_MINUTES = process.env.GH_AW_TIMEOUT_MINUTES || "30";
     process.env.GH_AW_STEERING_TIME_WARNING_MINUTES = process.env.GH_AW_STEERING_TIME_WARNING_MINUTES || "5";
@@ -384,11 +384,28 @@ function installCopilotSteeringHooks(resolvedArgs) {
     process.env.GH_AW_STEERING_RUN_CRITICAL_REMAINING = process.env.GH_AW_STEERING_RUN_CRITICAL_REMAINING || "1";
 
     fs.mkdirSync(hooksDir, { recursive: true });
-    fs.writeFileSync(hookConfigPath, JSON.stringify(buildSteeringHookConfig(hookScriptPath, process.execPath), null, 2) + "\n", "utf8");
+    const hookConfig = buildSteeringHookConfig(hookScriptPath, process.execPath);
+    fs.writeFileSync(hookConfigPath, JSON.stringify(hookConfig, null, 2) + "\n", "utf8");
     log(`installed steering hook config: ${hookConfigPath}`);
   } catch (error) {
     const err = /** @type {Error} */ error;
     log(`warning: failed to install steering hook config: ${err.message}`);
+  }
+}
+
+function cleanupCopilotSteeringState() {
+  const statePath = process.env.GH_AW_COPILOT_STEERING_STATE_PATH || "";
+  if (!statePath) {
+    return;
+  }
+  try {
+    if (fs.existsSync(statePath)) {
+      fs.unlinkSync(statePath);
+      log(`removed steering hook state file: ${statePath}`);
+    }
+  } catch (error) {
+    const err = /** @type {Error} */ error;
+    log(`warning: failed to remove steering hook state file ${statePath}: ${err.message}`);
   }
 }
 
@@ -557,6 +574,7 @@ async function main() {
   // This is best-effort: failures are logged but do not affect the agent exit code.
   await fetchAWFReflect({ logger: log });
 
+  cleanupCopilotSteeringState();
   log(`done: exitCode=${lastExitCode} totalDuration=${formatDuration(Date.now() - driverStartTime)}`);
   process.exit(lastExitCode);
 }
@@ -587,6 +605,7 @@ if (typeof module !== "undefined" && module.exports) {
 if (require.main === module) {
   main().catch(err => {
     log(`unexpected error: ${err.message}`);
+    cleanupCopilotSteeringState();
     process.exit(1);
   });
 }

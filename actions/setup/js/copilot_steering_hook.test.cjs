@@ -19,7 +19,7 @@ describe("copilot_steering_hook.cjs", () => {
     }
   });
 
-  function makeEnv(overrides = {}) {
+  function makeTestEnv(overrides = {}) {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "copilot-steering-hook-"));
     statePath = path.join(tempDir, "state.json");
     return {
@@ -44,7 +44,7 @@ describe("copilot_steering_hook.cjs", () => {
   });
 
   it("initializes state on sessionStart without emitting a decision", () => {
-    const env = makeEnv();
+    const env = makeTestEnv();
     const result = handleSteeringEvent("sessionStart", { timestamp: 1000, source: "new" }, env);
     expect(result.decision).toBeNull();
     expect(result.state).toEqual(createInitialState(1000));
@@ -52,7 +52,7 @@ describe("copilot_steering_hook.cjs", () => {
   });
 
   it("emits warning steering when remaining run budget hits warning threshold", () => {
-    const env = makeEnv({ GH_AW_STEERING_TIME_WARNING_MINUTES: "0.1", GH_AW_STEERING_TIME_CRITICAL_MINUTES: "0.05" });
+    const env = makeTestEnv({ GH_AW_STEERING_TIME_WARNING_MINUTES: "0.1", GH_AW_STEERING_TIME_CRITICAL_MINUTES: "0.05" });
     handleSteeringEvent("sessionStart", { timestamp: 1000, source: "new" }, env);
     const firstStop = handleSteeringEvent("agentStop", { timestamp: 1100 }, env);
     expect(firstStop.decision).toBeNull();
@@ -64,7 +64,7 @@ describe("copilot_steering_hook.cjs", () => {
   });
 
   it("emits critical steering when remaining time is below critical threshold", () => {
-    const env = makeEnv({
+    const env = makeTestEnv({
       GH_AW_TIMEOUT_MINUTES: "1",
       GH_AW_STEERING_TIME_WARNING_MINUTES: "0.5",
       GH_AW_STEERING_TIME_CRITICAL_MINUTES: "0.2",
