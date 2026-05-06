@@ -563,6 +563,7 @@ await main();`
 // It uses the same agentic engine already installed in the agent job, but runs it through
 // sandbox.agent (AWF) with no allowed domains (network fully blocked) and no MCP configured.
 func (c *Compiler) buildDetectionEngineExecutionStep(data *WorkflowData) []string {
+	const stepPropertyIndent = "        "
 	// Check if threat detection has engine explicitly disabled
 	if data.SafeOutputs != nil && data.SafeOutputs.ThreatDetection != nil {
 		if data.SafeOutputs.ThreatDetection.EngineDisabled {
@@ -671,7 +672,7 @@ func (c *Compiler) buildDetectionEngineExecutionStep(data *WorkflowData) []strin
 		for i, line := range step {
 			steps = append(steps, line+"\n")
 			if i == 0 && continueOnError {
-				steps = append(steps, "        continue-on-error: true\n")
+				steps = append(steps, stepPropertyIndent+"continue-on-error: true\n")
 			}
 		}
 	}

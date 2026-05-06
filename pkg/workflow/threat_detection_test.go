@@ -3,6 +3,7 @@
 package workflow
 
 import (
+	"regexp"
 	"strings"
 	"testing"
 
@@ -1744,8 +1745,11 @@ func TestBuildDetectionEngineExecutionStepInstallStepsRespectContinueOnErrorMode
 			// This test validates emitted YAML fragments from buildDetectionEngineExecutionStep.
 			// We intentionally parse by string boundaries here to keep the assertion focused
 			// on compile output text without introducing a YAML parser dependency in unit tests.
-			const stepMarker = "\n      - name:"
-			nextStepOffset := strings.Index(s[installIdx+1:], stepMarker)
+			stepMarkerPattern := regexp.MustCompile(`\n\s*- name:`)
+			nextStepOffset := -1
+			if loc := stepMarkerPattern.FindStringIndex(s[installIdx+1:]); loc != nil {
+				nextStepOffset = loc[0]
+			}
 			installStep := s[installIdx:]
 			if nextStepOffset != -1 {
 				installStep = s[installIdx : installIdx+1+nextStepOffset]
