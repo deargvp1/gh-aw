@@ -105,11 +105,12 @@ func findWorkflowsWithSource(workflowsDir string, filterNames []string, verbose 
 			return walkErr
 		}
 
+		// .lock.yml files never match this suffix check, so only markdown sources are scanned.
 		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".md") {
 			return nil
 		}
 
-		workflowName := normalizeWorkflowID(workflowPath)
+		workflowName := normalizeWorkflowID(filepath.Base(workflowPath))
 
 		// Filter by name if specified
 		if len(filterNames) > 0 {
