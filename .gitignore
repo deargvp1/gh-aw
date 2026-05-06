@@ -168,6 +168,7 @@ test-inline-*.lock.yml
 *.zip
 # Temporary downloaded logs
 *.txt
+!docs/public/robots.txt
 conclusion/
 detection/
 
