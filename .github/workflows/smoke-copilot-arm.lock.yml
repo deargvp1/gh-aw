@@ -2472,7 +2472,7 @@ jobs:
     if: >
       always() && (needs.detection.result == 'success' || needs.detection.result == 'skipped') &&
       needs.agent.result == 'success'
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
     env:

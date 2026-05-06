@@ -1660,7 +1660,7 @@ jobs:
     if: >
       always() && (needs.detection.result == 'success' || needs.detection.result == 'skipped') &&
       needs.agent.result == 'success'
-    runs-on: ubuntu-slim
+    runs-on: aw-gpu-runner-T4
     permissions:
       contents: read
     env:
