@@ -1741,6 +1741,9 @@ func TestBuildDetectionEngineExecutionStepInstallStepsRespectContinueOnErrorMode
 				t.Fatalf("missing install step in detection steps:\n%s", s)
 			}
 
+			// This test validates emitted YAML fragments from buildDetectionEngineExecutionStep.
+			// We intentionally parse by string boundaries here to keep the assertion focused
+			// on compile output text without introducing a YAML parser dependency in unit tests.
 			nextStepOffset := strings.Index(s[installIdx+1:], "\n      - name:")
 			installStep := s[installIdx:]
 			if nextStepOffset != -1 {
