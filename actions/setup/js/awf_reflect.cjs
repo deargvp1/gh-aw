@@ -19,12 +19,14 @@ const fs = require("fs");
 const path = require("path");
 
 // AWF API proxy management endpoint for discovering configured LLM providers and available models.
-// Uses "host.docker.internal" (the Docker-host address) rather than the "api-proxy" Docker
-// service hostname.  Pi CLI v0.72+ sets a global undici EnvHttpProxyAgent that routes all HTTP
-// requests through the AWF squid proxy; "api-proxy" is an internal Docker hostname that is not
-// in the allowDomains list and would be blocked.  "host.docker.internal" is always in allowDomains
-// and the api-proxy sidecar binds port 10000 to all interfaces, so it is reachable via the
-// Docker-host address both from inside the AWF agent container and from the runner host.
+// Uses "host.docker.internal" rather than the "api-proxy" Docker service hostname.
+// Pi CLI v0.72+ sets a global undici EnvHttpProxyAgent that routes all HTTP requests through the
+// AWF squid proxy; "api-proxy" is an internal Docker hostname that is not in the allowDomains
+// list and would be blocked.  "host.docker.internal" is always in allowDomains.
+// PREREQUISITE: --enable-host-access must be set in the AWF command so that "host.docker.internal"
+// resolves to the Docker host inside the agent container.  The api-proxy sidecar binds port 10000
+// to all interfaces, so it is reachable via the Docker-host address with host access enabled —
+// both from inside the AWF agent container and from the runner host.
 const AWF_API_PROXY_REFLECT_URL = "http://host.docker.internal:10000/reflect";
 // Path inside the agent container where the reflect payload is persisted. The directory is
 // co-located with other AWF firewall observability data so it is included in the agent artifact.

@@ -112,15 +112,18 @@ func piNativeProviderName(backend UniversalLLMBackend) string {
 // "COPILOT_GITHUB_TOKEN") causes Pi to automatically use the value that is
 // already present in the container environment.
 //
-// The baseUrl uses "host.docker.internal" (the Docker host, accessible when
-// --enable-host-access is set) rather than the "api-proxy" Docker service
-// hostname.  Pi CLI v0.72+ sets a global undici EnvHttpProxyAgent which routes
-// ALL HTTP requests through the AWF squid proxy.  The squid proxy only allows
-// domains listed in allowDomains; "api-proxy" is an internal Docker hostname
-// that is not in the allowlist, so every request to api-proxy:PORT is blocked.
-// "host.docker.internal" is always in the AWF allowDomains list and the
-// api-proxy sidecar binds its ports to all interfaces, so it is reachable via
-// the Docker-host address.
+// The baseUrl uses "host.docker.internal" rather than the "api-proxy" Docker
+// service hostname.  Pi CLI v0.72+ sets a global undici EnvHttpProxyAgent
+// which routes ALL HTTP requests through the AWF squid proxy.  The squid
+// proxy only allows domains listed in allowDomains; "api-proxy" is an
+// internal Docker hostname that is not in the allowlist, so every request to
+// api-proxy:PORT is blocked, causing "Connection error.".
+// "host.docker.internal" is always in the AWF allowDomains list.
+//
+// PREREQUISITE: the AWF command must include --enable-host-access so that
+// "host.docker.internal" resolves to the Docker host inside the agent
+// container.  The api-proxy sidecar binds its ports to all interfaces, so
+// it is reachable via the Docker-host address once host access is enabled.
 //
 // All dynamic values are marshaled via encoding/json to prevent JSON injection.
 func buildPiModelsJSON(gatewayPort int, secretEnvVarName, modelID string) string {
