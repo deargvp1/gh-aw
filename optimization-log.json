@@ -223,5 +223,14 @@
     "total_tokens_analyzed": 20058619,
     "estimated_savings_per_run": 1700000,
     "recommendations_count": 4
+  },
+  {
+    "date": "2026-05-06",
+    "workflow_name": "jsweep - JavaScript Unbloater",
+    "workflow_file": "jsweep",
+    "runs_audited": 3,
+    "total_tokens_analyzed": 8532748,
+    "estimated_savings_per_run": 1250000,
+    "recommendations_count": 5
   }
 ]
