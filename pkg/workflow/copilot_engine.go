@@ -39,7 +39,7 @@ func NewCopilotEngine() *CopilotEngine {
 			description:              "Uses GitHub Copilot CLI with MCP server support",
 			experimental:             false,
 			supportsToolsAllowlist:   true,
-			supportsMaxTurns:         false, // Copilot CLI does not support max-turns feature yet
+			supportsMaxTurns:         true,  // Implemented via Copilot CLI hooks guardrail
 			supportsMaxContinuations: true,  // Copilot CLI supports --autopilot with --max-autopilot-continues
 			supportsWebSearch:        false, // Copilot CLI does not have built-in web-search support
 			supportsBareMode:         true,  // Copilot CLI supports --no-custom-instructions

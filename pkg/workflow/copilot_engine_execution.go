@@ -267,6 +267,9 @@ func (e *CopilotEngine) GetExecutionSteps(workflowData *WorkflowData, logFile st
 		if customCommandScriptSetup != "" {
 			pathSetup = customCommandScriptSetup + "\n" + pathSetup
 		}
+		if maxTurnsHookSetup := buildCopilotMaxTurnsHookSetup(workflowData); maxTurnsHookSetup != "" {
+			pathSetup = maxTurnsHookSetup + "\n" + pathSetup
+		}
 		command = BuildAWFCommand(AWFCommandConfig{
 			EngineName:     "copilot",
 			EngineCommand:  engineCommand,
@@ -296,6 +299,9 @@ func (e *CopilotEngine) GetExecutionSteps(workflowData *WorkflowData, logFile st
 		preCommandSetup := mkdirCommands.String()
 		if customCommandScriptSetup != "" {
 			preCommandSetup = customCommandScriptSetup + "\n" + preCommandSetup
+		}
+		if maxTurnsHookSetup := buildCopilotMaxTurnsHookSetup(workflowData); maxTurnsHookSetup != "" {
+			preCommandSetup = maxTurnsHookSetup + "\n" + preCommandSetup
 		}
 		command = fmt.Sprintf(`set -o pipefail
 touch %s
@@ -580,6 +586,42 @@ cat > %s <<'%s'
 %s
 %s
 chmod 700 %s`, customEngineCommandScriptPath, heredocDelimiter, scriptContent, heredocDelimiter, customEngineCommandScriptPath)
+}
+
+func buildCopilotMaxTurnsHookSetup(workflowData *WorkflowData) string {
+	if workflowData == nil || workflowData.EngineConfig == nil || workflowData.EngineConfig.MaxTurns == "" {
+		return ""
+	}
+
+	return `mkdir -p .github/hooks
+cat > .github/hooks/gh-aw-max-turns.json <<'GH_AW_COPILOT_MAX_TURNS_HOOKS_EOF'
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "bash": "node \"${RUNNER_TEMP}/gh-aw/actions/copilot_max_turns_hook.cjs\"",
+        "timeoutSec": 5
+      }
+    ],
+    "agentStop": [
+      {
+        "type": "command",
+        "bash": "node \"${RUNNER_TEMP}/gh-aw/actions/copilot_max_turns_hook.cjs\"",
+        "timeoutSec": 5
+      }
+    ],
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "node \"${RUNNER_TEMP}/gh-aw/actions/copilot_max_turns_hook.cjs\"",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+GH_AW_COPILOT_MAX_TURNS_HOOKS_EOF`
 }
 
 // generateCopilotSessionFileCopyStep generates a step to copy the entire Copilot

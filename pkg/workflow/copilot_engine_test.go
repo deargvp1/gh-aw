@@ -34,8 +34,8 @@ func TestCopilotEngine(t *testing.T) {
 		t.Error("Expected copilot engine to support tools allowlist")
 	}
 
-	if engine.SupportsMaxTurns() {
-		t.Error("Expected copilot engine to not support max-turns yet")
+	if !engine.SupportsMaxTurns() {
+		t.Error("Expected copilot engine to support max-turns guardrails")
 	}
 
 	// Test declared output files (session files are copied to logs folder)
@@ -1836,6 +1836,54 @@ func TestCopilotEngineHarnessScript(t *testing.T) {
 		}
 		if driverIdx > promptIdx {
 			t.Error("Expected copilot_harness.cjs to appear before --prompt")
+		}
+	})
+
+	t.Run("Execution step configures max-turns hook when max-turns is set", func(t *testing.T) {
+		workflowData := &WorkflowData{
+			Name: "test-workflow",
+			EngineConfig: &EngineConfig{
+				ID:       "copilot",
+				MaxTurns: "3",
+			},
+			Tools: make(map[string]any),
+		}
+
+		steps := engine.GetExecutionSteps(workflowData, "/tmp/gh-aw/agent-stdio.log")
+		if len(steps) == 0 {
+			t.Fatal("Expected at least one step")
+		}
+
+		stepContent := strings.Join([]string(steps[0]), "\n")
+		if !strings.Contains(stepContent, ".github/hooks/gh-aw-max-turns.json") {
+			t.Errorf("Expected max-turns hook config file generation in execution step, got:\n%s", stepContent)
+		}
+		if !strings.Contains(stepContent, "copilot_max_turns_hook.cjs") {
+			t.Errorf("Expected max-turns hook script in execution step, got:\n%s", stepContent)
+		}
+		if !strings.Contains(stepContent, "GH_AW_MAX_TURNS: 3") {
+			t.Errorf("Expected GH_AW_MAX_TURNS env var to be set, got:\n%s", stepContent)
+		}
+	})
+
+	t.Run("Execution step does not configure max-turns hook when max-turns is unset", func(t *testing.T) {
+		workflowData := &WorkflowData{
+			Name:         "test-workflow",
+			EngineConfig: &EngineConfig{ID: "copilot"},
+			Tools:        make(map[string]any),
+		}
+
+		steps := engine.GetExecutionSteps(workflowData, "/tmp/gh-aw/agent-stdio.log")
+		if len(steps) == 0 {
+			t.Fatal("Expected at least one step")
+		}
+
+		stepContent := strings.Join([]string(steps[0]), "\n")
+		if strings.Contains(stepContent, ".github/hooks/gh-aw-max-turns.json") {
+			t.Errorf("Expected no max-turns hook config file generation when max-turns is unset, got:\n%s", stepContent)
+		}
+		if strings.Contains(stepContent, "copilot_max_turns_hook.cjs") {
+			t.Errorf("Expected no max-turns hook script reference when max-turns is unset, got:\n%s", stepContent)
 		}
 	})
 

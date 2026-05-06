@@ -153,6 +153,11 @@ func TestEngineSupportsMaxTurns(t *testing.T) {
 			engineID:        "codex",
 			expectedSupport: false,
 		},
+		{
+			name:            "copilot engine supports max-turns",
+			engineID:        "copilot",
+			expectedSupport: true,
+		},
 	}
 
 	for _, tt := range tests {
