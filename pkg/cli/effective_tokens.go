@@ -67,13 +67,14 @@ type modelCostInfo struct {
 
 // modelMultipliersData is the top-level structure of model_multipliers.json.
 type modelMultipliersData struct {
-	Version              string                   `json:"version"`
-	Description          string                   `json:"description"`
-	ReferenceModel       string                   `json:"reference_model"`
-	TokenClassWeights    tokenClassWeights        `json:"token_class_weights"`
-	CacheTokenMultiplier cacheTokenMultiplier     `json:"cache_token_multiplier"`
-	ModelCosts           map[string]modelCostInfo `json:"model_costs"`
-	Multipliers          map[string]float64       `json:"multipliers"`
+	Version               string                   `json:"version"`
+	Description           string                   `json:"description"`
+	ReferenceModel        string                   `json:"reference_model"`
+	TokenClassWeights     tokenClassWeights        `json:"token_class_weights"`
+	CacheTokenMultiplier  cacheTokenMultiplier     `json:"cache_token_multiplier"`
+	ModelCostsDescription string                   `json:"model_costs_description"`
+	ModelCosts            map[string]modelCostInfo `json:"model_costs"`
+	Multipliers           map[string]float64       `json:"multipliers"`
 }
 
 // loadedMultipliers is the parsed multiplier table, keyed by lowercase model name.

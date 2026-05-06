@@ -14,8 +14,8 @@
     "anthropic": 0.1,
     "openai": 0.5
   },
+  "model_costs_description": "Cost per million tokens (in USD) for each model. Input/output costs may differ; cached input uses the cache_token_multiplier.",
   "model_costs": {
-    "description": "Cost per million tokens (in USD) for each model. Input/output costs may differ; cached input uses the cache_token_multiplier.",
     "claude-haiku-4.5": {
       "input_per_million": 0.25,
       "output_per_million": 1.25,
