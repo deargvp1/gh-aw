@@ -301,16 +301,22 @@ func generateRecommendations(processedRun ProcessedRun, metrics MetricsData, fin
 // generatePerformanceMetrics calculates aggregated performance statistics
 func generatePerformanceMetrics(processedRun ProcessedRun, metrics MetricsData, toolUsage []ToolUsageInfo) *PerformanceMetrics {
 	run := processedRun.Run
-	auditReportLog.Printf("Generating performance metrics: token_usage=%d, tool_count=%d, duration=%v", metrics.TokenUsage, len(toolUsage), run.Duration)
+	auditReportLog.Printf("Generating performance metrics: token_usage=%d, effective_tokens=%d, tool_count=%d, duration=%v", metrics.TokenUsage, metrics.EffectiveTokens, len(toolUsage), run.Duration)
 	pm := &PerformanceMetrics{}
 
 	auditReportLog.Printf("Calculating cost efficiency: estimated_cost=$%.2f", metrics.EstimatedCost)
 
+	// Prefer EffectiveTokens for rate/density metrics; fall back to raw TokenUsage.
+	effectiveTokens := metrics.EffectiveTokens
+	if effectiveTokens == 0 {
+		effectiveTokens = metrics.TokenUsage
+	}
+
 	// Calculate tokens per minute
-	if run.Duration > 0 && metrics.TokenUsage > 0 {
+	if run.Duration > 0 && effectiveTokens > 0 {
 		minutes := run.Duration.Minutes()
 		if minutes > 0 {
-			pm.TokensPerMinute = float64(metrics.TokenUsage) / minutes
+			pm.TokensPerMinute = float64(effectiveTokens) / minutes
 		}
 	}
 
@@ -374,8 +380,8 @@ func generatePerformanceMetrics(processedRun ProcessedRun, metrics MetricsData, 
 		if metrics.EstimatedCost > 0 {
 			pm.CostPerTurn = metrics.EstimatedCost / float64(metrics.Turns)
 		}
-		if metrics.TokenUsage > 0 {
-			pm.TokensPerTurn = metrics.TokenUsage / metrics.Turns
+		if effectiveTokens > 0 {
+			pm.TokensPerTurn = effectiveTokens / metrics.Turns
 		}
 	}
 
