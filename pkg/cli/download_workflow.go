@@ -208,7 +208,7 @@ func workflowContentCandidatePaths(path string) []string {
 		candidates = append(candidates, filepath.ToSlash(filepath.Join("workflows", suffix)))
 	}
 
-	seen := make(map[string]struct{}, 3)
+	seen := make(map[string]struct{}, len(candidates))
 	unique := make([]string, 0, len(candidates))
 	for _, candidate := range candidates {
 		if _, exists := seen[candidate]; exists {

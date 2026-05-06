@@ -117,9 +117,11 @@ func TestDownloadWorkflowContent_TriesAlternateWorkflowDirectory(t *testing.T) {
 
 	encodedContent := base64.StdEncoding.EncodeToString([]byte("workflow content"))
 	var requestedPaths []string
+	var requestedRepo string
+	var requestedRef string
 	downloadWorkflowContentFromAPIFn = func(_ context.Context, repo, path, ref string) ([]byte, error) {
-		require.Equal(t, "githubnext/agentic-ops", repo, "repo should be preserved")
-		require.Equal(t, "main", ref, "ref should be preserved")
+		requestedRepo = repo
+		requestedRef = ref
 		requestedPaths = append(requestedPaths, path)
 
 		if path == "workflows/copilot-token-audit.md" {
@@ -135,6 +137,8 @@ func TestDownloadWorkflowContent_TriesAlternateWorkflowDirectory(t *testing.T) {
 	content, err := downloadWorkflowContent(context.Background(), "githubnext/agentic-ops", "workflows/copilot-token-audit.md", "main", false)
 	require.NoError(t, err, "alternate workflow directory should be tried after a 404")
 	assert.Equal(t, []byte("workflow content"), content, "downloaded content should match decoded workflow")
+	assert.Equal(t, "githubnext/agentic-ops", requestedRepo, "repo should be preserved across fallback attempts")
+	assert.Equal(t, "main", requestedRef, "ref should be preserved across fallback attempts")
 	assert.Equal(t,
 		[]string{"workflows/copilot-token-audit.md", ".github/workflows/copilot-token-audit.md"},
 		requestedPaths,
@@ -148,14 +152,16 @@ func TestDownloadWorkflowContent_ReturnsFirstSuccessfulCandidate(t *testing.T) {
 		downloadWorkflowContentFromAPIFn = originalAPIFn
 	}()
 
+	var requestedPaths []string
 	downloadWorkflowContentFromAPIFn = func(_ context.Context, _, path, _ string) ([]byte, error) {
-		require.Equal(t, "workflows/copilot-token-optimizer.md", path, "first candidate should be used when it succeeds")
+		requestedPaths = append(requestedPaths, path)
 		return []byte(base64.StdEncoding.EncodeToString([]byte("direct hit"))), nil
 	}
 
 	content, err := downloadWorkflowContent(context.Background(), "githubnext/agentic-ops", "workflows/copilot-token-optimizer.md", "main", false)
 	require.NoError(t, err, "first successful candidate should return immediately")
 	assert.Equal(t, []byte("direct hit"), content, "content should be decoded from the first candidate response")
+	assert.Equal(t, []string{"workflows/copilot-token-optimizer.md"}, requestedPaths, "download should stop after the first successful candidate")
 }
 
 func TestDownloadWorkflowContent_ReturnsLastErrorWhenCandidatesFail(t *testing.T) {
