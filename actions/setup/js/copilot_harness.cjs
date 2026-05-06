@@ -335,22 +335,23 @@ function computeMaxAutopilotRuns(args) {
  * @returns {{ version: number, hooks: Record<string, Array<{ type: string, bash: string, timeoutSec: number }>> }}
  */
 function buildSteeringHookConfig(hookScriptPath, nodeExecPath) {
-  const quotedNode = JSON.stringify(nodeExecPath);
-  const quotedHookScript = JSON.stringify(hookScriptPath);
+  // JSON-encode paths so they are safely quoted when embedded into bash hook command strings.
+  const jsonEncodedNode = JSON.stringify(nodeExecPath);
+  const jsonEncodedHookScript = JSON.stringify(hookScriptPath);
   return {
     version: 1,
     hooks: {
       sessionStart: [
         {
           type: "command",
-          bash: `${quotedNode} ${quotedHookScript} sessionStart`,
+          bash: `${jsonEncodedNode} ${jsonEncodedHookScript} sessionStart`,
           timeoutSec: 10,
         },
       ],
       agentStop: [
         {
           type: "command",
-          bash: `${quotedNode} ${quotedHookScript} agentStop`,
+          bash: `${jsonEncodedNode} ${jsonEncodedHookScript} agentStop`,
           timeoutSec: 10,
         },
       ],
@@ -374,6 +375,7 @@ function installCopilotSteeringHooks(resolvedArgs) {
       return;
     }
 
+    // Append PID for per-process isolation when multiple harnesses run concurrently on the same runner.
     const processStatePath = `${DEFAULT_STEERING_STATE_PATH}.${process.pid}`;
     process.env.GH_AW_COPILOT_STEERING_STATE_PATH = processStatePath;
     process.env.GH_AW_COPILOT_MAX_RUNS = String(computeMaxAutopilotRuns(resolvedArgs));

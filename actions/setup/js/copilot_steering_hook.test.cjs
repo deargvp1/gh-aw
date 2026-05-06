@@ -52,7 +52,10 @@ describe("copilot_steering_hook.cjs", () => {
   });
 
   it("emits warning steering when remaining run budget hits warning threshold", () => {
-    const env = makeTestEnv({ GH_AW_STEERING_TIME_WARNING_MINUTES: "0.1", GH_AW_STEERING_TIME_CRITICAL_MINUTES: "0.05" });
+    const env = makeTestEnv({
+      GH_AW_STEERING_TIME_WARNING_MINUTES: "0.1",
+      GH_AW_STEERING_TIME_CRITICAL_MINUTES: "0.05",
+    });
     handleSteeringEvent("sessionStart", { timestamp: 1000, source: "new" }, env);
     const firstStop = handleSteeringEvent("agentStop", { timestamp: 1100 }, env);
     expect(firstStop.decision).toBeNull();
