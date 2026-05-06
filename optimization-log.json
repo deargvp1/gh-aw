@@ -205,5 +205,14 @@
     "total_tokens_analyzed": 2925193,
     "estimated_savings_per_run": 550000,
     "recommendations_count": 4
+  },
+  {
+    "date": "2026-05-06",
+    "workflow_name": "daily-experiment-report",
+    "workflow_file": "daily-experiment-report",
+    "runs_audited": 5,
+    "total_tokens_analyzed": 10444695,
+    "estimated_savings_per_run": 1500000,
+    "recommendations_count": 5
   }
 ]
