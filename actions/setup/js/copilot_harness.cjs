@@ -411,11 +411,7 @@ function installCopilotSteeringHooks(resolvedArgs) {
 }
 
 function reportSteeringHookLoadStatus() {
-  const hookLogPath = process.env.GH_AW_COPILOT_STEERING_LOG_PATH || "";
-  if (!hookLogPath) {
-    log("warning: steering hook load check skipped because GH_AW_COPILOT_STEERING_LOG_PATH is not set");
-    return;
-  }
+  const hookLogPath = process.env.GH_AW_COPILOT_STEERING_LOG_PATH || DEFAULT_STEERING_HOOK_LOG_PATH;
 
   try {
     if (!fs.existsSync(hookLogPath)) {
@@ -423,7 +419,7 @@ function reportSteeringHookLoadStatus() {
       return;
     }
     const raw = fs.readFileSync(hookLogPath, "utf8").trim();
-    const lines = raw ? raw.split("\n").filter(Boolean) : [];
+    const lines = raw.split("\n").filter(Boolean);
     if (lines.length === 0) {
       log(`warning: steering hook load check found empty hook log file at ${hookLogPath}`);
       return;

@@ -45,7 +45,7 @@ describe("copilot_steering_hook.cjs", () => {
   });
 
   it("appends hook event log entries as JSON lines", () => {
-    const env = makeTestEnv();
+    makeTestEnv();
     const hookLogPath = path.join(tempDir, "hook.log");
     appendHookEventLog(hookLogPath, {
       event: "sessionStart",
