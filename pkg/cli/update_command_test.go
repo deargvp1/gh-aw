@@ -425,6 +425,34 @@ No source field.`
 	}
 }
 
+// TestFindWorkflowsWithSource_NestedDirectory tests that nested workflow files are scanned.
+func TestFindWorkflowsWithSource_NestedDirectory(t *testing.T) {
+	tmpDir := testutil.TempDir(t, "test-*")
+	customWorkflowDir := filepath.Join(tmpDir, "custom", "workflows")
+	nestedWorkflowDir := filepath.Join(customWorkflowDir, "shared", "nested")
+	require.NoError(t, os.MkdirAll(nestedWorkflowDir, 0755), "should create nested workflow directory")
+
+	workflowContent := `---
+on: push
+engine: claude
+source: test/repo/nested-workflow.md@v1.0.0
+---
+
+# Nested Workflow
+
+Test content.`
+
+	workflowPath := filepath.Join(nestedWorkflowDir, "nested-workflow.md")
+	require.NoError(t, os.WriteFile(workflowPath, []byte(workflowContent), 0644), "should write nested workflow file")
+
+	workflows, err := findWorkflowsWithSource(customWorkflowDir, nil, false)
+	require.NoError(t, err, "should scan nested workflow directories")
+	require.Len(t, workflows, 1, "should find the nested workflow with a source field")
+	assert.Equal(t, "nested-workflow", workflows[0].Name, "should normalize nested workflow name")
+	assert.Equal(t, workflowPath, workflows[0].Path, "should keep the nested workflow path")
+	assert.Equal(t, "test/repo/nested-workflow.md@v1.0.0", workflows[0].SourceSpec, "should preserve nested workflow source")
+}
+
 // TestUpdateWorkflows_CustomDirectory tests that UpdateWorkflows respects custom directory parameter
 func TestUpdateWorkflows_CustomDirectory(t *testing.T) {
 	// Create a temporary directory structure

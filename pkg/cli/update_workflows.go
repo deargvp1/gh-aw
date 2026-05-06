@@ -96,25 +96,20 @@ func findWorkflowsWithSource(workflowsDir string, filterNames []string, verbose 
 	updateLog.Printf("Finding workflows with source field in %s", workflowsDir)
 	var workflows []*workflowWithSource
 
-	// Read all .md files in workflows directory
-	entries, err := os.ReadDir(workflowsDir)
-	if err != nil {
+	if _, err := os.Stat(workflowsDir); err != nil {
 		return nil, fmt.Errorf("failed to read workflows directory: %w", err)
 	}
-	updateLog.Printf("Found %d entries in workflows directory", len(entries))
 
-	for _, entry := range entries {
+	err := filepath.WalkDir(workflowsDir, func(workflowPath string, entry os.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+
 		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".md") {
-			continue
+			return nil
 		}
 
-		// Skip .lock.yml files
-		if strings.HasSuffix(entry.Name(), ".lock.yml") {
-			continue
-		}
-
-		workflowPath := filepath.Join(workflowsDir, entry.Name())
-		workflowName := normalizeWorkflowID(entry.Name())
+		workflowName := normalizeWorkflowID(workflowPath)
 
 		// Filter by name if specified
 		if len(filterNames) > 0 {
@@ -128,7 +123,7 @@ func findWorkflowsWithSource(workflowsDir string, filterNames []string, verbose 
 				}
 			}
 			if !matched {
-				continue
+				return nil
 			}
 		}
 
@@ -138,7 +133,7 @@ func findWorkflowsWithSource(workflowsDir string, filterNames []string, verbose 
 			if verbose {
 				fmt.Fprintln(os.Stderr, console.FormatWarningMessage(fmt.Sprintf("Failed to read %s: %v", workflowPath, err)))
 			}
-			continue
+			return nil
 		}
 
 		// Parse frontmatter
@@ -147,7 +142,7 @@ func findWorkflowsWithSource(workflowsDir string, filterNames []string, verbose 
 			if verbose {
 				fmt.Fprintln(os.Stderr, console.FormatWarningMessage(fmt.Sprintf("Failed to parse frontmatter in %s: %v", workflowPath, err)))
 			}
-			continue
+			return nil
 		}
 
 		// Check for source field
@@ -156,7 +151,7 @@ func findWorkflowsWithSource(workflowsDir string, filterNames []string, verbose 
 			if verbose {
 				fmt.Fprintln(os.Stderr, console.FormatVerboseMessage(fmt.Sprintf("Skipping %s: no source field", workflowName)))
 			}
-			continue
+			return nil
 		}
 
 		source, ok := sourceRaw.(string)
@@ -164,7 +159,7 @@ func findWorkflowsWithSource(workflowsDir string, filterNames []string, verbose 
 			if verbose {
 				fmt.Fprintln(os.Stderr, console.FormatWarningMessage(fmt.Sprintf("Skipping %s: invalid source field", workflowName)))
 			}
-			continue
+			return nil
 		}
 
 		workflows = append(workflows, &workflowWithSource{
@@ -172,6 +167,10 @@ func findWorkflowsWithSource(workflowsDir string, filterNames []string, verbose 
 			Path:       workflowPath,
 			SourceSpec: strings.TrimSpace(source),
 		})
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to read workflows directory: %w", err)
 	}
 
 	return workflows, nil
