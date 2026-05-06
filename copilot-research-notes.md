@@ -1,5 +1,27 @@
 # Copilot CLI Research Notes
 
+### 2026-05-06 (Run 25416993511) — Run #16
+- 214 total MD workflows; 93 Copilot (simple form)
+- **mcp-session-timeout**: 0 (16th consecutive run — CRITICAL persistent gap)
+- **mcp-tool-timeout**: 0 (16th run — persistent gap)
+- **engine.api-target**: 0 (persistent)
+- **engine.harness**: 0 (persistent)
+- **max-continuations**: 0 in copilot wfs (test-quality-sentinel+smoke-copilot are the only users, neither filtered as copilot simple form)
+- **engine.model**: 12 workflows using model overrides (gpt-5.4-mini×3, claude-sonnet×2, claude-haiku×2, gpt-5, gpt-5-mini, gpt-4.1, copilot/gpt-5)
+- **engine.agent (custom)**: 7 copilot workflows using custom agent files
+- **engine.bare**: 0 in copilot wfs (9 total across engines)
+- **cache-memory**: 29/93 copilot wfs (31%)
+- **repo-memory**: 18/93 (19%)
+- **web-fetch**: 8/93 (9%)
+- **sandbox AWF**: 11/93 (12%); **SRT**: 0
+- **strict: true**: 56/93 (60%); **strict: false**: 4/93 (4%); not set: 33/93 (35%)
+- **network config**: 45/93 (48%)
+- **copilot-requests**: 38/93 (41%)
+- **tracker-id**: 37/93 (40%)
+- **timeout-minutes**: 91/93 (98%)
+- 5 unused agent files: grumpy-reviewer, w3c-specification-writer, create-safe-output-type, custom-engine-implementation, interactive-agent-designer
+- Discussion created: "Copilot CLI Deep Research - 2026-05-06"
+
 ### 2026-05-04 (Run 25301640113)
 - 211 total MD workflows; 95 Copilot (simple form)
 - **startup-timeout**: 0 (14th consecutive run — CRITICAL persistent gap)
