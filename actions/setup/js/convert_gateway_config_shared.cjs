@@ -53,10 +53,7 @@ function loadGatewayContext(options = {}) {
   const port = requireEnvVar("MCP_GATEWAY_PORT");
 
   /** @type {Record<string, string>} */
-  const extraEnv = {};
-  for (const envVar of extraRequiredEnv) {
-    extraEnv[envVar] = requireEnvVar(envVar);
-  }
+  const extraEnv = Object.fromEntries(extraRequiredEnv.map(envVar => [envVar, requireEnvVar(envVar)]));
 
   /** @type {Set<string>} */
   const cliServers = new Set(JSON.parse(process.env.GH_AW_MCP_CLI_SERVERS || "[]"));
@@ -65,10 +62,7 @@ function loadGatewayContext(options = {}) {
   const config = JSON.parse(fs.readFileSync(gatewayOutput, "utf8"));
   const rawServers = config.mcpServers;
   /** @type {Record<string, Record<string, unknown>>} */
-  let servers = {};
-  if (rawServers && typeof rawServers === "object" && !Array.isArray(rawServers)) {
-    servers = Object.fromEntries(Object.entries(rawServers));
-  }
+  const servers = rawServers && typeof rawServers === "object" && !Array.isArray(rawServers) ? /** @type {Record<string, Record<string, unknown>>} */ Object.fromEntries(Object.entries(rawServers)) : {};
 
   return {
     gatewayOutput,
@@ -97,14 +91,11 @@ function logCLIFilters(cliServers) {
  * @returns {Record<string, Record<string, unknown>>}
  */
 function filterAndTransformServers(servers, cliServers, transformServer) {
-  /** @type {Record<string, Record<string, unknown>>} */
-  const result = {};
-  for (const [name, value] of Object.entries(servers)) {
-    if (cliServers.has(name)) continue;
-    const entry = { ...value };
-    result[name] = transformServer(name, entry);
-  }
-  return result;
+  return Object.fromEntries(
+    Object.entries(servers)
+      .filter(([name]) => !cliServers.has(name))
+      .map(([name, value]) => [name, transformServer(name, { ...value })])
+  );
 }
 
 /**
