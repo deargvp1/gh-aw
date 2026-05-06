@@ -42,9 +42,10 @@ function buildNoResultError(content) {
     .split("\n")
     .map(line => line.trim())
     .filter(line => line.length > 0);
-  // Keep this focused on generic shell/runtime failures that indicate the model produced
-  // command execution output instead of THREAT_DETECTION_RESULT JSON. Add patterns here
-  // only when we see concrete detection-log artifacts in production incidents.
+  // Keep this focused on common English shell/runtime failures observed on hosted
+  // runner bash/powershell environments that indicate command output artifacts
+  // instead of THREAT_DETECTION_RESULT JSON. Add patterns here only when we see
+  // concrete detection-log artifacts in production incidents.
   const shellErrorPattern = /(command not found|not recognized as an internal or external command|No such file or directory|Permission denied)/i;
   const shellLine = nonEmptyLines.find(line => shellErrorPattern.test(line));
   if (shellLine) {

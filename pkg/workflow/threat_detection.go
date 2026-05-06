@@ -667,6 +667,14 @@ func (c *Compiler) buildDetectionEngineExecutionStep(data *WorkflowData) []strin
 	if data.SafeOutputs != nil && data.SafeOutputs.ThreatDetection != nil {
 		continueOnError = data.SafeOutputs.ThreatDetection.IsContinueOnError()
 	}
+	appendStepWithContinueOnError := func(step []string) {
+		for i, line := range step {
+			steps = append(steps, line+"\n")
+			if i == 0 && continueOnError {
+				steps = append(steps, "        continue-on-error: true\n")
+			}
+		}
+	}
 
 	// Install the engine in the detection job. The detection job runs on a separate fresh
 	// runner where the agent's installed tools are not available, so we must install them here.
@@ -679,21 +687,11 @@ func (c *Compiler) buildDetectionEngineExecutionStep(data *WorkflowData) []strin
 	// via BuildStandardNpmEngineInstallSteps) — a duplicate would trip
 	// JobManager.ValidateDuplicateSteps and hard-fail the compile.
 	if engineRequiresNodeHarness(engine) && !installStepsContainNodeSetup(installSteps) {
-		for i, line := range GenerateNodeJsSetupStep() {
-			steps = append(steps, line+"\n")
-			if i == 0 && continueOnError {
-				steps = append(steps, "        continue-on-error: true\n")
-			}
-		}
+		appendStepWithContinueOnError(GenerateNodeJsSetupStep())
 	}
 
 	for _, step := range installSteps {
-		for i, line := range step {
-			steps = append(steps, line+"\n")
-			if i == 0 && continueOnError {
-				steps = append(steps, "        continue-on-error: true\n")
-			}
-		}
+		appendStepWithContinueOnError(step)
 	}
 
 	// Codex detection runs with no MCP tools, but still needs MCP gateway/config bootstrap
