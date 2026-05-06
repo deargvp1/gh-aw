@@ -80,4 +80,29 @@ describe("copilot_steering_hook.cjs", () => {
     expect(result.decision.reason).toContain("CRITICAL");
     expect(result.decision.reason).toContain("minute(s) left");
   });
+
+  it("falls back to initial state when persisted state is malformed-but-parseable", () => {
+    const env = makeTestEnv({
+      GH_AW_TIMEOUT_MINUTES: "10",
+      GH_AW_STEERING_TIME_WARNING_MINUTES: "9.9",
+      GH_AW_STEERING_TIME_CRITICAL_MINUTES: "0.1",
+      GH_AW_COPILOT_MAX_RUNS: "2",
+    });
+    fs.writeFileSync(statePath, "{}", "utf8");
+    const result = handleSteeringEvent("agentStop", { timestamp: 60 * 1000 }, env);
+    expect(result.state.turns).toBe(1);
+    expect(result.state.warningInjected).toBe(true);
+    expect(result.decision).not.toBeNull();
+    expect(result.decision.reason).toContain("minute(s) left");
+  });
+
+  it("creates parent directory before saving state", () => {
+    const env = makeTestEnv();
+    const nestedStatePath = path.join(tempDir, "nested", "deeper", "state.json");
+    env.GH_AW_COPILOT_STEERING_STATE_PATH = nestedStatePath;
+
+    const result = handleSteeringEvent("sessionStart", { timestamp: 1000, source: "new" }, env);
+    expect(result.decision).toBeNull();
+    expect(fs.existsSync(nestedStatePath)).toBe(true);
+  });
 });

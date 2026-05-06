@@ -3,6 +3,7 @@
 "use strict";
 
 const fs = require("fs");
+const path = require("path");
 
 const DEFAULT_TIMEOUT_MINUTES = 30;
 const DEFAULT_TIME_WARNING_MINUTES = 5;
@@ -10,6 +11,7 @@ const DEFAULT_TIME_CRITICAL_MINUTES = 2;
 const DEFAULT_RUN_WARNING_REMAINING = 2;
 const DEFAULT_RUN_CRITICAL_REMAINING = 1;
 const DEFAULT_STATE_PATH = "/tmp/gh-aw/copilot-steering-state.json";
+const MS_PER_MINUTE = 60000;
 
 /**
  * @typedef {{
@@ -77,7 +79,11 @@ function loadState(statePath) {
       return null;
     }
     const raw = fs.readFileSync(statePath, "utf8");
-    return /** @type {SteeringState} */ JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (!isValidSteeringState(parsed)) {
+      return null;
+    }
+    return parsed;
   } catch {
     return null;
   }
@@ -88,7 +94,27 @@ function loadState(statePath) {
  * @param {SteeringState} state
  */
 function saveState(statePath, state) {
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
   fs.writeFileSync(statePath, JSON.stringify(state), "utf8");
+}
+
+/**
+ * @param {unknown} value
+ * @returns {value is SteeringState}
+ */
+function isValidSteeringState(value) {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const candidate = /** @type {Record<string, unknown>} */ value;
+  return (
+    typeof candidate.startedAtMs === "number" &&
+    Number.isFinite(candidate.startedAtMs) &&
+    typeof candidate.turns === "number" &&
+    Number.isFinite(candidate.turns) &&
+    typeof candidate.warningInjected === "boolean" &&
+    typeof candidate.criticalInjected === "boolean"
+  );
 }
 
 /**
@@ -140,7 +166,7 @@ function buildBudgetSummary(remainingMinutes, remainingRuns) {
  */
 function computeSteeringDecision(state, config, timestamp) {
   const nextState = { ...state, turns: state.turns + 1 };
-  const elapsedMinutes = (timestamp - nextState.startedAtMs) / 60000;
+  const elapsedMinutes = (timestamp - nextState.startedAtMs) / MS_PER_MINUTE;
   const remainingMinutes = Number.isFinite(config.timeoutMinutes) ? config.timeoutMinutes - elapsedMinutes : null;
   const remainingRuns = config.maxRuns > 0 ? config.maxRuns - nextState.turns : null;
 
