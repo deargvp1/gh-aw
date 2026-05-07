@@ -21,6 +21,7 @@ jobs:
         persist-credentials: false
     - name: Verify node availability
       run: |
+        # Fail fast on self-hosted runners that do not provide a base Node.js runtime.
         if ! command -v node >/dev/null 2>&1; then
           echo "::error::node not found on PATH — install Node.js before running this workflow"
           exit 1

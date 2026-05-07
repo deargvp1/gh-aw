@@ -36,6 +36,7 @@ jobs:
         run: curl -fsSL https://raw.githubusercontent.com/github/gh-aw/refs/heads/main/install-gh-aw.sh | bash
       - name: Verify node availability
         run: |
+          # Fail fast on self-hosted runners that do not provide a base Node.js runtime.
           if ! command -v node >/dev/null 2>&1; then
             echo "::error::node not found on PATH — install Node.js before running this workflow"
             exit 1
@@ -102,6 +103,8 @@ This workflow imports copilot-setup-steps.yml and should have the imported steps
 	// Verify imported steps are present
 	assert.Contains(t, yamlStr, "Install gh-aw extension", "Imported install step should be in compiled workflow")
 	assert.Contains(t, yamlStr, "Verify node availability", "Imported node availability check should be in compiled workflow")
+	assert.Contains(t, yamlStr, "command -v node >/dev/null 2>&1", "Imported node availability check should verify node on PATH")
+	assert.Contains(t, yamlStr, "::error::node not found on PATH", "Imported node availability check should emit actionable error output")
 	assert.Contains(t, yamlStr, "Set up Node.js", "Imported Node.js step should be in compiled workflow")
 	assert.Contains(t, yamlStr, "Set up Go", "Imported Go step should be in compiled workflow")
 
