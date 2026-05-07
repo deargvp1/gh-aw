@@ -4,9 +4,10 @@
 //
 // This file validates that the runs-on field in workflow frontmatter does not
 // specify runner types that are incompatible with agentic workflows. Specifically,
-// macOS runners are not supported because agentic workflows rely on containers to
-// provide a secure sandbox, and GitHub-hosted macOS runners do not support container
-// jobs which are required for the Agent Workflow Firewall.
+// macOS runners require Docker to be available for the Agent Workflow Firewall
+// containers. On GitHub-hosted macOS runners Docker can be provided via Colima
+// (a lightweight macOS Docker runtime); the generated workflow installs it
+// automatically before pulling AWF container images.
 //
 // # Validation Functions
 //
@@ -24,19 +25,23 @@ package workflow
 
 import (
 	"fmt"
+	"os"
 	"strings"
+
+	"github.com/github/gh-aw/pkg/console"
 )
 
 var runsOnValidationLog = newValidationLogger("runs_on")
 
-// macOSRunnerFAQURL is the URL to the FAQ entry explaining why macOS runners are not supported.
+// macOSRunnerFAQURL is the URL to the FAQ entry explaining macOS runner support via Colima.
 const macOSRunnerFAQURL = "https://github.github.com/gh-aw/reference/faq/#why-are-macos-runners-not-supported"
 
-// validateRunsOn validates that the runs-on field does not specify macOS runners,
-// which are not supported in agentic workflows because they do not support
-// container jobs required for the Agent Workflow Firewall sandbox.
+// validateRunsOn validates the runs-on field for runner types that require
+// special setup in agentic workflows. macOS runners are supported via Docker
+// installed through Colima; a warning is emitted to remind authors of this
+// dependency. All other runner types are allowed without restriction.
 //
-// Returns an error with a FAQ link if a macOS runner is detected, nil otherwise.
+// Returns nil in all cases (macOS support is allowed with a warning).
 func validateRunsOn(frontmatter map[string]any, markdownPath string) error {
 	runsOn, exists := frontmatter["runs-on"]
 	if !exists {
@@ -49,14 +54,16 @@ func validateRunsOn(frontmatter map[string]any, markdownPath string) error {
 	for _, label := range labels {
 		lower := strings.ToLower(label)
 		if strings.HasPrefix(lower, "macos-") || lower == "macos" {
-			return formatCompilerError(markdownPath, "error",
-				fmt.Sprintf("runner '%s' is not supported in agentic workflows.\n\n"+
-					"macOS runners are not supported because agentic workflows rely on containers "+
-					"for the secure Agent Workflow Firewall sandbox, and GitHub-hosted macOS runners "+
-					"do not support container jobs.\n\n"+
-					"Use 'ubuntu-latest' (default) or another Linux-based runner instead.\n\n"+
+			warningMsg := fmt.Sprintf(
+				"runner '%s' requires Docker to be available for the AWF containers. "+
+					"On GitHub-hosted macOS runners Docker is installed automatically via Colima "+
+					"(install_docker_macos.sh) before image downloads. "+
+					"Network firewalling runs inside the Colima Linux VM where iptables is available. "+
 					"See %s for details.",
-					label, macOSRunnerFAQURL), nil)
+				label, macOSRunnerFAQURL)
+			fmt.Fprintln(os.Stderr, console.FormatWarningMessage(warningMsg))
+			runsOnValidationLog.Printf("macOS runner detected with warning: %s", label)
+			return nil
 		}
 	}
 

@@ -18,6 +18,17 @@ set +o histexpand
 
 set -euo pipefail
 
+# On macOS, Docker is not pre-installed. Install it via Colima if needed.
+# On Linux runners, Docker is pre-installed so this is a no-op.
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  if [ -f "${SCRIPT_DIR}/install_docker_macos.sh" ]; then
+    bash "${SCRIPT_DIR}/install_docker_macos.sh"
+  else
+    echo "::warning::install_docker_macos.sh not found at ${SCRIPT_DIR} — Docker may not be available on macOS"
+  fi
+fi
+
 # Helper function to pull Docker images with retry logic
 docker_pull_with_retry() {
   local image="$1"
