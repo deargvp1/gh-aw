@@ -14,6 +14,12 @@ tracker-id: daily-testify-uber-super-expert
 engine: copilot
 
 imports:
+  - uses: shared/repo-memory-standard.md
+    with:
+      branch-name: "memory/testify-expert"
+      description: "Tracks processed test files to avoid duplicates"
+      file-glob: ["*.json", "*.txt"]
+      max-file-size: 51200
   - uses: shared/skip-if-issue-open.md
     with:
       title-prefix: "[testify-expert]"
@@ -28,11 +34,6 @@ imports:
 
 tools:
   cli-proxy: true
-  repo-memory:
-    branch-name: memory/testify-expert
-    description: "Tracks processed test files to avoid duplicates"
-    file-glob: ["*.json", "*.txt"]
-    max-file-size: 51200  # 50KB
   github:
     mode: gh-proxy
     toolsets: [default]

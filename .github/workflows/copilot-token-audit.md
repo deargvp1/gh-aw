@@ -24,16 +24,16 @@ safe-outputs:
   upload-asset:
     max: 5
     allowed-exts: [.png, .jpg, .jpeg, .svg]
+imports:
+  - uses: shared/repo-memory-standard.md
+    with:
+      branch-name: "memory/token-audit"
+      description: "Historical daily Copilot token usage snapshots (shared with copilot-token-optimizer)"
+      max-patch-size: 51200
 tools:
   agentic-workflows:
   bash:
     - "*"
-  repo-memory:
-    branch-name: "memory/token-audit"
-    description: "Historical daily Copilot token usage snapshots (shared with copilot-token-optimizer)"
-    file-glob: ["*.json", "*.jsonl", "*.csv", "*.md"]
-    max-file-size: 102400
-    max-patch-size: 51200
 steps:
   - name: Setup Python runtime
     uses: actions/setup-python@v6.2.0

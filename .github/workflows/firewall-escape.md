@@ -48,12 +48,16 @@ tools:
       - discussions
   cache-memory: true
   repo-memory:
-    branch-name: memory/firewall-escape
-    description: "Persistent storage for firewall escape attempt history and strategies"
-    max-file-size: 524288  # 512KB
     max-file-count: 50
   bash: [":*"]
   web-fetch:
+
+imports:
+  - uses: shared/repo-memory-standard.md
+    with:
+      branch-name: "memory/firewall-escape"
+      description: "Persistent storage for firewall escape attempt history and strategies"
+      max-file-size: 524288
 
 jobs:
   post-issue:

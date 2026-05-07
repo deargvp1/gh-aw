@@ -30,14 +30,15 @@ engine:
     "$memory_file"; done; else printf "%b\n" "$HAIKU" >
     /tmp/gh-aw/comment-memory/default.md; fi; else safeoutputs noop --message "smoke-ci:
     push event - no PR context, no action needed"; fi'
+imports:
+  - uses: shared/repo-memory-standard.md
+    with:
+      branch-name: "memory/smoke-ci"
+      description: "Smoke CI persisted repo-memory entries"
+      file-glob: ["*.md"]
 tools:
   cache-memory: true
   comment-memory: true
-  repo-memory:
-    branch-name: memory/smoke-ci
-    description: "Smoke CI persisted repo-memory entries"
-    file-glob:
-      - "*.md"
   github:
 safe-outputs:
   create-issue:

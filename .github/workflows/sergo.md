@@ -22,6 +22,11 @@ network:
     - go
 
 imports:
+  - uses: shared/repo-memory-standard.md
+    with:
+      branch-name: "memory/sergo"
+      description: "Historical Sergo Go analysis results, strategies, and tool snapshots"
+      file-glob: ["*.json", "*.jsonl"]
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[sergo] "
@@ -30,10 +35,6 @@ imports:
 
 tools:
   cli-proxy: true
-  repo-memory:
-    branch-name: memory/sergo
-    description: "Historical Sergo Go analysis results, strategies, and tool snapshots"
-    file-glob: ["*.json", "*.jsonl"]
   github:
     mode: gh-proxy
     toolsets: [default, issues]

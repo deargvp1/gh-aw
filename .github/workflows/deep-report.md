@@ -60,11 +60,6 @@ safe-outputs:
 tools:
   cli-proxy: true
   agentic-workflows:
-  repo-memory:
-    branch-name: memory/deep-report
-    description: "Long-term insights, patterns, and trend data"
-    file-glob: ["*.md"]
-    max-file-size: 1048576  # 1MB
   github:
     mode: gh-proxy
     toolsets:
@@ -72,8 +67,13 @@ tools:
   bash:
     - "*"
   edit:
-
 imports:
+  - uses: shared/repo-memory-standard.md
+    with:
+      branch-name: "memory/deep-report"
+      description: "Long-term insights, patterns, and trend data"
+      file-glob: ["*.md"]
+      max-file-size: 1048576
   - shared/jqschema.md
   - shared/discussions-data-fetch.md
   - shared/weekly-issues-data-fetch.md

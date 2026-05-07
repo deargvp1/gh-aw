@@ -9,6 +9,11 @@ permissions:
   pull-requests: read
 engine: copilot
 imports:
+  - uses: shared/repo-memory-standard.md
+    with:
+      branch-name: "memory/pr-triage"
+      description: "PR triage decisions and categorization history"
+      file-glob: ["**"]
   - uses: shared/pr-review-base.md
     with:
       min-integrity: approved
@@ -17,10 +22,6 @@ tools:
   github:
     mode: gh-proxy
     toolsets: [pull_requests, repos, issues, labels]
-  repo-memory:
-    branch-name: memory/pr-triage
-    file-glob: "**"
-    max-file-size: 102400  # 100KB
 safe-outputs:
   add-labels:
     max: 100

@@ -14,11 +14,12 @@ tools:
   github:
     mode: gh-proxy
     toolsets: [default, actions, repos]
-  repo-memory:
-    branch-name: memory/meta-orchestrators
-    file-glob: "**"
-    max-file-size: 102400  # 100KB
 imports:
+  - uses: shared/repo-memory-standard.md
+    with:
+      branch-name: "memory/meta-orchestrators"
+      description: "AI agent performance metrics and analysis history"
+      file-glob: ["**"]
   - shared/reporting.md
 safe-outputs:
   create-issue:

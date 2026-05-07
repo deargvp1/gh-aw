@@ -14,9 +14,12 @@ tools:
   github:
     mode: gh-proxy
     toolsets: [default]
-  repo-memory:
-    branch-name: memory/meta-orchestrators
-    file-glob: "metrics/**"
+imports:
+  - uses: shared/repo-memory-standard.md
+    with:
+      branch-name: "memory/meta-orchestrators"
+      description: "Daily performance metrics for the agent ecosystem"
+      file-glob: ["metrics/**"]
 timeout-minutes: 15
 safe-outputs:
   noop:

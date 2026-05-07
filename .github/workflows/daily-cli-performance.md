@@ -34,11 +34,6 @@ tracker-id: daily-cli-performance
 engine: copilot
 tools:
   cli-proxy: true
-  repo-memory:
-    branch-name: memory/cli-performance
-    description: "Historical CLI compilation performance benchmark results"
-    file-glob: ["*.json", "*.jsonl", "*.txt"]
-    max-file-size: 131072  # 128KB — bounded to limit context size
   bash: true
   edit:
   github:
@@ -56,6 +51,12 @@ safe-outputs:
 timeout-minutes: 20
 strict: true
 imports:
+  - uses: shared/repo-memory-standard.md
+    with:
+      branch-name: "memory/cli-performance"
+      description: "Historical CLI compilation performance benchmark results"
+      file-glob: ["*.json", "*.jsonl", "*.txt"]
+      max-file-size: 131072
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[daily-cli-performance] "

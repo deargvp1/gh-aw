@@ -15,18 +15,18 @@ observability:
     headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
 tracker-id: copilot-token-optimizer
 engine: copilot
+imports:
+  - uses: shared/repo-memory-standard.md
+    with:
+      branch-name: "memory/token-audit"
+      description: "Historical daily Copilot token usage snapshots (shared with copilot-token-audit)"
+      max-patch-size: 51200
 tools:
   github:
     mode: gh-proxy
     toolsets: [issues]
   bash:
     - "*"
-  repo-memory:
-    branch-name: "memory/token-audit"
-    description: "Historical daily Copilot token usage snapshots (shared with copilot-token-audit)"
-    file-glob: ["*.json", "*.jsonl", "*.csv", "*.md"]
-    max-file-size: 102400
-    max-patch-size: 51200
 safe-outputs:
   create-issue:
     expires: 7d

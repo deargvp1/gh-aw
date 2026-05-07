@@ -37,9 +37,13 @@ tools:
   github:
     mode: gh-proxy
     toolsets: [repos, search, code_security]
-  repo-memory:
-    branch-name: memory/campaigns
-    file-glob: "security-compliance-*/**"
+
+imports:
+  - uses: shared/repo-memory-standard.md
+    with:
+      branch-name: "memory/campaigns"
+      description: "Security compliance campaign tracking and remediation history"
+      file-glob: ["security-compliance-*/**"]
 
 ---
 

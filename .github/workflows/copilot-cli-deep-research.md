@@ -22,11 +22,6 @@ tools:
   github:
     mode: gh-proxy
     toolsets: [default, actions]
-  repo-memory:
-    branch-name: memory/copilot-cli-research
-    description: "Copilot CLI research notes and analysis history"
-    file-glob: ["*.json", "*.md"]
-    max-file-size: 204800  # 200KB
   bash:
     - "find .github -name '*.md'"
     - "find .github -type f -exec cat {} +"
@@ -35,7 +30,14 @@ tools:
     - "grep -r *"
     - "git log --oneline"
     - "git diff"
-
+imports:
+  - uses: shared/repo-memory-standard.md
+    with:
+      branch-name: "memory/copilot-cli-research"
+      description: "Copilot CLI research notes and analysis history"
+      file-glob: ["*.json", "*.md"]
+      max-file-size: 204800
+  - shared/reporting.md
 safe-outputs:
   create-discussion:
     expires: 1d
@@ -43,11 +45,8 @@ safe-outputs:
     category: "research"
     max: 1
     close-older-discussions: true
-
 timeout-minutes: 20
 strict: true
-imports:
-  - shared/reporting.md
 features:
   copilot-requests: true
 ---
