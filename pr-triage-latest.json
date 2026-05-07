@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-05-07T01:08:10Z",
-  "run_id": "25470078858",
+  "run_date": "2026-05-07T07:19:15Z",
+  "run_id": "25481730380",
   "fork_prs": 0,
-  "agent_prs_found": 11,
-  "agent_prs_excluded": 11,
-  "notes": "No open fork PRs found. 11 open PRs from copilot agents, all from same-repo branches (isCrossRepository=false). Per policy, only fork PRs are triaged.",
+  "agent_prs_found": 12,
+  "agent_prs_excluded": 12,
+  "notes": "No open fork PRs found. 12 open PRs from copilot agents, all from same-repo branches. Per policy, only fork PRs are triaged.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -17,10 +17,10 @@
     "by_action": {}
   },
   "previous_run": {
-    "run_id": "25454479534",
-    "run_date": "2026-05-06T18:48:54Z",
+    "run_id": "25470078858",
+    "run_date": "2026-05-07T01:08:10Z",
     "fork_prs": 0,
-    "agent_prs_found": 8,
-    "agent_prs_excluded": 8
+    "agent_prs_found": 11,
+    "agent_prs_excluded": 11
   }
 }
