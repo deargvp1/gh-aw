@@ -12,6 +12,7 @@ import (
 
 	"github.com/github/gh-aw/pkg/constants"
 	"github.com/github/gh-aw/pkg/testutil"
+	"github.com/github/gh-aw/pkg/types"
 )
 
 func TestCopilotEngine(t *testing.T) {
@@ -1773,6 +1774,33 @@ func TestCopilotEngineEnvOverridesTokenExpression(t *testing.T) {
 
 		if !strings.Contains(stepContent, "CUSTOM_VAR: custom-value") {
 			t.Errorf("Expected engine.env to add CUSTOM_VAR, got:\n%s", stepContent)
+		}
+	})
+
+	t.Run("engine auth maps to AWF auth environment variables", func(t *testing.T) {
+		workflowData := &WorkflowData{
+			Name: "test-workflow",
+			EngineConfig: &EngineConfig{
+				ID: "copilot",
+				Auth: &types.MCPAuthConfig{
+					Type:     "github-oidc",
+					Audience: "https://cognitiveservices.azure.com",
+				},
+			},
+		}
+
+		steps := engine.GetExecutionSteps(workflowData, "/tmp/gh-aw/test.log")
+		if len(steps) != 1 {
+			t.Fatalf("Expected 1 step, got %d", len(steps))
+		}
+
+		stepContent := strings.Join([]string(steps[0]), "\n")
+
+		if !strings.Contains(stepContent, "AWF_AUTH_TYPE: github-oidc") {
+			t.Errorf("Expected engine.auth.type to set AWF_AUTH_TYPE, got:\n%s", stepContent)
+		}
+		if !strings.Contains(stepContent, "AWF_AUTH_AUDIENCE: https://cognitiveservices.azure.com") {
+			t.Errorf("Expected engine.auth.audience to set AWF_AUTH_AUDIENCE, got:\n%s", stepContent)
 		}
 	})
 }

@@ -25,6 +25,7 @@ type EngineConfig struct {
 	Command          string // Custom executable path (when set, skip installation steps)
 	HarnessScript    string // Custom Node.js harness script filename (replaces engine default harness script when supported)
 	Env              map[string]string
+	Auth             *types.MCPAuthConfig // engine.auth (e.g., type: github-oidc, audience: ...)
 	Config           string
 	Args             []string
 	Agent            string // Agent identifier for copilot --agent flag (copilot engine only)
@@ -258,6 +259,24 @@ func (c *Compiler) ExtractEngineConfig(frontmatter map[string]any) (string, *Eng
 			if harness, hasHarness := engineObj["harness"]; hasHarness {
 				if harnessStr, ok := harness.(string); ok {
 					config.HarnessScript = harnessStr
+				}
+			}
+
+			// Extract optional 'auth' field for BYOK provider auth configuration
+			if authVal, hasAuth := engineObj["auth"]; hasAuth {
+				if authObj, ok := authVal.(map[string]any); ok {
+					authConfig := &types.MCPAuthConfig{}
+					if authType, ok := authObj["type"].(string); ok {
+						authConfig.Type = authType
+					}
+					if audience, ok := authObj["audience"].(string); ok {
+						authConfig.Audience = audience
+					}
+					if authConfig.Type != "" {
+						config.Auth = authConfig
+					}
+				} else if authCfg, ok := authVal.(*types.MCPAuthConfig); ok {
+					config.Auth = authCfg
 				}
 			}
 

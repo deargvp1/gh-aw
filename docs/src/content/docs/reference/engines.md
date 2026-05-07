@@ -212,6 +212,27 @@ Set `COPILOT_PROVIDER_BASE_URL` in `engine.env` to activate BYOK mode. The crede
 | `COPILOT_PROVIDER_MAX_PROMPT_TOKENS` | Optional | Override the maximum prompt token limit (otherwise resolved from model catalog) |
 | `COPILOT_PROVIDER_MAX_OUTPUT_TOKENS` | Optional | Override the maximum output token limit |
 
+#### OIDC authentication for BYOK (`engine.auth`)
+
+For providers that require short-lived OIDC tokens instead of static keys (for example Azure OpenAI with Entra-only auth), set `engine.auth.type: github-oidc`.
+
+```yaml wrap
+permissions:
+  id-token: write
+
+engine:
+  id: copilot
+  auth:
+    type: github-oidc
+    audience: https://cognitiveservices.azure.com
+  env:
+    COPILOT_PROVIDER_BASE_URL: https://my-resource.openai.azure.com
+    COPILOT_PROVIDER_TYPE: azure
+    COPILOT_MODEL: gpt-4.1
+```
+
+`audience` is optional. When omitted, the provider-side default audience behavior applies.
+
 **Example: OpenAI-compatible provider**
 
 ```yaml wrap

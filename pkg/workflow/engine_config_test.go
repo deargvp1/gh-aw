@@ -10,6 +10,7 @@ import (
 
 	"github.com/github/gh-aw/pkg/constants"
 	"github.com/github/gh-aw/pkg/testutil"
+	"github.com/github/gh-aw/pkg/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -104,6 +105,26 @@ func TestExtractEngineConfig(t *testing.T) {
 			},
 			expectedEngineSetting: "codex",
 			expectedConfig:        &EngineConfig{ID: "codex", Model: "gpt-4o"},
+		},
+		{
+			name: "object format - with engine auth",
+			frontmatter: map[string]any{
+				"engine": map[string]any{
+					"id": "copilot",
+					"auth": map[string]any{
+						"type":     "github-oidc",
+						"audience": "https://cognitiveservices.azure.com",
+					},
+				},
+			},
+			expectedEngineSetting: "copilot",
+			expectedConfig: &EngineConfig{
+				ID: "copilot",
+				Auth: &types.MCPAuthConfig{
+					Type:     "github-oidc",
+					Audience: "https://cognitiveservices.azure.com",
+				},
+			},
 		},
 		{
 			name: "object format - complete",
@@ -279,6 +300,23 @@ func TestExtractEngineConfig(t *testing.T) {
 					t.Errorf("Expected config.HarnessScript '%s', got '%s'", test.expectedConfig.HarnessScript, config.HarnessScript)
 				}
 
+				if test.expectedConfig.Auth == nil {
+					if config.Auth != nil {
+						t.Errorf("Expected config.Auth to be nil, got %+v", config.Auth)
+					}
+				} else {
+					if config.Auth == nil {
+						t.Errorf("Expected config.Auth %+v, got nil", test.expectedConfig.Auth)
+					} else {
+						if config.Auth.Type != test.expectedConfig.Auth.Type {
+							t.Errorf("Expected config.Auth.Type '%s', got '%s'", test.expectedConfig.Auth.Type, config.Auth.Type)
+						}
+						if config.Auth.Audience != test.expectedConfig.Auth.Audience {
+							t.Errorf("Expected config.Auth.Audience '%s', got '%s'", test.expectedConfig.Auth.Audience, config.Auth.Audience)
+						}
+					}
+				}
+
 				if len(config.Env) != len(test.expectedConfig.Env) {
 					t.Errorf("Expected config.Env length %d, got %d", len(test.expectedConfig.Env), len(config.Env))
 				} else {
@@ -323,6 +361,35 @@ strict: false
 This is a test workflow.`,
 			expectedAI:     "claude",
 			expectedConfig: &EngineConfig{ID: "claude"},
+		},
+		{
+			name: "object engine format - copilot with oidc auth",
+			content: `---
+on: push
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+  id-token: write
+strict: false
+engine:
+  id: copilot
+  auth:
+    type: github-oidc
+    audience: https://cognitiveservices.azure.com
+---
+
+# Test Workflow
+
+This is a test workflow.`,
+			expectedAI: "copilot",
+			expectedConfig: &EngineConfig{
+				ID: "copilot",
+				Auth: &types.MCPAuthConfig{
+					Type:     "github-oidc",
+					Audience: "https://cognitiveservices.azure.com",
+				},
+			},
 		},
 		{
 			name: "object engine format - complete",
@@ -406,6 +473,22 @@ This is a test workflow.`,
 
 				if workflowData.EngineConfig.Model != test.expectedConfig.Model {
 					t.Errorf("Expected EngineConfig.Model '%s', got '%s'", test.expectedConfig.Model, workflowData.EngineConfig.Model)
+				}
+				if test.expectedConfig.Auth == nil {
+					if workflowData.EngineConfig.Auth != nil {
+						t.Errorf("Expected EngineConfig.Auth to be nil, got %+v", workflowData.EngineConfig.Auth)
+					}
+				} else {
+					if workflowData.EngineConfig.Auth == nil {
+						t.Errorf("Expected EngineConfig.Auth %+v, got nil", test.expectedConfig.Auth)
+					} else {
+						if workflowData.EngineConfig.Auth.Type != test.expectedConfig.Auth.Type {
+							t.Errorf("Expected EngineConfig.Auth.Type '%s', got '%s'", test.expectedConfig.Auth.Type, workflowData.EngineConfig.Auth.Type)
+						}
+						if workflowData.EngineConfig.Auth.Audience != test.expectedConfig.Auth.Audience {
+							t.Errorf("Expected EngineConfig.Auth.Audience '%s', got '%s'", test.expectedConfig.Auth.Audience, workflowData.EngineConfig.Auth.Audience)
+						}
+					}
 				}
 			}
 		})

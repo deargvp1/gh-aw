@@ -10106,6 +10106,10 @@
                 }
               },
               "additionalProperties": false
+            },
+            "auth": {
+              "$ref": "#/$defs/http_mcp_auth",
+              "description": "Authentication configuration for BYOK model-provider requests routed through the AWF api-proxy sidecar."
             }
           },
           "required": ["id"],

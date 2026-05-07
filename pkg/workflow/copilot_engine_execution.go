@@ -427,6 +427,14 @@ touch %s
 	if workflowData.EngineConfig != nil && len(workflowData.EngineConfig.Env) > 0 {
 		maps.Copy(env, workflowData.EngineConfig.Env)
 	}
+	if workflowData.EngineConfig != nil && workflowData.EngineConfig.Auth != nil {
+		if workflowData.EngineConfig.Auth.Type != "" {
+			env["AWF_AUTH_TYPE"] = workflowData.EngineConfig.Auth.Type
+		}
+		if workflowData.EngineConfig.Auth.Audience != "" {
+			env["AWF_AUTH_AUDIENCE"] = workflowData.EngineConfig.Auth.Audience
+		}
+	}
 
 	// Add custom environment variables from agent config
 	agentConfig := getAgentConfig(workflowData)
