@@ -41,7 +41,7 @@ const macOSRunnerFAQURL = "https://github.github.com/gh-aw/reference/faq/#why-ar
 // installed through Colima; a warning is emitted to remind authors of this
 // dependency. All other runner types are allowed without restriction.
 //
-// Returns nil in all cases (macOS support is allowed with a warning).
+// Always returns nil — macOS runners emit a warning but do not block compilation.
 func validateRunsOn(frontmatter map[string]any, markdownPath string) error {
 	runsOn, exists := frontmatter["runs-on"]
 	if !exists {
@@ -55,10 +55,7 @@ func validateRunsOn(frontmatter map[string]any, markdownPath string) error {
 		lower := strings.ToLower(label)
 		if strings.HasPrefix(lower, "macos-") || lower == "macos" {
 			warningMsg := fmt.Sprintf(
-				"runner '%s' requires Docker to be available for the AWF containers. "+
-					"On GitHub-hosted macOS runners Docker is installed automatically via Colima "+
-					"(install_docker_macos.sh) before image downloads. "+
-					"Network firewalling runs inside the Colima Linux VM where iptables is available. "+
+				"runner '%s' requires Docker, which is installed automatically via Colima on macOS runners. "+
 					"See %s for details.",
 				label, macOSRunnerFAQURL)
 			fmt.Fprintln(os.Stderr, console.FormatWarningMessage(warningMsg))

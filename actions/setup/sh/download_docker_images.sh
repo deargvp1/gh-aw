@@ -25,7 +25,7 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
   if [ -f "${SCRIPT_DIR}/install_docker_macos.sh" ]; then
     bash "${SCRIPT_DIR}/install_docker_macos.sh"
   else
-    echo "::warning::install_docker_macos.sh not found at ${SCRIPT_DIR} — Docker may not be available on macOS"
+    echo "::warning::install_docker_macos.sh not found at ${SCRIPT_DIR} -- Docker may not be available on macOS"
   fi
 fi
 
