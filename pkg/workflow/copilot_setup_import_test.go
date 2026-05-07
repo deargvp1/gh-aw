@@ -36,7 +36,7 @@ jobs:
         run: curl -fsSL https://raw.githubusercontent.com/github/gh-aw/refs/heads/main/install-gh-aw.sh | bash
       - name: Verify node availability
         run: |
-          if ! command -v node &>/dev/null; then
+          if ! command -v node >/dev/null 2>&1; then
             echo "::error::node not found on PATH — install Node.js before running this workflow"
             exit 1
           fi
