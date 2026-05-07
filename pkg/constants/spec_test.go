@@ -358,6 +358,8 @@ func TestSpec_VersionConstraints_MinVersionValues(t *testing.T) {
 		{name: "AWFCliProxyMinVersion", constant: constants.AWFCliProxyMinVersion, expected: "v0.25.17"},
 		// From spec: CopilotNoAskUserMinVersion // "1.0.19"
 		{name: "CopilotNoAskUserMinVersion", constant: constants.CopilotNoAskUserMinVersion, expected: "1.0.19"},
+		// From spec: AWFModelsMinVersion // "v0.25.38"
+		{name: "AWFModelsMinVersion", constant: constants.AWFModelsMinVersion, expected: "v0.25.38"},
 	}
 
 	for _, tt := range tests {

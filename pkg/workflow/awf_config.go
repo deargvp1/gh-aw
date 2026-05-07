@@ -268,7 +268,9 @@ func BuildAWFConfigJSON(config AWFCommandConfig) (string, error) {
 	}
 
 	// ── Models section (nested under apiProxy per AWF config schema) ──────────
-	if config.WorkflowData != nil && len(config.WorkflowData.ModelMappings) > 0 {
+	// apiProxy.models requires AWF v0.25.38+; skip for workflows that pin an older version
+	// to avoid "config.models is not supported" startup failures.
+	if config.WorkflowData != nil && len(config.WorkflowData.ModelMappings) > 0 && awfSupportsModels(firewallConfig) {
 		apiProxy.Models = config.WorkflowData.ModelMappings
 		awfConfigLog.Printf("Models section: %d alias entries", len(config.WorkflowData.ModelMappings))
 	}

@@ -684,3 +684,34 @@ func awfSupportsAllowHostPorts(firewallConfig *FirewallConfig) bool {
 	minVersion := string(constants.AWFAllowHostPortsMinVersion)
 	return semverutil.Compare(versionStr, minVersion) >= 0
 }
+
+// awfSupportsModels returns true when the effective AWF version supports the
+// apiProxy.models config field for model alias and fallback policy definitions.
+//
+// The apiProxy.models field was introduced in AWF v0.25.38. Any workflow that
+// pins an explicit version older than v0.25.38 must not emit apiProxy.models or
+// the run will fail at startup with "config.models is not supported".
+//
+// Special cases:
+//   - No version override (firewallConfig is nil or has no Version): use DefaultFirewallVersion
+//     and compare against AWFModelsMinVersion (currently this returns true because
+//     DefaultFirewallVersion is at or above the minimum supported version).
+//   - "latest": always returns true (latest is always a new release).
+//   - Any semver string ≥ AWFModelsMinVersion: returns true.
+//   - Any semver string < AWFModelsMinVersion: returns false.
+//   - Non-semver string (e.g. a branch name): returns false (conservative).
+func awfSupportsModels(firewallConfig *FirewallConfig) bool {
+	var versionStr string
+	if firewallConfig != nil && firewallConfig.Version != "" {
+		versionStr = firewallConfig.Version
+	} else {
+		versionStr = string(constants.DefaultFirewallVersion)
+	}
+
+	if strings.EqualFold(versionStr, "latest") {
+		return true
+	}
+
+	minVersion := string(constants.AWFModelsMinVersion)
+	return semverutil.Compare(versionStr, minVersion) >= 0
+}

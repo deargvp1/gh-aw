@@ -1173,8 +1173,73 @@ func TestAWFSupportsAllowHostPorts(t *testing.T) {
 	}
 }
 
-// TestGetGeminiAPITarget tests the GetGeminiAPITarget helper that resolves the effective
-// Gemini API target from GEMINI_API_BASE_URL in engine.env or the default endpoint.
+// TestAWFSupportsModels tests the awfSupportsModels version gate function.
+func TestAWFSupportsModels(t *testing.T) {
+	tests := []struct {
+		name           string
+		firewallConfig *FirewallConfig
+		want           bool
+	}{
+		{
+			name:           "nil firewall config returns true (uses default version)",
+			firewallConfig: nil,
+			want:           true,
+		},
+		{
+			name:           "empty version returns true (uses default version)",
+			firewallConfig: &FirewallConfig{},
+			want:           true,
+		},
+		{
+			name:           "latest returns true",
+			firewallConfig: &FirewallConfig{Version: "latest"},
+			want:           true,
+		},
+		{
+			name:           "v0.25.38 supports apiProxy.models (exact minimum version)",
+			firewallConfig: &FirewallConfig{Version: "v0.25.38"},
+			want:           true,
+		},
+		{
+			name:           "v0.25.41 supports apiProxy.models",
+			firewallConfig: &FirewallConfig{Version: "v0.25.41"},
+			want:           true,
+		},
+		{
+			name:           "v0.26.0 supports apiProxy.models",
+			firewallConfig: &FirewallConfig{Version: "v0.26.0"},
+			want:           true,
+		},
+		{
+			name:           "v0.25.37 does not support apiProxy.models",
+			firewallConfig: &FirewallConfig{Version: "v0.25.37"},
+			want:           false,
+		},
+		{
+			name:           "v0.25.0 does not support apiProxy.models",
+			firewallConfig: &FirewallConfig{Version: "v0.25.0"},
+			want:           false,
+		},
+		{
+			name:           "v0.24.0 does not support apiProxy.models",
+			firewallConfig: &FirewallConfig{Version: "v0.24.0"},
+			want:           false,
+		},
+		{
+			name:           "non-semver branch name returns false (conservative)",
+			firewallConfig: &FirewallConfig{Version: "main"},
+			want:           false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := awfSupportsModels(tt.firewallConfig)
+			assert.Equal(t, tt.want, got, "awfSupportsModels result")
+		})
+	}
+}
+
 func TestGetGeminiAPITarget(t *testing.T) {
 	tests := []struct {
 		name         string

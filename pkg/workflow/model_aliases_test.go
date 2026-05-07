@@ -151,6 +151,28 @@ func TestBuildAWFConfigJSON_ModelsSection(t *testing.T) {
 
 		assert.NotContains(t, jsonStr, `"models"`, "models section should be absent when ModelMappings is nil")
 	})
+
+	t.Run("no models section when firewall version is older than v0.25.38", func(t *testing.T) {
+		config := AWFCommandConfig{
+			EngineName:     "copilot",
+			AllowedDomains: "github.com",
+			WorkflowData: &WorkflowData{
+				EngineConfig: &EngineConfig{ID: "copilot"},
+				NetworkPermissions: &NetworkPermissions{
+					// Pin an old version that does not support apiProxy.models.
+					Firewall: &FirewallConfig{Enabled: true, Version: "v0.25.37"},
+				},
+				ModelMappings: MergeImportedModelAliases(nil, nil),
+			},
+		}
+
+		jsonStr, err := BuildAWFConfigJSON(config)
+		require.NoError(t, err, "BuildAWFConfigJSON should not return an error for old version")
+
+		// models must NOT appear when the pinned firewall version predates apiProxy.models support.
+		assert.NotContains(t, jsonStr, `"models"`,
+			"models section must be absent for firewall versions older than v0.25.38 to avoid startup failure")
+	})
 }
 
 // TestMergeImportedModelAliases verifies the three-layer merge: builtins → imports → main.
