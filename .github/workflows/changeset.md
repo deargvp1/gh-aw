@@ -1,10 +1,10 @@
 ---
 name: Changeset Generator
-description: Automatically creates changeset files when PRs are labeled with 'changeset' or 'smoke' to document changes for release notes
+description: Automatically creates changeset files when PRs are labeled with 'changeset' to document changes for release notes
 on:
   pull_request:
     types: [labeled]
-    names: ["changeset", "smoke"]
+    names: ["changeset"]
   workflow_dispatch:
   reaction: "rocket"
 if: github.event.pull_request.base.ref == github.event.repository.default_branch
@@ -158,4 +158,3 @@ Your task is to:
 - **Follow Conventions**: Use the exact changeset format specified above
 - **Single Package Default**: If unsure about package structure, default to "gh-aw"
 - **Smart Naming**: Use descriptive filenames that indicate the change (e.g., `patch-fix-rendering-bug.md`)
-

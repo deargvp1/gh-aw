@@ -88,7 +88,7 @@ checkout:
 
 ## Test Requirements
 
-1. **GitHub MCP Testing**: Use GitHub MCP tools to fetch details of exactly 2 merged pull requests from ${{ github.repository }} (title and number only, no descriptions)
+1. **GitHub MCP Testing**: Make exactly 1 GitHub MCP call to list pull requests (use `list_pull_requests` with `state: closed`, `sort: updated`, `direction: desc`, `perPage: 10`), then report exactly 2 merged PRs (`merged_at != null`) with title and number only (no descriptions). Do not call `pull_request_read`.
 2. **Serena MCP Testing**: 
    - Use the Serena MCP server tool `activate_project` to initialize the workspace at `${{ github.workspace }}` and verify it succeeds (do NOT use bash to run go commands)
    - After initialization, use the `find_symbol` tool to search for symbols and verify that at least 3 symbols are found in the results

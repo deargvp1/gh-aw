@@ -94,7 +94,7 @@ jobs:
     permissions:
       actions: read
       contents: read
-      issues: write
+      issues: read
       pull-requests: write
     outputs:
       body: ${{ steps.sanitized.outputs.body }}
@@ -1193,7 +1193,7 @@ jobs:
     permissions:
       contents: write
       discussions: write
-      issues: write
+      issues: read
       pull-requests: write
     concurrency:
       group: "gh-aw-conclusion-smoke-project"
@@ -1763,4 +1763,3 @@ jobs:
             actions/setup
           sparse-checkout-cone-mode: true
           persist-credentials: false
-

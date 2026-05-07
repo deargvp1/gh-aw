@@ -25,7 +25,7 @@ network:
 tools:
   cache-memory: true
   github:
-    toolsets: [repos, pull_requests]
+    toolsets: [pull_requests]
   edit:
   bash:
     - "*"
@@ -59,7 +59,7 @@ timeout-minutes: 10
 
 ## Test Requirements
 
-1. **GitHub MCP Testing**: Use GitHub MCP tools to fetch details of exactly 2 merged pull requests from ${{ github.repository }} (title and number only)
+1. **GitHub MCP Testing**: Make exactly 1 GitHub MCP call to list pull requests (use `list_pull_requests` with `state: closed`, `sort: updated`, `direction: desc`, `perPage: 10`), then report exactly 2 merged PRs (`merged_at != null`) with title and number only. Do not call `pull_request_read`.
 2. **Web Fetch Testing**: Use the web-fetch MCP tool to fetch https://github.com and verify the response contains "GitHub" (do NOT use bash or playwright for this test - use the web-fetch MCP tool directly)
 3. **File Writing Testing**: Create a test file `/tmp/gh-aw/agent/smoke-test-gemini-${{ github.run_id }}.txt` with content "Smoke test passed for Gemini at $(date)" (create the directory if it doesn't exist)
 4. **Bash Tool Testing**: Execute bash commands to verify file creation was successful (use `cat` to read the file back)

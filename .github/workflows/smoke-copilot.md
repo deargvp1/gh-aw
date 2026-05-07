@@ -157,7 +157,7 @@ These are **not** MCP protocol tools — they are bash executables. Call them wi
 
 ## Test Requirements
 
-1. **GitHub MCP Testing**: Review the last 2 merged pull requests in ${{ github.repository }}
+1. **GitHub MCP Testing**: Make exactly 1 GitHub MCP call to list pull requests (use `list_pull_requests` with `state: closed`, `sort: updated`, `direction: desc`, `perPage: 10`), then report exactly 2 merged PRs (`merged_at != null`) with title and number only. Do not call `pull_request_read` for this step.
 2. **MCP Scripts GH CLI Testing**: Use the `mcpscripts-gh` tool to query 2 pull requests from ${{ github.repository }} (use args: "pr list --repo ${{ github.repository }} --limit 2 --json number,title,author")
 3. **Serena CLI Testing**: 
    - Use bash to run `serena activate_project --path ${{ github.workspace }}` to initialize the workspace and verify it succeeds (do NOT use bash to run go commands - use the serena CLI only)
@@ -214,4 +214,3 @@ model: small
 description: Summarizes the content of a file in a few concise sentences
 ---
 You are a file summarization assistant. When given a file path, read the file and return a brief summary (2–4 sentences) describing its purpose and key contents. Be concise and factual.
-

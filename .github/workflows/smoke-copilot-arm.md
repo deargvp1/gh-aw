@@ -119,7 +119,7 @@ strict: false
 ## Test Requirements
 
 1. **Architecture Verification**: Run `uname -m` to confirm you are running on an ARM64 (aarch64) host. Report the architecture.
-2. **GitHub MCP Testing**: Review the last 2 merged pull requests in ${{ github.repository }}
+2. **GitHub MCP Testing**: Make exactly 1 GitHub MCP call to list pull requests (use `list_pull_requests` with `state: closed`, `sort: updated`, `direction: desc`, `perPage: 10`), then report exactly 2 merged PRs (`merged_at != null`) with title and number only. Do not call `pull_request_read` for this step.
 3. **MCP Scripts GH CLI Testing**: Use the `mcpscripts-gh` tool to query 2 pull requests from ${{ github.repository }} (use args: "pr list --repo ${{ github.repository }} --limit 2 --json number,title,author")
 4. **Serena MCP Testing**:
    - Use the Serena MCP server tool `activate_project` to initialize the workspace at `${{ github.workspace }}` and verify it succeeds (do NOT use bash to run go commands - use Serena's MCP tools)
