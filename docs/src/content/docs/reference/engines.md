@@ -216,6 +216,15 @@ Set `COPILOT_PROVIDER_BASE_URL` in `engine.env` to activate BYOK mode. The crede
 
 For providers that require short-lived OIDC tokens instead of static keys (for example Azure OpenAI with Entra-only auth), set `engine.auth.type: github-oidc`.
 
+This configuration is translated to AWF api-proxy auth settings at runtime:
+
+| `engine.auth` field | AWF setting |
+|---|---|
+| `type` | `AWF_AUTH_TYPE` |
+| `audience` | `AWF_AUTH_AUDIENCE` |
+
+`type` currently supports only `github-oidc`.
+
 ```yaml wrap
 permissions:
   id-token: write
@@ -232,6 +241,9 @@ engine:
 ```
 
 `audience` is optional. When omitted, the provider-side default audience behavior applies.
+
+> [!IMPORTANT]
+> OIDC BYOK requires `permissions: { id-token: write }` so GitHub Actions exposes `ACTIONS_ID_TOKEN_REQUEST_URL` and `ACTIONS_ID_TOKEN_REQUEST_TOKEN` for token acquisition.
 
 **Example: OpenAI-compatible provider**
 
