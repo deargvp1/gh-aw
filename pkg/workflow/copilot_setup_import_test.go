@@ -34,6 +34,13 @@ jobs:
     steps:
       - name: Install gh-aw extension
         run: curl -fsSL https://raw.githubusercontent.com/github/gh-aw/refs/heads/main/install-gh-aw.sh | bash
+      - name: Verify node availability
+        run: |
+          if ! command -v node &>/dev/null; then
+            echo "::error::node not found on PATH — install Node.js before running this workflow"
+            exit 1
+          fi
+          echo "node $(node --version) found at $(which node)"
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -94,27 +101,32 @@ This workflow imports copilot-setup-steps.yml and should have the imported steps
 
 	// Verify imported steps are present
 	assert.Contains(t, yamlStr, "Install gh-aw extension", "Imported install step should be in compiled workflow")
+	assert.Contains(t, yamlStr, "Verify node availability", "Imported node availability check should be in compiled workflow")
 	assert.Contains(t, yamlStr, "Set up Node.js", "Imported Node.js step should be in compiled workflow")
 	assert.Contains(t, yamlStr, "Set up Go", "Imported Go step should be in compiled workflow")
 
 	// Verify the order: copilot-setup-steps → custom steps (main frontmatter steps LAST)
 	customStepIndex := strings.Index(yamlStr, "My custom step")
 	installStepIndex := strings.Index(yamlStr, "Install gh-aw extension")
+	verifyNodeStepIndex := strings.Index(yamlStr, "Verify node availability")
 	nodeStepIndex := strings.Index(yamlStr, "Set up Node.js")
 	goStepIndex := strings.Index(yamlStr, "Set up Go")
 
 	require.NotEqual(t, -1, customStepIndex, "Custom step not found")
 	require.NotEqual(t, -1, installStepIndex, "Install step not found")
+	require.NotEqual(t, -1, verifyNodeStepIndex, "Node availability check step not found")
 	require.NotEqual(t, -1, nodeStepIndex, "Node.js step not found")
 	require.NotEqual(t, -1, goStepIndex, "Go step not found")
 
 	// Copilot-setup-steps should come BEFORE custom steps (custom steps are LAST)
 	assert.Less(t, installStepIndex, customStepIndex, "Install step should come before custom step (copilot-setup at start)")
+	assert.Less(t, verifyNodeStepIndex, customStepIndex, "Node availability check step should come before custom step (copilot-setup at start)")
 	assert.Less(t, nodeStepIndex, customStepIndex, "Node.js step should come before custom step (copilot-setup at start)")
 	assert.Less(t, goStepIndex, customStepIndex, "Go step should come before custom step (copilot-setup at start)")
 
 	// Verify the imported steps maintain their order
-	assert.Less(t, installStepIndex, nodeStepIndex, "Install step should come before Node.js step")
+	assert.Less(t, installStepIndex, verifyNodeStepIndex, "Install step should come before node availability check")
+	assert.Less(t, verifyNodeStepIndex, nodeStepIndex, "Node availability check should come before Node.js step")
 	assert.Less(t, nodeStepIndex, goStepIndex, "Node.js step should come before Go step")
 
 	// Verify that job-level fields are NOT present in the compiled workflow
