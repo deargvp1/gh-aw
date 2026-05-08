@@ -16,6 +16,7 @@ const mockCore = {
 };
 
 const mockGithub = {
+  graphql: vi.fn(),
   rest: {
     issues: {
       get: vi.fn(),
@@ -72,6 +73,7 @@ describe("update_issue.cjs - footer support", () => {
         html_url: "https://github.com/testowner/testrepo/issues/100",
       },
     });
+    mockGithub.graphql.mockReset();
   });
 
   describe("Footer addition", () => {
@@ -572,6 +574,34 @@ describe("update_issue.cjs - allow_body configuration", () => {
     expect(mockCore.warning).toHaveBeenCalledWith("Body update not allowed by safe-outputs configuration");
   });
 
+  it("should include normalized fields in update data", async () => {
+    const { buildIssueUpdateData } = await import("./update_issue.cjs");
+
+    const item = {
+      fields: [{ name: "Priority", value: "High" }],
+    };
+
+    const config = {};
+    const result = buildIssueUpdateData(item, config);
+
+    expect(result.success).toBe(true);
+    expect(result.data.fields).toEqual([{ name: "Priority", value: "High" }]);
+  });
+
+  it("should return actionable error for invalid fields payload", async () => {
+    const { buildIssueUpdateData } = await import("./update_issue.cjs");
+
+    const item = {
+      fields: "Priority=High",
+    };
+
+    const config = {};
+    const result = buildIssueUpdateData(item, config);
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain("update_issue 'fields' must be an array");
+  });
+
   it("should respect allow_body true with explicit operation", async () => {
     const { buildIssueUpdateData } = await import("./update_issue.cjs");
 
@@ -882,5 +912,130 @@ describe("update_issue.cjs - cross-repo and operation integration", () => {
     expect(capturedBody).not.toContain("Old island");
     expect(capturedBody).toContain("<!-- gh-aw-island-start:test-workflow -->");
     expect(capturedBody).toContain("<!-- gh-aw-island-end:test-workflow -->");
+  });
+});
+
+describe("update_issue.cjs - issue fields", () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.resetModules();
+    process.env.GH_AW_WORKFLOW_NAME = "Test Workflow";
+    process.env.GH_AW_WORKFLOW_ID = "test-workflow";
+  });
+
+  it("applies issue fields when provided", async () => {
+    mockGithub.rest.issues.update.mockResolvedValueOnce({
+      data: {
+        number: 100,
+        title: "Issue title",
+        body: "Body",
+        html_url: "https://github.com/testowner/testrepo/issues/100",
+      },
+    });
+
+    mockGithub.graphql
+      .mockResolvedValueOnce({
+        repository: {
+          issue: { id: "ISSUE_NODE_ID" },
+        },
+      })
+      .mockResolvedValueOnce({
+        repository: {
+          issueFields: {
+            nodes: [{ id: "FIELD_PRIORITY", name: "Priority", dataType: "SINGLE_SELECT", options: [{ id: "OPTION_HIGH", name: "High" }] }],
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        setIssueFieldValue: {
+          issue: { id: "ISSUE_NODE_ID" },
+        },
+      });
+
+    const { main } = await import("./update_issue.cjs");
+    const handler = await main({});
+    const result = await handler({ issue_number: 100, title: "Issue title", fields: [{ name: "Priority", value: "High" }] }, {});
+
+    expect(result.success).toBe(true);
+    const mutationCall = mockGithub.graphql.mock.calls.find(([query]) => query.includes("setIssueFieldValue"));
+    expect(mutationCall).toBeDefined();
+    expect(mutationCall[1].input.issueFields).toEqual([{ fieldId: "FIELD_PRIORITY", singleSelectOptionId: "OPTION_HIGH" }]);
+  });
+
+  it("supports fields-only updates without calling issues.update", async () => {
+    mockGithub.rest.issues.get.mockResolvedValueOnce({
+      data: {
+        number: 100,
+        title: "Existing issue title",
+        body: "Existing body",
+        html_url: "https://github.com/testowner/testrepo/issues/100",
+      },
+    });
+
+    mockGithub.graphql
+      .mockResolvedValueOnce({
+        repository: {
+          issue: { id: "ISSUE_NODE_ID" },
+        },
+      })
+      .mockResolvedValueOnce({
+        repository: {
+          issueFields: {
+            nodes: [{ id: "FIELD_PRIORITY", name: "Priority", dataType: "TEXT" }],
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        setIssueFieldValue: {
+          issue: { id: "ISSUE_NODE_ID" },
+        },
+      });
+
+    const { main } = await import("./update_issue.cjs");
+    const handler = await main({});
+    const result = await handler({ issue_number: 100, fields: [{ name: "Priority", value: "P1" }] }, {});
+
+    expect(result.success).toBe(true);
+    expect(mockGithub.rest.issues.update).not.toHaveBeenCalled();
+    expect(mockGithub.rest.issues.get).toHaveBeenCalledWith(
+      expect.objectContaining({
+        owner: "testowner",
+        repo: "testrepo",
+        issue_number: 100,
+      })
+    );
+  });
+
+  it("returns actionable error for unknown issue field names", async () => {
+    mockGithub.rest.issues.update.mockResolvedValueOnce({
+      data: {
+        number: 100,
+        title: "Issue title",
+        body: "Body",
+        html_url: "https://github.com/testowner/testrepo/issues/100",
+      },
+    });
+
+    mockGithub.graphql
+      .mockResolvedValueOnce({
+        repository: {
+          issue: { id: "ISSUE_NODE_ID" },
+        },
+      })
+      .mockResolvedValueOnce({
+        repository: {
+          issueFields: {
+            nodes: [{ id: "FIELD_PRIORITY", name: "Priority", dataType: "TEXT" }],
+          },
+        },
+      });
+
+    const { main } = await import("./update_issue.cjs");
+    const handler = await main({});
+    const result = await handler({ issue_number: 100, title: "Issue title", fields: [{ name: "Iteration", value: "Sprint 1" }] }, {});
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('unknown issue field "Iteration"');
+    expect(result.error).toContain("Available fields: Priority");
   });
 });

@@ -244,6 +244,13 @@ interface UpdateIssueItem extends BaseSafeOutputItem {
   title?: string;
   /** Optional new issue body */
   body?: string;
+  /** Optional issue fields to set */
+  fields?: Array<{
+    /** Issue field display name */
+    name: string;
+    /** Field value (string for text/single-select/iteration/date, number for numeric fields) */
+    value: string | number;
+  }>;
   /** Optional issue number for target "*" */
   issue_number?: number | string;
 }

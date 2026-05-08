@@ -202,7 +202,7 @@
     },
     "UpdateIssueOutput": {
       "title": "Update Issue Output",
-      "description": "Output for updating an existing issue. Note: The JavaScript validation ensures at least one of status, title, or body is provided.",
+      "description": "Output for updating an existing issue. Note: The JavaScript validation ensures at least one update field is provided.",
       "type": "object",
       "properties": {
         "type": {
@@ -220,6 +220,25 @@
         "body": {
           "type": "string",
           "description": "New body content for the issue"
+        },
+        "fields": {
+          "type": "array",
+          "description": "Optional issue fields to set after updating the issue",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Issue field name"
+              },
+              "value": {
+                "oneOf": [{ "type": "string" }, { "type": "number" }],
+                "description": "Issue field value"
+              }
+            },
+            "required": ["name", "value"],
+            "additionalProperties": false
+          }
         },
         "issue_number": {
           "oneOf": [{ "type": "number" }, { "type": "string" }],

@@ -203,18 +203,38 @@ func TestUpdatePullRequestValidationConfig(t *testing.T) {
 	}
 }
 
+func TestUpdateIssueValidationConfig(t *testing.T) {
+	config, ok := ValidationConfig["update_issue"]
+	if !ok {
+		t.Fatal("update_issue not found in ValidationConfig")
+	}
+
+	if config.CustomValidation != "requiresOneOf:status,title,body,labels,assignees,milestone,fields" {
+		t.Errorf(
+			"update_issue customValidation = %q, want %q",
+			config.CustomValidation,
+			"requiresOneOf:status,title,body,labels,assignees,milestone,fields",
+		)
+	}
+
+	if _, ok := config.Fields["fields"]; !ok {
+		t.Error("update_issue Fields is missing the 'fields' field")
+	}
+}
+
 func TestValidationConfigConsistency(t *testing.T) {
 	// Verify that all types with customValidation have valid validation rules
 	validCustomValidations := map[string]bool{
-		"requiresOneOf:status,title,body":        true,
-		"requiresOneOf:title,body":               true,
-		"requiresOneOf:title,body,update_branch": true,
-		"requiresOneOf:title,body,labels":        true,
-		"requiresOneOf:issue_number,pull_number": true,
-		"requiresOneOf:field_name,field_node_id": true,
-		"requiresOneOf:reviewers,team_reviewers": true,
-		"startLineLessOrEqualLine":               true,
-		"parentAndSubDifferent":                  true,
+		"requiresOneOf:status,title,body":                                   true,
+		"requiresOneOf:status,title,body,labels,assignees,milestone,fields": true,
+		"requiresOneOf:title,body":                                          true,
+		"requiresOneOf:title,body,update_branch":                            true,
+		"requiresOneOf:title,body,labels":                                   true,
+		"requiresOneOf:issue_number,pull_number":                            true,
+		"requiresOneOf:field_name,field_node_id":                            true,
+		"requiresOneOf:reviewers,team_reviewers":                            true,
+		"startLineLessOrEqualLine":                                          true,
+		"parentAndSubDifferent":                                             true,
 	}
 
 	for typeName, config := range ValidationConfig {

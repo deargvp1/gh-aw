@@ -68,8 +68,17 @@ describe("collect_ndjson_output.cjs", () => {
           },
           update_issue: {
             defaultMax: 1,
-            customValidation: "requiresOneOf:status,title,body",
-            fields: { status: { type: "string", enum: ["open", "closed"] }, title: { type: "string", sanitize: !0, maxLength: 128 }, body: { type: "string", sanitize: !0, maxLength: 65e3 }, issue_number: { issueOrPRNumber: !0 } },
+            customValidation: "requiresOneOf:status,title,body,labels,assignees,milestone,fields",
+            fields: {
+              status: { type: "string", enum: ["open", "closed"] },
+              title: { type: "string", sanitize: !0, maxLength: 128 },
+              body: { type: "string", sanitize: !0, maxLength: 65e3 },
+              labels: { type: "array", itemType: "string", itemSanitize: !0, itemMaxLength: 128 },
+              assignees: { type: "array", itemType: "string", itemSanitize: !0, itemMaxLength: 39 },
+              milestone: { optionalPositiveInteger: !0 },
+              fields: { type: "array" },
+              issue_number: { issueOrPRNumber: !0 },
+            },
           },
           create_pull_request_review_comment: {
             defaultMax: 1,

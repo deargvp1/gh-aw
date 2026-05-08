@@ -38,11 +38,15 @@ const SAMPLE_VALIDATION_CONFIG = {
   },
   update_issue: {
     defaultMax: 1,
-    customValidation: "requiresOneOf:status,title,body",
+    customValidation: "requiresOneOf:status,title,body,labels,assignees,milestone,fields",
     fields: {
       status: { type: "string", enum: ["open", "closed"] },
       title: { type: "string", sanitize: true, maxLength: 128 },
       body: { type: "string", sanitize: true, maxLength: 65000 },
+      labels: { type: "array", itemType: "string", itemSanitize: true, itemMaxLength: 128 },
+      assignees: { type: "array", itemType: "string", itemSanitize: true, itemMaxLength: 39 },
+      milestone: { optionalPositiveInteger: true },
+      fields: { type: "array" },
       issue_number: { issueOrPRNumber: true },
     },
   },
@@ -370,6 +374,14 @@ describe("safe_output_type_validator", () => {
       const { validateItem } = await import("./safe_output_type_validator.cjs");
 
       const result = validateItem({ type: "update_issue", status: "open" }, "update_issue", 1);
+
+      expect(result.isValid).toBe(true);
+    });
+
+    it("should pass for update_issue with fields-only payload", async () => {
+      const { validateItem } = await import("./safe_output_type_validator.cjs");
+
+      const result = validateItem({ type: "update_issue", fields: [{ name: "Priority", value: "High" }] }, "update_issue", 1);
 
       expect(result.isValid).toBe(true);
     });

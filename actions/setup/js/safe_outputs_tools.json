@@ -733,7 +733,7 @@
   },
   {
     "name": "update_issue",
-    "description": "Update an existing GitHub issue's status, title, or body. Use this to modify issue properties after creation. Only the fields you specify will be updated; other fields remain unchanged. IMPORTANT: The behavior of this tool depends on the workflow's `update-issue: target:` configuration. When `target: triggering` (the default), the tool always updates the issue that triggered the workflow and `issue_number` is ignored. When `target: '*'`, the `issue_number` field controls which issue is updated. The tool will fail (not skip silently) when `target: triggering` and there is no triggering issue (e.g., in scheduled or workflow_dispatch workflows).",
+    "description": "Update an existing GitHub issue's status, title, body, labels, assignees, milestone, or issue fields. Use this to modify issue properties after creation. Only the fields you specify will be updated; other fields remain unchanged. IMPORTANT: The behavior of this tool depends on the workflow's `update-issue: target:` configuration. When `target: triggering` (the default), the tool always updates the issue that triggered the workflow and `issue_number` is ignored. When `target: '*'`, the `issue_number` field controls which issue is updated. The tool will fail (not skip silently) when `target: triggering` and there is no triggering issue (e.g., in scheduled or workflow_dispatch workflows).",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -776,6 +776,25 @@
         "milestone": {
           "type": ["number", "string"],
           "description": "Milestone number to assign (e.g., 1). Use null to clear."
+        },
+        "fields": {
+          "type": "array",
+          "description": "Optional issue fields to set (e.g., Priority, Iteration, Start Date). Only specified fields are changed.",
+          "items": {
+            "type": "object",
+            "required": ["name", "value"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Issue field name exactly as configured in the repository (e.g., \"Priority\", \"Iteration\")."
+              },
+              "value": {
+                "type": ["string", "number"],
+                "description": "Field value. Use string for text, single-select, iteration, and date (YYYY-MM-DD) fields; use number for numeric fields."
+              }
+            },
+            "additionalProperties": false
+          }
         },
         "secrecy": {
           "type": "string",

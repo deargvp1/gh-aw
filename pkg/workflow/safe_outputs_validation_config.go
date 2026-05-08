@@ -160,7 +160,7 @@ var ValidationConfig = map[string]TypeValidationConfig{
 	},
 	"update_issue": {
 		DefaultMax:       1,
-		CustomValidation: "requiresOneOf:status,title,body",
+		CustomValidation: "requiresOneOf:status,title,body,labels,assignees,milestone,fields",
 		Fields: map[string]FieldValidation{
 			"status":       {Type: "string", Enum: []string{"open", "closed"}},
 			"title":        {Type: "string", Sanitize: true, MaxLength: 128},
@@ -169,6 +169,7 @@ var ValidationConfig = map[string]TypeValidationConfig{
 			"labels":       {Type: "array", ItemType: "string", ItemSanitize: true, ItemMaxLength: 128},
 			"assignees":    {Type: "array", ItemType: "string", ItemSanitize: true, ItemMaxLength: MaxGitHubUsernameLength},
 			"milestone":    {OptionalPositiveInteger: true},
+			"fields":       {Type: "array"},
 			"issue_number": {IssueOrPRNumber: true},
 			"repo":         {Type: "string", MaxLength: 256}, // Optional: target repository in format "owner/repo"
 		},
