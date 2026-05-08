@@ -630,10 +630,10 @@ gh aw mcp list workflow                    # List servers for workflow
 gh aw mcp list-tools <mcp-server>          # List tools for server
 gh aw mcp inspect workflow                 # Inspect and test servers
 gh aw mcp add                              # List available MCP servers from the registry
-gh aw mcp add <workflow> <server>          # Add MCP server to a workflow
+gh aw mcp add <workflow-id-or-file> <server>          # Add MCP server to a workflow
 ```
 
-`mcp add` with no arguments lists available servers from the MCP registry. Providing only a workflow ID (without a server name) is an error — both arguments are required to add a server.
+`mcp add` with no arguments lists available servers from the MCP registry. Providing only a workflow ID or file (without a server name) is an error — both arguments are required to add a server.
 
 See [MCPs Guide](/gh-aw/guides/mcps/).
 
