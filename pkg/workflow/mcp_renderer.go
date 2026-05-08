@@ -48,11 +48,20 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/github/gh-aw/pkg/logger"
 )
 
 var mcpRendererLog = logger.New("workflow:mcp_renderer")
+
+func durationStringToSeconds(durationValue string) (int, error) {
+	parsedDuration, err := time.ParseDuration(durationValue)
+	if err != nil {
+		return 0, err
+	}
+	return int(parsedDuration.Round(time.Second) / time.Second), nil
+}
 
 // NewMCPConfigRenderer creates a new unified MCP config renderer with the specified options
 func NewMCPConfigRenderer(opts MCPRendererOptions) *MCPConfigRendererUnified {
@@ -192,7 +201,11 @@ func RenderJSONMCPConfig(
 			fmt.Fprintf(&configBuilder, ",\n              \"sessionTimeout\": %q", options.GatewayConfig.SessionTimeout)
 		}
 		if options.GatewayConfig.ToolTimeout != "" {
-			fmt.Fprintf(&configBuilder, ",\n              \"toolTimeout\": %q", options.GatewayConfig.ToolTimeout)
+			toolTimeoutSeconds, err := durationStringToSeconds(options.GatewayConfig.ToolTimeout)
+			if err != nil {
+				return fmt.Errorf("failed to parse engine.mcp.tool-timeout %q for gateway.toolTimeout: %w", options.GatewayConfig.ToolTimeout, err)
+			}
+			fmt.Fprintf(&configBuilder, ",\n              \"toolTimeout\": %d", toolTimeoutSeconds)
 		}
 		// When OTLP tracing is configured, add the opentelemetry section directly to the
 		// gateway config. The endpoint is passed via the OTEL_EXPORTER_OTLP_ENDPOINT env var
