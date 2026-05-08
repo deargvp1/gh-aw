@@ -35,17 +35,17 @@ safe-outputs:
     close-older-issues: true
 timeout-minutes: 30
 strict: true
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[grafana-otel-advisor] "
       expires: 3d
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[grafana-otel-advisor] "
-      expires: 3d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 ---
 
 # Daily Grafana OTel Instrumentation Advisor

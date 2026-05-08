@@ -375,9 +375,13 @@ safe-outputs:
     max: 1
     close-older-issues: true
 
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - shared/otel.md
-  - shared/observability-otlp.md
 ---
 
 # Daily Model Inventory Checker

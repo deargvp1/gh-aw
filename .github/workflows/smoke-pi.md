@@ -16,11 +16,15 @@ engine:
   id: pi
   model: copilot/claude-sonnet-4-20250514
 strict: true
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - shared/gh.md
   - shared/reporting-otlp.md
-  - shared/observability-otlp.md
-  - shared/reporting.md
 network:
   allowed:
     - defaults

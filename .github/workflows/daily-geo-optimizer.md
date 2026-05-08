@@ -97,17 +97,16 @@ steps:
       name: geo-optimizer-results
       path: /tmp/gh-aw/geo-optimizer
 
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[geo-optimizer] "
       expires: 3d
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[geo-optimizer] "
-      expires: 3d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 ---
 
 {{#runtime-import? .github/shared-instructions.md}}

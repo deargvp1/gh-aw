@@ -8,6 +8,12 @@ permissions:
   pull-requests: read
   issues: read
 engine: copilot
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/skip-if-issue-open.md
     with:
@@ -19,8 +25,6 @@ imports:
       expires: "3d"
       labels: [chore, dead-code]
       reviewers: [copilot]
-  - shared/activation-app.md
-  - shared/reporting.md
 network:
   allowed:
     - defaults

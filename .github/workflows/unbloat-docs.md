@@ -37,6 +37,12 @@ engine:
   max-turns: 90  # Reduce from avg 115 turns
 
 # Shared instructions
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-pr-base.md
     with:
@@ -47,8 +53,6 @@ imports:
   - shared/docs-server-lifecycle.md
 
 # Network access for documentation best practices research
-  - shared/activation-app.md
-  - shared/reporting.md
 network:
   allowed:
     - defaults

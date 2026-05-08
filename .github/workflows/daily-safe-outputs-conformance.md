@@ -23,17 +23,17 @@ safe-outputs:
     close-older-issues: true
     max: 10
 timeout-minutes: 20
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[safe-outputs-conformance] "
       expires: 1d
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[safe-outputs-conformance] "
-      expires: 1d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 ---
 
 # Daily Safe Outputs Conformance Checker

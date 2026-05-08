@@ -40,19 +40,18 @@ safe-outputs:
     category: "announcements"
     title-prefix: "📰 "
     close-older-discussions: true
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[repo-chronicle] "
       expires: 3d
   - shared/trends.md
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[repo-chronicle] "
-      expires: 3d
-  - shared/observability-otlp.md
-  - shared/python-dataviz.md
-  - shared/reporting.md
 features:
   copilot-requests: true
 ---

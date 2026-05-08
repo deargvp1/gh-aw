@@ -22,17 +22,17 @@ safe-outputs:
   noop:
 timeout-minutes: 60
 strict: true
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[cli-tools-test] "
       expires: 3d
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[cli-tools-test] "
-      expires: 3d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 ---
 
 # Daily CLI Tools Exploratory Tester

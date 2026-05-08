@@ -18,17 +18,17 @@ tools:
     allowed: [get_repository, list_issues, issue_read]
 timeout-minutes: 5
 strict: true
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[auth-test] "
       expires: 1d
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[auth-test] "
-      expires: 1d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 ---
 # GitHub Remote MCP Authentication Test
 

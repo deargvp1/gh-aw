@@ -11,6 +11,11 @@ permissions:
 
 tracker-id: code-simplifier
 
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/skip-if-issue-open.md
     with:
@@ -23,8 +28,6 @@ imports:
       labels: [refactoring, code-quality, automation]
       reviewers: [copilot]
 
-  - shared/activation-app.md
-  - shared/reporting.md
 network:
   allowed:
     - go

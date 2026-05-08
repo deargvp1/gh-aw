@@ -285,6 +285,11 @@ steps:
     run: |
       find /tmp/gh-aw/daily-news-data/ -maxdepth 1 -ls
 
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/repo-memory-standard.md
     with:
@@ -297,13 +302,6 @@ imports:
       title-prefix: "[daily-news] "
       expires: 3d
   - shared/trends.md
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[daily-news] "
-      expires: 3d
-  - shared/observability-otlp.md
-  - shared/python-dataviz.md
-  - shared/reporting.md
 features:
   copilot-requests: true
 ---

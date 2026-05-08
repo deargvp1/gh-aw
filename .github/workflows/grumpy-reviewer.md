@@ -8,12 +8,16 @@ engine: codex
 permissions:
   contents: read
   pull-requests: read
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/pr-review-base.md
     with:
       min-integrity: approved
-  - shared/github-guard-policy.md
-  - shared/pr-code-review-config.md
 tools:
   cli-proxy: true
 safe-outputs:

@@ -29,6 +29,12 @@ safe-outputs:
     max: 1
     close-older-discussions: true
 timeout-minutes: 60
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/meta-analysis-base.md
     with:
@@ -36,7 +42,6 @@ imports:
   - shared/reporting.md
   - shared/noop-reminder.md
   - shared/otel.md
-  - shared/observability-otlp.md
 ---
 {{#runtime-import? .github/shared-instructions.md}}
 

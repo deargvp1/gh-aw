@@ -25,11 +25,15 @@ safe-outputs:
     run-success: "🔒 [{workflow_name}]({run_url}) completed the security review."
     run-failure: "⚠️ [{workflow_name}]({run_url}) {status} during security review."
 timeout-minutes: 15
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/pr-review-base.md
   - shared/security-analysis-base.md
-  - shared/github-guard-policy.md
-  - shared/pr-code-review-config.md
 ---
 
 # Security Review Agent 🔒

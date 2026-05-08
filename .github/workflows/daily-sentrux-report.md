@@ -6,18 +6,18 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[daily-sentrux] "
       expires: "3d"
   - shared/mcp/sentrux.md
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[daily-sentrux] "
-      expires: 3d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 network:
   allowed:
     - defaults

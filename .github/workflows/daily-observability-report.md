@@ -13,6 +13,12 @@ tracker-id: daily-observability-report
 tools:
   agentic-workflows: true
 timeout-minutes: 45
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/meta-analysis-base.md
     with:
@@ -21,12 +27,6 @@ imports:
     with:
       title-prefix: "[observability] "
       expires: 1d
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[observability] "
-      expires: 1d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 ---
 {{#runtime-import? .github/shared-instructions.md}}
 

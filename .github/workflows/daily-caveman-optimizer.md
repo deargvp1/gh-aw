@@ -44,9 +44,13 @@ tools:
 
 timeout-minutes: 30
 
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - shared/otel.md
-  - shared/observability-otlp.md
 ---
 
 # Daily Caveman Optimizer 🪨

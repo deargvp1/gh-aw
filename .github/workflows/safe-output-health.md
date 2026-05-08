@@ -13,6 +13,12 @@ tools:
   cli-proxy: true
 timeout-minutes: 30
 strict: true
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
@@ -20,12 +26,6 @@ imports:
       expires: 1d
   - shared/aw-logs-24h-fetch.md
   - shared/jqschema.md
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[safe-output-health] "
-      expires: 1d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 ---
 # Safe Output Health Monitor
 

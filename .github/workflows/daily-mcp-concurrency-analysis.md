@@ -14,6 +14,11 @@ permissions:
 tracker-id: mcp-concurrency-analysis
 engine: copilot
 
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
@@ -24,12 +29,6 @@ imports:
     with:
       languages: ["go", "typescript"]
 
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[mcp-concurrency] "
-      expires: 3d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 safe-outputs:
   create-issue:
     expires: 7d

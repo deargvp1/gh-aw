@@ -33,18 +33,17 @@ tools:
 
 timeout-minutes: 30
 
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[claude-code-user-docs-review] "
       expires: 1d
 
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[claude-code-user-docs-review] "
-      expires: 1d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 features:
   copilot-requests: true
 ---

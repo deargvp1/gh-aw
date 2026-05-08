@@ -37,6 +37,12 @@ experiments:
     issue: 30573
     analysis_type: mann_whitney
     tags: [output, readability, engagement]
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - shared/github-guard-policy.md
   - uses: shared/daily-audit-base.md
@@ -47,8 +53,6 @@ imports:
   - shared/python-dataviz.md
   - shared/python-nlp.md
   - shared/trends.md
-  - shared/observability-otlp.md
-  - shared/reporting.md
 ---
 {{#runtime-import? .github/shared-instructions.md}}
 

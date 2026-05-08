@@ -23,6 +23,12 @@ network:
 
 sandbox:
   agent: awf  # Firewall enabled (migrated from network.firewall)
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
@@ -37,13 +43,6 @@ imports:
   - shared/python-nlp.md
   - shared/reporting.md
 
-  - shared/copilot-pr-data-fetch.md
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[nlp-analysis] "
-      expires: 1d
-  - shared/jqschema.md
-  - shared/observability-otlp.md
 steps:
   - name: Fetch PR comments for detailed analysis
     env:

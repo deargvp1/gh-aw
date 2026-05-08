@@ -23,17 +23,17 @@ timeout-minutes: 30
 checkout:
   - fetch-depth: 1
     current: true
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[Schema Consistency] "
       expires: 1d
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[Schema Consistency] "
-      expires: 1d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 pre-agent-steps:
   - name: Precompute schema analysis data
     run: |

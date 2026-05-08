@@ -21,18 +21,18 @@ safe-outputs:
     expires: 1d
     max: 1
 timeout-minutes: 30
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - shared/mcp/sentry.md
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[token-consumption] "
       expires: 1d
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[token-consumption] "
-      expires: 1d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 ---
 
 {{#runtime-import? .github/shared-instructions.md}}

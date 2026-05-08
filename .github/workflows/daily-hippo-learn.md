@@ -47,12 +47,16 @@ safe-outputs:
     close-older-discussions: true
     max: 1
 
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - shared/hippo-memory.md
   - shared/reporting.md
   - shared/otel.md
 
-  - shared/observability-otlp.md
 features:
   copilot-requests: true
 ---

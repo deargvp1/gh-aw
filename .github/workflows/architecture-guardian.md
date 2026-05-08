@@ -9,6 +9,12 @@ permissions:
   actions: read
 engine: copilot
 tracker-id: architecture-guardian
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/skip-if-issue-open.md
     with:
@@ -19,8 +25,6 @@ imports:
       expires: "2d"
       labels: [architecture, automated-analysis, cookie]
       assignees: [copilot]
-  - shared/activation-app.md
-  - shared/reporting.md
 tools:
   cli-proxy: true
   bash:

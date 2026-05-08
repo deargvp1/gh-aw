@@ -18,12 +18,16 @@ tools:
     toolsets: [default, discussions]
   bash: true
 timeout-minutes: 20
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[daily secrets] "
-  - shared/observability-otlp.md
-  - shared/reporting.md
 features:
   copilot-requests: true
 ---

@@ -28,17 +28,17 @@ safe-outputs:
     labels: [cookie]
 timeout-minutes: 45
 strict: true
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[repo-audit] "
       expires: 1d
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[repo-audit] "
-      expires: 1d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 ---
 # Repository Audit & Agentic Workflow Opportunity Analyzer
 

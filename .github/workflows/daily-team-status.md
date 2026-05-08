@@ -12,17 +12,17 @@ permissions:
   pull-requests: read
 tracker-id: daily-team-status
 network: defaults
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[team-status] "
       expires: 1d
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[team-status] "
-      expires: 1d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 safe-outputs:
   create-issue:
     expires: 1d

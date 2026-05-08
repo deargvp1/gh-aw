@@ -10,6 +10,12 @@ permissions:
   actions: read
 tracker-id: refactoring-cadence
 engine: copilot
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/skip-if-issue-open.md
     with:
@@ -19,8 +25,6 @@ imports:
       title-prefix: "[refactoring-cadence] "
       expires: "14d"
       labels: [refactoring, ai-generated]
-  - shared/activation-app.md
-  - shared/reporting.md
 tools:
   cli-proxy: true
   github:

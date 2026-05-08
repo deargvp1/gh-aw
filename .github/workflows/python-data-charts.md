@@ -12,10 +12,14 @@ tools:
   cli-proxy: true
   agentic-workflows:
   edit:
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - shared/charts-with-trending.md
-  - shared/python-dataviz.md
-  - shared/trends.md
 safe-outputs:
   upload-artifact:
     max-uploads: 3

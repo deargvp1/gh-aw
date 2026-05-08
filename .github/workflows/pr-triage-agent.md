@@ -8,12 +8,16 @@ permissions:
   issues: read
   pull-requests: read
 engine: copilot
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/pr-review-base.md
     with:
       min-integrity: approved
-  - shared/github-guard-policy.md
-  - shared/pr-code-review-config.md
 tools:
   cli-proxy: true
   github:

@@ -20,14 +20,18 @@ tools:
   bash: true
 timeout-minutes: 30
 strict: true
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[daily-code-metrics] "
   - shared/python-dataviz.md
   - shared/trends.md
-  - shared/observability-otlp.md
-  - shared/reporting.md
 ---
 {{#runtime-import? .github/shared-instructions.md}}
 

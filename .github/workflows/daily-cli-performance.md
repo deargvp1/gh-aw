@@ -55,18 +55,18 @@ safe-outputs:
     max: 5
 timeout-minutes: 20
 strict: true
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[daily-cli-performance] "
       expires: 3d
   - shared/go-make.md
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[daily-cli-performance] "
-      expires: 3d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 features:
   copilot-requests: true
 if: needs.pre_activation.outputs.has_changes == 'true' || github.event_name == 'workflow_dispatch'

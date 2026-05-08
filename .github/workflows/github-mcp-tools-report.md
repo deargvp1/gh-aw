@@ -27,12 +27,16 @@ safe-outputs:
     draft: false
     protected-files: fallback-to-issue
 timeout-minutes: 15
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[mcp-tools-report] "
-  - shared/observability-otlp.md
-  - shared/reporting.md
 ---
 # GitHub MCP Remote Server Tools Report Generator
 

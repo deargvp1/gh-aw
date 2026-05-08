@@ -22,18 +22,18 @@ tools:
     toolsets: [all]
   cache-memory:
     key: mcp-response-analysis-${{ github.workflow }}
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[mcp-analysis] "
       expires: 1d
   - shared/python-dataviz.md
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[mcp-analysis] "
-      expires: 1d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 ---
 # GitHub MCP Structural Analysis
 

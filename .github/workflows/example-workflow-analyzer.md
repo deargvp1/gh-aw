@@ -10,6 +10,12 @@ permissions:
   actions: read
 engine: claude
 timeout-minutes: 10
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/meta-analysis-base.md
     with:
@@ -18,12 +24,6 @@ imports:
     with:
       title-prefix: "[workflow-analysis] "
       expires: 1d
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[workflow-analysis] "
-      expires: 1d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 ---
 # Weekly Workflow Analysis
 

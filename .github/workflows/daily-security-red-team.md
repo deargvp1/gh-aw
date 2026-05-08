@@ -25,18 +25,18 @@ safe-outputs:
 timeout-minutes: 60
 features:
   inline-agents: true
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - shared/security-analysis-base.md
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[security-red-team] "
       expires: 3d
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[security-red-team] "
-      expires: 3d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 ---
 
 # Daily Security Red Team Agent

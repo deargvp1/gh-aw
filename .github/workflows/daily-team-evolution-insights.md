@@ -24,17 +24,17 @@ tools:
     mode: local
     toolsets: [repos, issues, pull_requests, discussions]
 timeout-minutes: 90
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[daily-team-evolution] "
       expires: 1d
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[daily-team-evolution] "
-      expires: 1d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 ---
 # Daily Team Evolution Insights
 

@@ -62,18 +62,17 @@ network:
     - node
     - chrome
 
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - shared/docs-server-lifecycle.md
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[multi-device-docs] "
       expires: 3d
-  - uses: shared/daily-audit-discussion.md
-    with:
-      title-prefix: "[multi-device-docs] "
-      expires: 3d
-  - shared/observability-otlp.md
-  - shared/reporting.md
 ---
 
 {{#runtime-import? .github/shared-instructions.md}}

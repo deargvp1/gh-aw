@@ -40,10 +40,15 @@ network:
     - defaults
     - github
     - go
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - shared/reporting.md
   - shared/otel.md
-  - shared/observability-otlp.md
 ---
 
 # Daily AW Cross-Repo Compilation Agent

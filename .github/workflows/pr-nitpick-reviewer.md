@@ -9,11 +9,15 @@ permissions:
   pull-requests: read
   actions: read
 engine: copilot
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/pr-review-base.md
   - shared/reporting.md
-  - shared/github-guard-policy.md
-  - shared/pr-code-review-config.md
 tools:
   cli-proxy: true
 safe-outputs:

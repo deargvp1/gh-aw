@@ -23,11 +23,16 @@ safe-outputs:
     title-prefix: "[ci-coach] "
     protected-files: fallback-to-issue
 timeout-minutes: 30
+
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - shared/ci-data-analysis.md
   - shared/ci-optimization-strategies.md
   - shared/reporting.md
-  - shared/jqschema.md
 features:
   copilot-requests: true
 ---

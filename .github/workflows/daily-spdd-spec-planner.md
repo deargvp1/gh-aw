@@ -14,6 +14,11 @@ tracker-id: daily-spdd-spec-planner
 engine: copilot
 strict: true
 
+observability:
+  otlp:
+    endpoint: ${{ secrets.GH_AW_OTEL_ENDPOINT }}
+    headers: ${{ secrets.GH_AW_OTEL_HEADERS }}
+
 imports:
   - uses: shared/daily-issue-base.md
     with:
@@ -22,8 +27,6 @@ imports:
       labels: [spdd, specifications, planning, automation]
       assignees: [copilot]
 
-  - shared/activation-app.md
-  - shared/reporting.md
 tools:
   cli-proxy: true
   github:
