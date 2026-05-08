@@ -195,31 +195,31 @@ func (c *Compiler) buildConclusionJobAgentFailureEnvVars(
 	}
 
 	// Pass assignment error outputs from safe_outputs job if assign-to-agent is configured
-	if data.SafeOutputs != nil && data.SafeOutputs.AssignToAgent != nil {
+	if slices.Contains(safeOutputJobNames, string(constants.SafeOutputsJobName)) && data.SafeOutputs != nil && data.SafeOutputs.AssignToAgent != nil {
 		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_ASSIGNMENT_ERRORS: ${{ needs.safe_outputs.outputs.assign_to_agent_assignment_errors }}\n")
 		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_ASSIGNMENT_ERROR_COUNT: ${{ needs.safe_outputs.outputs.assign_to_agent_assignment_error_count }}\n")
 	}
 
 	// Pass copilot assignment failure outputs if create-issue with copilot assignee is configured
-	if data.SafeOutputs != nil && data.SafeOutputs.CreateIssues != nil && hasCopilotAssignee(data.SafeOutputs.CreateIssues.Assignees) {
+	if slices.Contains(safeOutputJobNames, string(constants.SafeOutputsJobName)) && data.SafeOutputs != nil && data.SafeOutputs.CreateIssues != nil && hasCopilotAssignee(data.SafeOutputs.CreateIssues.Assignees) {
 		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_ASSIGN_COPILOT_FAILURE_COUNT: ${{ needs.safe_outputs.outputs.assign_copilot_failure_count }}\n")
 		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_ASSIGN_COPILOT_ERRORS: ${{ needs.safe_outputs.outputs.assign_copilot_errors }}\n")
 	}
 
 	// Pass create_discussion error outputs if create-discussions is configured
-	if data.SafeOutputs != nil && data.SafeOutputs.CreateDiscussions != nil {
+	if slices.Contains(safeOutputJobNames, string(constants.SafeOutputsJobName)) && data.SafeOutputs != nil && data.SafeOutputs.CreateDiscussions != nil {
 		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_CREATE_DISCUSSION_ERRORS: ${{ needs.safe_outputs.outputs.create_discussion_errors }}\n")
 		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_CREATE_DISCUSSION_ERROR_COUNT: ${{ needs.safe_outputs.outputs.create_discussion_error_count }}\n")
 	}
 
 	// Pass code-push failure outputs if push-to-pull-request-branch or create-pull-request is configured
-	if data.SafeOutputs != nil && (data.SafeOutputs.PushToPullRequestBranch != nil || data.SafeOutputs.CreatePullRequests != nil) {
+	if slices.Contains(safeOutputJobNames, string(constants.SafeOutputsJobName)) && data.SafeOutputs != nil && (data.SafeOutputs.PushToPullRequestBranch != nil || data.SafeOutputs.CreatePullRequests != nil) {
 		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_CODE_PUSH_FAILURE_ERRORS: ${{ needs.safe_outputs.outputs.code_push_failure_errors }}\n")
 		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_CODE_PUSH_FAILURE_COUNT: ${{ needs.safe_outputs.outputs.code_push_failure_count }}\n")
 	}
 
 	// Pass GitHub App token minting failure status
-	if data.SafeOutputs != nil && data.SafeOutputs.GitHubApp != nil {
+	if slices.Contains(safeOutputJobNames, string(constants.SafeOutputsJobName)) && data.SafeOutputs != nil && data.SafeOutputs.GitHubApp != nil {
 		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_SAFE_OUTPUTS_APP_TOKEN_MINTING_FAILED: ${{ needs.safe_outputs.outputs.app_token_minting_failed }}\n")
 		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_CONCLUSION_APP_TOKEN_MINTING_FAILED: ${{ steps.safe-outputs-app-token.outcome == 'failure' }}\n")
 	}
@@ -307,7 +307,7 @@ func buildConclusionJobCondition(mainJobName string, safeOutputJobNames []string
 
 	// Check that agent job was activated (not skipped)
 	agentNotSkipped := BuildNotEquals(
-		BuildPropertyAccess(fmt.Sprintf("needs.%s.result", constants.AgentJobName)),
+		BuildPropertyAccess(fmt.Sprintf("needs.%s.result", mainJobName)),
 		BuildStringLiteral("skipped"),
 	)
 
