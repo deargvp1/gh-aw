@@ -316,10 +316,10 @@ func TestBuildAWFConfigJSON_SchemaURLIsVersionPinned(t *testing.T) {
 // BuildAWFConfigJSON always satisfies the embedded AWF config JSON schema.
 //
 // validateAWFConfigJSON is intentionally not called in the production hot path
-// (see BuildAWFConfigJSON) to avoid the per-compilation overhead of re-marshaling
-// and schema-validating compiler-generated output.  This test is the authoritative
-// coverage for schema compliance and must be updated whenever AWFConfigFile or the
-// embedded schema changes.
+// (see BuildAWFConfigJSON) to avoid the per-compilation overhead of unmarshaling/
+// re-parsing and schema-validating compiler-generated output.  This test is the
+// authoritative coverage for schema compliance and must be updated whenever
+// AWFConfigFile or the embedded schema changes.
 func TestBuildAWFConfigJSON_SchemaCompliance(t *testing.T) {
 	cases := []struct {
 		name   string
