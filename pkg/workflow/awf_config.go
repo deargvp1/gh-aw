@@ -100,6 +100,12 @@ func getCompiledAWFConfigSchema() (*jsonschema.Schema, error) {
 
 // validateAWFConfigJSON validates the provided AWF config JSON string against the
 // embedded AWF config schema. Returns nil if validation passes.
+//
+// This function is intentionally not called in the production BuildAWFConfigJSON hot
+// path: AWFConfigFile is a typed Go struct whose JSON encoding always satisfies the
+// schema, so runtime validation is redundant and adds measurable overhead (extra
+// json.Unmarshal + jsonschema.Validate on every compilation).  Call it from tests to
+// verify schema compliance when the AWFConfigFile struct or schema changes.
 func validateAWFConfigJSON(configJSON string) error {
 	schema, err := getCompiledAWFConfigSchema()
 	if err != nil {
@@ -290,10 +296,6 @@ func BuildAWFConfigJSON(config AWFCommandConfig) (string, error) {
 	}
 
 	awfConfigLog.Printf("AWF config JSON generated: %d bytes", len(jsonStr))
-
-	if err := validateAWFConfigJSON(jsonStr); err != nil {
-		return "", fmt.Errorf("generated AWF config failed schema validation: %w", err)
-	}
 
 	return jsonStr, nil
 }

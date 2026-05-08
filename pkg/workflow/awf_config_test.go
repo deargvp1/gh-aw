@@ -312,6 +312,121 @@ func TestBuildAWFConfigJSON_SchemaURLIsVersionPinned(t *testing.T) {
 	})
 }
 
+// TestBuildAWFConfigJSON_SchemaCompliance verifies that the JSON produced by
+// BuildAWFConfigJSON always satisfies the embedded AWF config JSON schema.
+//
+// validateAWFConfigJSON is intentionally not called in the production hot path
+// (see BuildAWFConfigJSON) to avoid the per-compilation overhead of re-marshaling
+// and schema-validating compiler-generated output.  This test is the authoritative
+// coverage for schema compliance and must be updated whenever AWFConfigFile or the
+// embedded schema changes.
+func TestBuildAWFConfigJSON_SchemaCompliance(t *testing.T) {
+	cases := []struct {
+		name   string
+		config AWFCommandConfig
+	}{
+		{
+			name: "basic copilot config with network and container",
+			config: AWFCommandConfig{
+				EngineName:     "copilot",
+				AllowedDomains: "github.com,api.github.com",
+				WorkflowData: &WorkflowData{
+					EngineConfig: &EngineConfig{ID: "copilot"},
+					NetworkPermissions: &NetworkPermissions{
+						Firewall: &FirewallConfig{Enabled: true},
+					},
+				},
+			},
+		},
+		{
+			name: "claude config with blocked domains",
+			config: AWFCommandConfig{
+				EngineName:     "claude",
+				AllowedDomains: "github.com",
+				WorkflowData: &WorkflowData{
+					EngineConfig: &EngineConfig{ID: "claude"},
+					NetworkPermissions: &NetworkPermissions{
+						Blocked:  []string{"ads.example.com"},
+						Firewall: &FirewallConfig{Enabled: true},
+					},
+				},
+			},
+		},
+		{
+			name: "empty domains config",
+			config: AWFCommandConfig{
+				EngineName:     "copilot",
+				AllowedDomains: "",
+				WorkflowData: &WorkflowData{
+					EngineConfig: &EngineConfig{ID: "copilot"},
+					NetworkPermissions: &NetworkPermissions{
+						Firewall: &FirewallConfig{Enabled: true},
+					},
+				},
+			},
+		},
+		{
+			name: "config with model mappings (user-provided model aliases)",
+			config: AWFCommandConfig{
+				EngineName:     "claude",
+				AllowedDomains: "github.com",
+				WorkflowData: &WorkflowData{
+					EngineConfig: &EngineConfig{ID: "claude"},
+					ModelMappings: map[string][]string{
+						"sonnet": {"claude-3-5-sonnet-*"},
+						"haiku":  {"claude-3-haiku-*"},
+					},
+					NetworkPermissions: &NetworkPermissions{
+						Firewall: &FirewallConfig{Enabled: true},
+					},
+				},
+			},
+		},
+		{
+			name: "config with custom API targets (user-provided env vars)",
+			config: AWFCommandConfig{
+				EngineName:     "claude",
+				AllowedDomains: "github.com",
+				WorkflowData: &WorkflowData{
+					EngineConfig: &EngineConfig{
+						ID: "claude",
+						Env: map[string]string{
+							"ANTHROPIC_BASE_URL": "https://my-proxy.internal.example.com/v1",
+						},
+					},
+					NetworkPermissions: &NetworkPermissions{
+						Firewall: &FirewallConfig{Enabled: true},
+					},
+				},
+			},
+		},
+		{
+			name: "config with pinned firewall version",
+			config: AWFCommandConfig{
+				EngineName:     "copilot",
+				AllowedDomains: "github.com",
+				WorkflowData: &WorkflowData{
+					EngineConfig: &EngineConfig{ID: "copilot"},
+					NetworkPermissions: &NetworkPermissions{
+						Firewall: &FirewallConfig{Enabled: true, Version: "v0.25.0"},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			jsonStr, err := BuildAWFConfigJSON(tc.config)
+			require.NoError(t, err, "BuildAWFConfigJSON should not return an error")
+
+			// Validate the generated JSON against the embedded schema.
+			err = validateAWFConfigJSON(jsonStr)
+			assert.NoError(t, err, "generated AWF config must satisfy the embedded JSON schema")
+		})
+	}
+}
+
 // TestBuildAWFConfigJSON_DomainDeduplication verifies that duplicate domain entries
 // in the comma-separated allowed domains list are removed.
 func TestBuildAWFConfigJSON_DomainDeduplication(t *testing.T) {
