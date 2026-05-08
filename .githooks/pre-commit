@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+staged_workflow_md_files="$(git diff --cached --name-only --diff-filter=ACMR | grep -E '^\.github/workflows/.*\.md$' || true)"
+if [ -z "$staged_workflow_md_files" ]; then
+	exit 0
+fi
+
+echo "Detected staged workflow markdown changes. Running make recompile..."
+make recompile
+
+if ! git diff --quiet -- .github/workflows; then
+	echo "Workflow lock files are out of sync after recompilation."
+	echo "Stage the updated .lock.yml files and commit again."
+	git --no-pager diff --name-only -- .github/workflows | grep -E '\.lock\.yml$' || true
+	exit 1
+fi

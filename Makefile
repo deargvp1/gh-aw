@@ -691,6 +691,12 @@ sync-action-scripts:
 	@chmod +x actions/setup-cli/install.sh
 	@echo "✓ Action scripts synced successfully"
 
+.PHONY: install-git-hooks
+install-git-hooks:
+	@git config core.hooksPath .githooks
+	@chmod +x .githooks/pre-commit
+	@echo "✓ Git hooks installed (core.hooksPath=.githooks)"
+
 # Recompile all workflow files
 .PHONY: recompile
 recompile: build
@@ -829,6 +835,7 @@ help:
 	@echo "  install          - Install binary locally"
 	@echo "  sync-action-pins - Sync actions-lock.json from .github/aw to pkg/actionpins/data and pkg/workflow/data (runs automatically during build)"
 	@echo "  sync-action-scripts - Sync install-gh-aw.sh to actions/setup-cli/install.sh (runs automatically during build)"
+	@echo "  install-git-hooks - Install repository git hooks (sets core.hooksPath=.githooks)"
 	@echo "  update           - Update GitHub Actions and workflows, sync action pins, and rebuild binary"
 	@echo "  fix              - Apply automatic codemod-style fixes to workflow files (depends on build)"
 	@echo "  recompile        - Recompile all workflow files (runs init, depends on build)"
