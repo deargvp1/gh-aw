@@ -1,9 +1,11 @@
 {
-  "total_runs": 2,
-  "total_findings": 20,
-  "total_tasks": 6,
-  "avg_success_score": 7.5,
-  "last_run": "2026-05-07",
+  "total_runs": 3,
+  "total_findings": 27,
+  "total_tasks": 9,
+  "avg_success_score": 7.7,
+  "last_run": "2026-05-08",
   "most_successful_strategy": "deep-error-analysis-plus-symbol-naming",
-  "serena_lsp_status": "OPERATIONAL as of 2026-05-07. Key parameter changes: activate_project uses --project, find_symbol uses --name_path_pattern, find_referencing_symbols requires --name_path and --relative_path (file, not dir). Use JSON stdin pipe with '.' sentinel for multi-param calls."
+  "serena_lsp_status": "OPERATIONAL as of 2026-05-07. Key parameter changes: activate_project uses --project, find_symbol uses --name_path_pattern, find_referencing_symbols requires --name_path and --relative_path (file, not dir). search_for_pattern requires --substring_pattern (literal string, not regex). Use JSON stdin pipe with '.' sentinel for multi-param calls.",
+  "type_assertion_scan_result": "Only 5 type assertions found in all of pkg/ (non-test). All 5 use safe comma-ok pattern. No unsafe raw assertions. Run 3 2026-05-08.",
+  "http_request_scan_result": "1 remaining http.NewRequest (without context) in pkg/cli/mcp_registry.go:56. All others use http.NewRequestWithContext. Run 3 2026-05-08."
 }

@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-07T00:00:00Z",
+  "last_updated": "2026-05-08T00:00:00Z",
   "tools": [
     {"name": "activate_project", "description": "Activates the project with the given name or path (param: --project)"},
     {"name": "check_onboarding_performed", "description": "Checks whether project onboarding was already performed"},
@@ -19,11 +19,11 @@
     {"name": "read_memory", "description": "Read the content of a memory file"},
     {"name": "rename_symbol", "description": "Renames the symbol with the given name_path to new_name throughout the entire codebase"},
     {"name": "replace_symbol_body", "description": "Replaces the body of the symbol with the given name_path"},
-    {"name": "search_for_pattern", "description": "Flexible search for arbitrary patterns in the codebase"},
+    {"name": "search_for_pattern", "description": "Flexible search for arbitrary patterns in the codebase (param: --substring_pattern required, not regex)"},
     {"name": "think_about_collected_information", "description": "Think about collected information"},
     {"name": "think_about_task_adherence", "description": "Think about task adherence"},
     {"name": "think_about_whether_you_are_done", "description": "Think about whether you are done"},
     {"name": "write_memory", "description": "Write a memory file"}
   ],
-  "notes": "Run 2 (2026-05-07): LSP tools fully operational. get_symbols_overview, find_symbol, find_referencing_symbols all working. Key: activate_project uses --project param (not --path). find_symbol uses --name_path_pattern. find_referencing_symbols requires both --name_path and --relative_path. Pipe JSON with '.' sentinel for multi-param calls."
+  "notes": "Run 3 (2026-05-08): No tool changes vs Run 2. 23 tools total. search_for_pattern requires --substring_pattern (not regex). find_referencing_symbols uses --name_path + --relative_path (file path, not dir). All LSP tools operational."
 }
