@@ -2,13 +2,13 @@
 tools:
   bash:
     - "jq *"
-    - "/tmp/gh-aw/jqschema.sh"
+    - "${RUNNER_TEMP}/gh-aw/actions/jqschema.sh"
     - "git"
 ---
 
 ## jqschema - JSON Schema Discovery
 
-A utility script is available at `/tmp/gh-aw/jqschema.sh` to help you discover the structure of complex JSON responses. The script is pre-installed by the gh-aw setup action.
+A utility script is available at `${RUNNER_TEMP}/gh-aw/actions/jqschema.sh` to help you discover the structure of complex JSON responses. The script is pre-installed by the gh-aw setup action.
 
 ### Purpose
 
@@ -22,11 +22,11 @@ Generate a compact structural schema (keys + types) from JSON input. This is par
 
 ```bash
 # Analyze a file
-cat data.json | /tmp/gh-aw/jqschema.sh
+cat data.json | ${RUNNER_TEMP}/gh-aw/actions/jqschema.sh
 
 # Analyze command output
-echo '{"name": "test", "count": 42, "items": [{"id": 1}]}' | /tmp/gh-aw/jqschema.sh
+echo '{"name": "test", "count": 42, "items": [{"id": 1}]}' | ${RUNNER_TEMP}/gh-aw/actions/jqschema.sh
 
 # Analyze GitHub search results
-gh api search/repositories?q=language:go | /tmp/gh-aw/jqschema.sh
+gh api search/repositories?q=language:go | ${RUNNER_TEMP}/gh-aw/actions/jqschema.sh
 ```

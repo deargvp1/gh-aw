@@ -27,7 +27,7 @@ tools:
   bash:
     - "cat *"
     - "jq *"
-    - "/tmp/gh-aw/jqschema.sh"
+    - "${RUNNER_TEMP}/gh-aw/actions/jqschema.sh"
 steps:
   - name: Fetch issues
     env:
@@ -49,7 +49,7 @@ steps:
         > /tmp/gh-aw/issues-data/issues.json
 
       # Generate schema for reference using jqschema
-      /tmp/gh-aw/jqschema.sh < /tmp/gh-aw/issues-data/issues.json > /tmp/gh-aw/issues-data/issues-schema.json
+      ${RUNNER_TEMP}/gh-aw/actions/jqschema.sh < /tmp/gh-aw/issues-data/issues.json > /tmp/gh-aw/issues-data/issues-schema.json
 
       echo "✓ Issues data saved to /tmp/gh-aw/issues-data/issues.json"
       echo "✓ Schema saved to /tmp/gh-aw/issues-data/issues-schema.json"

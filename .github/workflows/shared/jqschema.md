@@ -2,13 +2,13 @@
 tools:
   bash:
     - "jq *"
-    - "/tmp/gh-aw/jqschema.sh"
+    - "${RUNNER_TEMP}/gh-aw/actions/jqschema.sh"
     - "git"
 ---
 
 ## jqschema - JSON Schema Discovery
 
-A utility script is available at `/tmp/gh-aw/jqschema.sh` to help you discover the structure of complex JSON responses.
+A utility script is available at `${RUNNER_TEMP}/gh-aw/actions/jqschema.sh` to help you discover the structure of complex JSON responses.
 
 ### Purpose
 
@@ -22,13 +22,13 @@ Generate a compact structural schema (keys + types) from JSON input. This is par
 
 ```bash
 # Analyze a file
-cat data.json | /tmp/gh-aw/jqschema.sh
+cat data.json | ${RUNNER_TEMP}/gh-aw/actions/jqschema.sh
 
 # Analyze command output
-echo '{"name": "test", "count": 42, "items": [{"id": 1}]}' | /tmp/gh-aw/jqschema.sh
+echo '{"name": "test", "count": 42, "items": [{"id": 1}]}' | ${RUNNER_TEMP}/gh-aw/actions/jqschema.sh
 
 # Analyze GitHub search results
-gh api search/repositories?q=language:go | /tmp/gh-aw/jqschema.sh
+gh api search/repositories?q=language:go | ${RUNNER_TEMP}/gh-aw/actions/jqschema.sh
 ```
 
 ### How It Works
@@ -69,7 +69,7 @@ The script transforms JSON data by:
 ```bash
 # Step 1: Get schema with minimal data (fetch just 1 result)
 # This helps understand the structure before requesting large datasets
-echo '{}' | gh api search/repositories -f q="language:go" -f per_page=1 | /tmp/gh-aw/jqschema.sh
+echo '{}' | gh api search/repositories -f q="language:go" -f per_page=1 | ${RUNNER_TEMP}/gh-aw/actions/jqschema.sh
 
 # Output shows the schema:
 # {"incomplete_results":"boolean","items":[{...}],"total_count":"number"}
@@ -87,7 +87,7 @@ When using tools like `search_code`, `search_issues`, or `search_repositories`, 
 gh api search/code -f q="jq in:file language:bash" -f per_page=1 > /tmp/sample.json
 
 # Generate schema to understand structure
-cat /tmp/sample.json | /tmp/gh-aw/jqschema.sh
+cat /tmp/sample.json | ${RUNNER_TEMP}/gh-aw/actions/jqschema.sh
 
 # Now you know which fields exist and can use them in your analysis
 ```

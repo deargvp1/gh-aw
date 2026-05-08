@@ -178,15 +178,6 @@ fi
 
 echo "Successfully copied ${FILE_COUNT} files to ${DESTINATION}"
 
-# Copy jqschema utility script to /tmp/gh-aw/ for agent access.
-# This avoids inline heredoc script creation in workflow steps (RGS-018).
-JQSCHEMA_SCRIPT="${SH_SOURCE_DIR}/jqschema.sh"
-if [ -f "${JQSCHEMA_SCRIPT}" ]; then
-  cp "${JQSCHEMA_SCRIPT}" /tmp/gh-aw/jqschema.sh
-  chmod +x /tmp/gh-aw/jqschema.sh
-  debug_log "Copied jqschema.sh to /tmp/gh-aw/"
-fi
-
 # Export model multipliers JSON as GH_AW_MODEL_MULTIPLIERS environment variable.
 # This makes the per-model effective token multipliers available to JavaScript
 # actions running in subsequent steps so they can compute Effective Tokens (ET).
