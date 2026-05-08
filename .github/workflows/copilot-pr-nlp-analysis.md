@@ -254,9 +254,11 @@ Post a comprehensive discussion with the following structure:
 
 **Title**: `Copilot PR Conversation NLP Analysis - [DATE]`
 
+**Formatting guideline**: Use `###` (h3) or lower for all headers in the discussion body.
+
 **Content Template** (substitute `[SENTIMENT_DIST_URL]`, `[SENTIMENT_TIME_URL]`, `[TOPIC_FREQ_URL]`, `[TOPICS_CLOUD_URL]`, and `[KEYWORD_TRENDS_URL]` with the literal URL strings read by Python from the files above):
 ````markdown
-# 🤖 Copilot PR Conversation NLP Analysis - [DATE]
+### 🤖 Copilot PR Conversation NLP Analysis - [DATE]
 
 ### Executive Summary
 
@@ -268,7 +270,7 @@ Post a comprehensive discussion with the following structure:
 
 ### Sentiment Analysis
 
-### Overall Sentiment Distribution
+#### Overall Sentiment Distribution
 ![Sentiment Distribution]([SENTIMENT_DIST_URL])
 
 **Key Findings**:
@@ -277,7 +279,7 @@ Post a comprehensive discussion with the following structure:
 - **Negative messages**: [count] ([percentage]%)
 - **Average polarity**: [score] on scale of -1 (very negative) to +1 (very positive)
 
-### Sentiment Over Conversation Timeline
+#### Sentiment Over Conversation Timeline
 ![Sentiment Timeline]([SENTIMENT_TIME_URL])
 
 **Observations**:
@@ -286,7 +288,7 @@ Post a comprehensive discussion with the following structure:
 
 ### Topic Analysis
 
-### Identified Discussion Topics
+#### Identified Discussion Topics
 ![Topic Frequencies]([TOPIC_FREQ_URL])
 
 **Major Topics Detected**:
@@ -295,12 +297,12 @@ Post a comprehensive discussion with the following structure:
 3. **[Topic 3 Name]** ([count] messages, [percentage]%): [brief description]
 4. **[Topic 4 Name]** ([count] messages, [percentage]%): [brief description]
 
-### Topic Word Cloud
+#### Topic Word Cloud
 ![Topics Word Cloud]([TOPICS_CLOUD_URL])
 
 ### Keyword Trends
 
-### Most Common Keywords and Phrases
+#### Most Common Keywords and Phrases
 ![Keyword Trends]([KEYWORD_TRENDS_URL])
 
 **Top Recurring Terms**:
@@ -310,7 +312,7 @@ Post a comprehensive discussion with the following structure:
 
 ### Conversation Patterns
 
-### User ↔ Copilot Exchange Analysis
+#### User ↔ Copilot Exchange Analysis
 
 **Typical Exchange Pattern**:
 - Average messages per PR: [number]
@@ -324,7 +326,7 @@ Post a comprehensive discussion with the following structure:
 
 ### Insights and Trends
 
-### 🔍 Key Observations
+#### 🔍 Key Observations
 
 1. **[Insight 1]**: [e.g., "Code quality feedback is the most common topic, appearing in 78% of conversations"]
 
@@ -332,7 +334,7 @@ Post a comprehensive discussion with the following structure:
 
 3. **[Insight 3]**: [e.g., "Testing concerns are mentioned in 45% of PRs but sentiment remains neutral"]
 
-### 📊 Trend Highlights
+#### 📊 Trend Highlights
 
 - **Positive Pattern**: [e.g., "Quick acknowledgment of suggestions correlates with faster merge"]
 - **Concerning Pattern**: [e.g., "PRs with >5 review cycles show declining sentiment"]
@@ -348,17 +350,17 @@ Post a comprehensive discussion with the following structure:
 
 ### PR Highlights
 
-### Most Positive PR 😊
+#### Most Positive PR 😊
 **PR #[number]**: [title]  
 **Sentiment**: [score]  
 **Summary**: [brief summary of why positive]
 
-### Most Discussed PR 💬
+#### Most Discussed PR 💬
 **PR #[number]**: [title]  
 **Messages**: [count]  
 **Summary**: [brief summary of discussion]
 
-### Notable Topics PR 🔖
+#### Notable Topics PR 🔖
 **PR #[number]**: [title]  
 **Topics**: [list of topics]  
 **Summary**: [brief summary]

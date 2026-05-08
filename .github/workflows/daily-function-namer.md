@@ -252,7 +252,7 @@ If **no improvements were found**, emit `noop` and exit:
 {"noop": {"message": "No rename suggestions found for package <pkg>. All analyzed functions have clear, descriptive names."}}
 ```
 
-Otherwise, create an issue with this structure:
+Otherwise, create an issue with this structure. Use `###` (h3) or lower for all headers in the issue body.
 
 ---
 
@@ -261,7 +261,7 @@ Otherwise, create an issue with this structure:
 **Body**:
 
 ```markdown
-# 🏷️ Go Function Rename Plan
+### 🏷️ Go Function Rename Plan
 
 **Package Analyzed**: `<package>`
 **Analysis Date**: <YYYY-MM-DD>
