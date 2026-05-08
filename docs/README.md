@@ -44,6 +44,14 @@ The sitemap (`/gh-aw/sitemap-index.xml`) is **only generated during a production
 
 If a CI pipeline or automated tool checks for the sitemap URL during a local preview, it will receive a 404 response. To verify the sitemap, run `npm run build` followed by `npm run preview`.
 
+### Search not available in dev mode
+
+The site search feature is **only available in production builds**. When running `npm run dev`, clicking the search button will display:
+
+> "Search is only available in production builds. Try building and previewing the site to test it out locally."
+
+This is expected Astro/Starlight behavior. To test search locally, run `npm run build` followed by `npm run preview`.
+
 ## Want to learn more?
 
 Check out [Starlight’s docs](https://starlight.astro.build/), read [the Astro documentation](https://docs.astro.build), or jump into the [Astro Discord server](https://astro.build/chat).
