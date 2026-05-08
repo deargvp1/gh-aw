@@ -18,7 +18,12 @@ imports:
     with:
       title-prefix: "[workflow-analysis] "
       expires: 1d
-
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[workflow-analysis] "
+      expires: 1d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 ---
 # Weekly Workflow Analysis
 

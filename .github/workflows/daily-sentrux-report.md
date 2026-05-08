@@ -12,6 +12,12 @@ imports:
       title-prefix: "[daily-sentrux] "
       expires: "3d"
   - shared/mcp/sentrux.md
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[daily-sentrux] "
+      expires: 3d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 network:
   allowed:
     - defaults

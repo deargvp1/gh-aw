@@ -60,6 +60,8 @@ imports:
       branch-name: "memory/delight"
       description: "Track delight findings and historical patterns"
 
+  - shared/observability-otlp.md
+  - shared/reporting.md
 pre-agent-steps:
   - name: Sample files and load memory
     run: |

@@ -20,6 +20,12 @@ imports:
       expires: 1d
   - shared/aw-logs-24h-fetch.md
   - shared/jqschema.md
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[safe-output-health] "
+      expires: 1d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 ---
 # Safe Output Health Monitor
 

@@ -27,6 +27,12 @@ imports:
     with:
       title-prefix: "[cli-tools-test] "
       expires: 3d
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[cli-tools-test] "
+      expires: 3d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 ---
 
 # Daily CLI Tools Exploratory Tester

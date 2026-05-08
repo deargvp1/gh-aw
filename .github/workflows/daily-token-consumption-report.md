@@ -27,6 +27,12 @@ imports:
     with:
       title-prefix: "[token-consumption] "
       expires: 1d
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[token-consumption] "
+      expires: 1d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 ---
 
 {{#runtime-import? .github/shared-instructions.md}}

@@ -16,6 +16,8 @@ imports:
     with:
       min-integrity: approved
   - shared/reporting.md
+  - shared/github-guard-policy.md
+  - shared/pr-code-review-config.md
 tools:
   cli-proxy: true
 safe-outputs:

@@ -22,6 +22,8 @@ imports:
       labels: [spdd, specifications, planning, automation]
       assignees: [copilot]
 
+  - shared/activation-app.md
+  - shared/reporting.md
 tools:
   cli-proxy: true
   github:

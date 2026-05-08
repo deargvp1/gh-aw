@@ -19,6 +19,8 @@ imports:
       expires: "3d"
       labels: [chore, dead-code]
       reviewers: [copilot]
+  - shared/activation-app.md
+  - shared/reporting.md
 network:
   allowed:
     - defaults

@@ -37,6 +37,12 @@ imports:
       expires: 1d
   - shared/docs-server-lifecycle.md
   - shared/keep-it-short.md
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[docs-noob-tester] "
+      expires: 1d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 pre-agent-steps:
   - name: Install docs dependencies
     run: |

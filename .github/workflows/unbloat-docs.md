@@ -47,6 +47,8 @@ imports:
   - shared/docs-server-lifecycle.md
 
 # Network access for documentation best practices research
+  - shared/activation-app.md
+  - shared/reporting.md
 network:
   allowed:
     - defaults

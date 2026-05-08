@@ -37,6 +37,13 @@ imports:
   - shared/python-nlp.md
   - shared/reporting.md
 
+  - shared/copilot-pr-data-fetch.md
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[nlp-analysis] "
+      expires: 1d
+  - shared/jqschema.md
+  - shared/observability-otlp.md
 steps:
   - name: Fetch PR comments for detailed analysis
     env:

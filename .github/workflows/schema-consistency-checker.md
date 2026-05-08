@@ -28,6 +28,12 @@ imports:
     with:
       title-prefix: "[Schema Consistency] "
       expires: 1d
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[Schema Consistency] "
+      expires: 1d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 pre-agent-steps:
   - name: Precompute schema analysis data
     run: |

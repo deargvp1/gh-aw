@@ -50,6 +50,12 @@ imports:
       title-prefix: "[safe-output-integrator] "
       expires: 3d
 
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[safe-output-integrator] "
+      expires: 3d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 features:
   copilot-requests: true
 ---

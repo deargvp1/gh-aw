@@ -28,7 +28,12 @@ imports:
       title-prefix: "[mcp-analysis] "
       expires: 1d
   - shared/python-dataviz.md
-
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[mcp-analysis] "
+      expires: 1d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 ---
 # GitHub MCP Structural Analysis
 

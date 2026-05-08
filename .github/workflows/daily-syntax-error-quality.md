@@ -51,6 +51,12 @@ imports:
     with:
       title-prefix: "[syntax-error-quality] "
       expires: 3d
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[syntax-error-quality] "
+      expires: 3d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 features:
   copilot-requests: true
 ---

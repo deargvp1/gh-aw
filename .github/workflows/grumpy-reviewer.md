@@ -12,6 +12,8 @@ imports:
   - uses: shared/pr-review-base.md
     with:
       min-integrity: approved
+  - shared/github-guard-policy.md
+  - shared/pr-code-review-config.md
 tools:
   cli-proxy: true
 safe-outputs:
@@ -23,7 +25,6 @@ safe-outputs:
     run-success: "😤 Fine. [{workflow_name}]({run_url}) finished the review. It wasn't completely terrible. I guess. 🙄"
     run-failure: "😤 Great. [{workflow_name}]({run_url}) {status}. As if my day couldn't get any worse..."
 timeout-minutes: 10
-
 ---
 
 > ⚠️ **Deprecated**: This agent is superseded by the [PR Code Quality Reviewer](pr-code-quality-reviewer.md), which consolidates code quality and nitpick reviews into a single pass. Use `/review` instead of `/grumpy` for new PRs. This agent is kept for backward compatibility but will be removed in a future release.

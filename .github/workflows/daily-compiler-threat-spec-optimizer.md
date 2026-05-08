@@ -21,6 +21,12 @@ imports:
       title-prefix: "[compiler-threat-spec] "
       expires: 3d
 
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[compiler-threat-spec] "
+      expires: 3d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 safe-outputs:
   create-pull-request:
     title-prefix: "[compiler-threat-spec] "

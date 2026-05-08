@@ -11,6 +11,8 @@ imports:
   - uses: shared/pr-review-base.md
     with:
       min-integrity: approved
+  - shared/github-guard-policy.md
+  - shared/pr-code-review-config.md
 tools:
   cli-proxy: true
   github:
@@ -32,7 +34,6 @@ timeout-minutes: 30
 concurrency:
   group: "refiner-${{ github.event.pull_request.number }}"
   cancel-in-progress: true
-
 ---
 
 # Code Refiner

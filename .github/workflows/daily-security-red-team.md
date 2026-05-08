@@ -31,6 +31,12 @@ imports:
     with:
       title-prefix: "[security-red-team] "
       expires: 3d
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[security-red-team] "
+      expires: 3d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 ---
 
 # Daily Security Red Team Agent

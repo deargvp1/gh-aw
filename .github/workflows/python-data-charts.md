@@ -14,6 +14,8 @@ tools:
   edit:
 imports:
   - shared/charts-with-trending.md
+  - shared/python-dataviz.md
+  - shared/trends.md
 safe-outputs:
   upload-artifact:
     max-uploads: 3
@@ -24,7 +26,6 @@ safe-outputs:
     category: "artifacts"
     max: 1
 timeout-minutes: 15
-
 ---
 
 # Python Data Visualization Generator

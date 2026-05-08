@@ -23,6 +23,8 @@ imports:
       labels: [refactoring, code-quality, automation]
       reviewers: [copilot]
 
+  - shared/activation-app.md
+  - shared/reporting.md
 network:
   allowed:
     - go

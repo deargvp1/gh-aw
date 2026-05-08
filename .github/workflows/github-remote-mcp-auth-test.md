@@ -23,7 +23,12 @@ imports:
     with:
       title-prefix: "[auth-test] "
       expires: 1d
-
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[auth-test] "
+      expires: 1d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 ---
 # GitHub Remote MCP Authentication Test
 

@@ -17,6 +17,12 @@ imports:
     with:
       title-prefix: "[team-status] "
       expires: 1d
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[team-status] "
+      expires: 1d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 safe-outputs:
   create-issue:
     expires: 1d
@@ -32,7 +38,6 @@ source: githubnext/agentics/workflows/daily-team-status.md@d3422bf940923ef1d43db
 tools:
   cli-proxy: true
   github: null
-
 ---
 
 {{#runtime-import? .github/shared-instructions.md}}

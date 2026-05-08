@@ -36,6 +36,7 @@ imports:
   - shared/reporting.md
   - shared/noop-reminder.md
   - shared/otel.md
+  - shared/observability-otlp.md
 ---
 {{#runtime-import? .github/shared-instructions.md}}
 

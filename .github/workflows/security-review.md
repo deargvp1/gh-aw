@@ -28,6 +28,8 @@ timeout-minutes: 15
 imports:
   - uses: shared/pr-review-base.md
   - shared/security-analysis-base.md
+  - shared/github-guard-policy.md
+  - shared/pr-code-review-config.md
 ---
 
 # Security Review Agent 🔒

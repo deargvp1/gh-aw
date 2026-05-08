@@ -24,6 +24,12 @@ imports:
     with:
       languages: ["go", "typescript"]
 
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[mcp-concurrency] "
+      expires: 3d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 safe-outputs:
   create-issue:
     expires: 7d

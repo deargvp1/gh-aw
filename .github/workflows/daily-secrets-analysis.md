@@ -22,6 +22,8 @@ imports:
   - uses: shared/daily-audit-base.md
     with:
       title-prefix: "[daily secrets] "
+  - shared/observability-otlp.md
+  - shared/reporting.md
 features:
   copilot-requests: true
 ---

@@ -19,6 +19,8 @@ imports:
       expires: "2d"
       labels: [architecture, automated-analysis, cookie]
       assignees: [copilot]
+  - shared/activation-app.md
+  - shared/reporting.md
 tools:
   cli-proxy: true
   bash:

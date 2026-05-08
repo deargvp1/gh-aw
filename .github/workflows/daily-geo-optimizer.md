@@ -102,6 +102,12 @@ imports:
     with:
       title-prefix: "[geo-optimizer] "
       expires: 3d
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[geo-optimizer] "
+      expires: 3d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 ---
 
 {{#runtime-import? .github/shared-instructions.md}}

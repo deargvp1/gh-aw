@@ -39,6 +39,12 @@ imports:
       title-prefix: "[claude-code-user-docs-review] "
       expires: 1d
 
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[claude-code-user-docs-review] "
+      expires: 1d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 features:
   copilot-requests: true
 ---

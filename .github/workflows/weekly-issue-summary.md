@@ -35,6 +35,13 @@ imports:
       title-prefix: "[Weekly Summary] "
       expires: 1d
   - shared/trends.md
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[Weekly Summary] "
+      expires: 1d
+  - shared/observability-otlp.md
+  - shared/python-dataviz.md
+  - shared/reporting.md
 ---
 # Weekly Issue Summary
 

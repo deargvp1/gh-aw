@@ -19,6 +19,8 @@ imports:
       title-prefix: "[refactoring-cadence] "
       expires: "14d"
       labels: [refactoring, ai-generated]
+  - shared/activation-app.md
+  - shared/reporting.md
 tools:
   cli-proxy: true
   github:

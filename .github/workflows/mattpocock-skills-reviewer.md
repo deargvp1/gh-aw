@@ -11,6 +11,8 @@ imports:
   - uses: shared/pr-review-base.md
     with:
       min-integrity: approved
+  - shared/github-guard-policy.md
+  - shared/pr-code-review-config.md
 pre-agent-steps:
   - name: Upgrade gh CLI
     run: |
@@ -59,7 +61,6 @@ safe-outputs:
     run-success: "🧠 [{workflow_name}]({run_url}) has completed the skills-based review. ✅"
     run-failure: "🧠 [{workflow_name}]({run_url}) {status} during the skills-based review."
 timeout-minutes: 15
-
 ---
 
 # Matt Pocock Skills Reviewer

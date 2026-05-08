@@ -28,7 +28,12 @@ imports:
     with:
       title-prefix: "[safe-outputs-conformance] "
       expires: 1d
-
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[safe-outputs-conformance] "
+      expires: 1d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 ---
 
 # Daily Safe Outputs Conformance Checker

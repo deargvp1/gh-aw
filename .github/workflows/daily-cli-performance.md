@@ -61,6 +61,12 @@ imports:
       title-prefix: "[daily-cli-performance] "
       expires: 3d
   - shared/go-make.md
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[daily-cli-performance] "
+      expires: 3d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 features:
   copilot-requests: true
 if: needs.pre_activation.outputs.has_changes == 'true' || github.event_name == 'workflow_dispatch'

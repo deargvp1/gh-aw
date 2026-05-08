@@ -26,7 +26,8 @@ imports:
       title-prefix: "[daily-code-metrics] "
   - shared/python-dataviz.md
   - shared/trends.md
-
+  - shared/observability-otlp.md
+  - shared/reporting.md
 ---
 {{#runtime-import? .github/shared-instructions.md}}
 

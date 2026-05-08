@@ -297,6 +297,13 @@ imports:
       title-prefix: "[daily-news] "
       expires: 3d
   - shared/trends.md
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[daily-news] "
+      expires: 3d
+  - shared/observability-otlp.md
+  - shared/python-dataviz.md
+  - shared/reporting.md
 features:
   copilot-requests: true
 ---

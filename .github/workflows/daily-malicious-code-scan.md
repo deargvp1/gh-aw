@@ -22,9 +22,14 @@ imports:
       title-prefix: "[malicious-code-scan] "
       expires: 3d
 
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[malicious-code-scan] "
+      expires: 3d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 tools:
   cli-proxy: true
-
 ---
 
 {{#runtime-import? .github/shared-instructions.md}}

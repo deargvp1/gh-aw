@@ -33,6 +33,12 @@ imports:
     with:
       title-prefix: "[repo-audit] "
       expires: 1d
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[repo-audit] "
+      expires: 1d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 ---
 # Repository Audit & Agentic Workflow Opportunity Analyzer
 

@@ -22,6 +22,12 @@ imports:
       title-prefix: "[repository-quality] "
       expires: 1d
   - shared/repository-quality-report-template.md
+  - uses: shared/daily-audit-discussion.md
+    with:
+      title-prefix: "[repository-quality] "
+      expires: 1d
+  - shared/observability-otlp.md
+  - shared/reporting.md
 tools:
   cli-proxy: true
   edit:
@@ -71,7 +77,6 @@ steps:
         wc -l README.md 2>/dev/null || echo "No README.md"
       } > /tmp/gh-aw/agent/analysis-context.md
       echo "✅ Quality metrics collected → /tmp/gh-aw/agent/analysis-context.md"
-
 ---
 # Repository Quality Improvement Agent
 
