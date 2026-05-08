@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-05-08T01:08:45Z",
-  "run_id": "25530802010",
+  "run_date": "2026-05-08T06:50:44Z",
+  "run_id": "25541512866",
   "fork_prs": 0,
-  "agent_prs_found": 7,
-  "agent_prs_excluded": 7,
-  "notes": "No open fork PRs found. 7 open PRs total, all from same-repo branches (headRepositoryOwner=github). Per policy, only fork PRs are triaged.",
+  "agent_prs_found": 8,
+  "agent_prs_excluded": 8,
+  "notes": "No open fork PRs found. 8 open PRs total, all from same-repo branches (head_repo=github/gh-aw). Per policy, only fork PRs are triaged.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -17,10 +17,10 @@
     "by_action": {}
   },
   "previous_run": {
-    "run_id": "25515426243",
-    "run_date": "2026-05-07T18:49:09Z",
+    "run_id": "25530802010",
+    "run_date": "2026-05-08T01:08:45Z",
     "fork_prs": 0,
-    "agent_prs_found": 13,
-    "agent_prs_excluded": 13
+    "agent_prs_found": 7,
+    "agent_prs_excluded": 7
   }
 }
