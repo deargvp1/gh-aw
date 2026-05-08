@@ -26,6 +26,7 @@ imports:
       assignees: [copilot]
   - shared/go-source-analysis.md
 
+  - shared/observability-otlp.md
 network:
   allowed:
     - defaults
@@ -73,6 +74,7 @@ timeout-minutes: 25
 features:
   copilot-requests: true
   inline-agents: true
+
 ---
 
 # Package Specification Librarian
@@ -88,6 +90,9 @@ You are the Package Specification Librarian — a meticulous documentation audit
 ## Mission
 
 Perform a comprehensive daily audit of all Go package specifications under `pkg/`. Create an issue if problems are found that require human or agent intervention.
+
+**🚨 MANDATORY: You MUST call either `noop` or `create_issue` before exiting, regardless of outcome.**
+This workflow has `strict: true` and `create-issue` as its only write safe output. If no issue is needed, call `noop` as your LAST action before finishing.
 
 ## Phase 1: Inventory All Packages and Specifications
 

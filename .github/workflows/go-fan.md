@@ -30,6 +30,7 @@ imports:
       labels: [automation, cookie]
   - shared/go-source-analysis.md
 
+  - shared/observability-otlp.md
 tools:
   cli-proxy: true
   cache-memory: true
@@ -48,6 +49,7 @@ tools:
 
 timeout-minutes: 30
 strict: true
+
 ---
 # Go Fan 🐹 - Daily Go Module Reviewer
 

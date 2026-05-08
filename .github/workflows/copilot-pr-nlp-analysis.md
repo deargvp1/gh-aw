@@ -37,6 +37,7 @@ imports:
   - shared/python-nlp.md
   - shared/reporting.md
 
+  - shared/observability-otlp.md
 steps:
   - name: Fetch PR comments for detailed analysis
     env:
@@ -67,6 +68,7 @@ features:
 
 tools:
   cli-proxy: true
+
 ---
 # Copilot PR Conversation NLP Analysis
 
@@ -85,6 +87,12 @@ Generate a daily NLP-based analysis report of Copilot-created PRs merged within 
   - PR comments: `/tmp/gh-aw/pr-comments/pr-*.json`
 - **Python Environment**: NumPy, Pandas, Matplotlib, Seaborn, SciPy, NLTK, scikit-learn, TextBlob, WordCloud
 - **Output Directory**: `/tmp/gh-aw/python/charts/`
+
+### Runtime Constraint (Required)
+
+- Python analysis dependencies are already installed by pre-agent workflow steps.
+- **Do NOT run any `pip install` commands in agent turns.**
+- Run Python scripts with `/tmp/gh-aw/venv/bin/python3` to use the preinstalled environment.
 
 ## Task Overview
 
