@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-07",
+  "last_updated": "2026-05-08",
   "pending_tasks": [
     {
       "file": "docs/src/content/docs/blog/2026-01-27-operational-patterns.md",
@@ -11,7 +11,7 @@
       "file": "docs/src/content/docs/blog/2026-01-27-operational-patterns.md",
       "created": "2026-05-07",
       "status": "pending",
-      "description": "Replace fictional narrative intro (lines 15-19) with professional context-setting paragraph; preserve author photo and previous-article link"
+      "description": "Replace fictional narrative intro (lines 15-19) with professional context-setting paragraph"
     },
     {
       "file": "docs/src/content/docs/guides/self-hosted-runners.md",
@@ -36,6 +36,18 @@
       "created": "2026-05-06",
       "status": "pending",
       "description": "Trim --strict flag description from 189 chars to one concise sentence; move default-behaviour note into Long: block"
+    },
+    {
+      "file": "docs/src/content/docs/blog/2026-01-13-meet-the-workflows-tool-infrastructure.md",
+      "created": "2026-05-08",
+      "status": "pending",
+      "description": "Line 47: fix broken Quick Start URL from https://github.github.com/gh-aw/setup/quick-start/ to correct URL; line 21: replace informal narrative intro with professional paragraph"
+    },
+    {
+      "file": ".github/workflows/mattpocock-skills-reviewer.md",
+      "created": "2026-05-08",
+      "status": "pending",
+      "description": "Line 61: replace 🧠 emoji in run-failure with ❌ — brain emoji is identical to run-started/run-success, making failure state visually indistinguishable"
     }
   ]
 }
