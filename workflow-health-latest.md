@@ -1,38 +1,33 @@
-# Workflow Health — 2026-05-07T05:38Z
+# Workflow Health — 2026-05-08T05:20Z
 
-Score: 61/100 (→ stable). 217 workflows (+3). Run: §25477981073
+Score: 61/100 (→ stable). 217 workflows. Run: §25538277149
 
 ## KEY FINDINGS
 
 ### Compilation Status
-- 217/217 lock files present ✅ (+3 from yesterday's 214)
+- 217/217 lock files present ✅ (unchanged)
 - 0 missing lock files ✅
 
-### P0 Issues (Active, unchanged)
-- **Smoke Gemini** (#30175, #29666 OPEN): 100% failure, proxy blocks traffic (32+ days)
-- **Smoke CI** (#29666 OPEN): Chronic action_required, EROFS crash
+### P0 Issues (Active)
+- **Smoke Gemini** (#29666 OPEN, #30175 CLOSED but fix ineffective): Still 100% failure on May 7. 34+ days.
+- **Smoke CI** (#29666 OPEN): CGO/EROFS persistent, action_required
 - **Daily Model Inventory Checker** (#30043 OPEN): Copilot CLI silent startup crash
-- **APM Unpack Systemic Failure** (#30252 OPEN): apm-default.tar.gz unpack exit code 1
+- **APM Unpack** (#30252 OPEN): apm-default.tar.gz exit code 1
+- **config.models** (#30307 OPEN): unsupported AWF config field
 
 ### P1 Issues (Active)
-- **Smoke macOS ARM64**: 100% failure since Feb 20 2026 (**76 days**) — **ISSUE FILED THIS RUN** ✅
-- **CI regression** (TestStrictModePermissions): Filed 2026-05-06; status unknown this run (API unavailable)
-- **config.models unsupported field** (#30307 OPEN): blocks smoke runs
-- **MCP gateway session timeout** (#23153 OPEN): Long-running workflows at risk
-- **Performance Regression in Validation** (#30180): 82.1% slower
-
-### P2 Issues
-- Node.js 20 deprecation deadline Sep 16, 2026
-- 9 PR-review agents on same triggers (~100 action_required/day)
+- **Smoke macOS ARM64**: Issue FILED 2026-05-07 ✅ (77 days)
+- **CI regression** TestStrictModePermissions: Filed 2026-05-06
+- **MCP gateway session timeout** (#23153 OPEN)
+- **Performance Regression** (#30180): 82.1% slower
+- **CJS**: Mixed results today (3 action_required + 2 success) — PR-approval pattern
 
 ### Actions Taken This Run
-- Added health dashboard comment to #29109
-- Filed P1 issue for Smoke macOS ARM64 (76+ days overdue)
+- Added comment to #29109 dashboard
 - Updated shared memory
 
 ### Trends
-- Score: 61/100 (→ stable, no new regressions)
-- 217 workflows (+3 new), all compiled
-- P0s persist (Gemini 32+ days, CI CGO chronic)
-- macOS ARM64 issue finally filed after 76 days
-- Network-restricted run: GitHub API unavailable, analysis from pre-computed data
+- Score: 61/100 (→ stable, day 2)
+- 217 workflows (→ unchanged)
+- No new regressions
+- #30175 Gemini issue closed but fix appears ineffective
