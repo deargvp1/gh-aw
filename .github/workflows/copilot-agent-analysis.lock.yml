@@ -417,9 +417,6 @@ jobs:
         run: bash "${RUNNER_TEMP}/gh-aw/actions/configure_gh_for_ghe.sh"
         env:
           GH_TOKEN: ${{ github.token }}
-      - name: Setup jq utilities directory
-        run: |
-          chmod +x /tmp/gh-aw/jqschema.sh
       - name: Install gh CLI
         run: |
           bash "${RUNNER_TEMP}/gh-aw/actions/install_gh_cli.sh"

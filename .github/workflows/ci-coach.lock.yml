@@ -431,9 +431,6 @@ jobs:
         run: |
           mkdir -p /tmp/gh-aw
           go test -v -json -count=1 -timeout=3m -tags '!integration' -run='^Test' ./... | tee /tmp/gh-aw/test-results.json
-      - name: Setup jq utilities directory
-        run: |
-          chmod +x /tmp/gh-aw/jqschema.sh
 
       # Cache memory file share configuration from frontmatter processed below
       - name: Create cache-memory directory

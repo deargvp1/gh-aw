@@ -4,10 +4,6 @@ tools:
     - "jq *"
     - "/tmp/gh-aw/jqschema.sh"
     - "git"
-steps:
-  - name: Setup jq utilities directory
-    run: |
-      chmod +x /tmp/gh-aw/jqschema.sh
 ---
 
 ## jqschema - JSON Schema Discovery
