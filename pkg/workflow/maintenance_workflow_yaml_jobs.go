@@ -1,0 +1,841 @@
+package workflow
+
+import (
+	"strconv"
+	"strings"
+)
+
+// buildMaintenanceWorkflowOnSection returns the workflow name, on: triggers,
+// and permissions/jobs header for the maintenance workflow.
+func buildMaintenanceWorkflowOnSection(p maintenanceWorkflowParams) string {
+	var b strings.Builder
+
+	b.WriteString(`name: Agentic Maintenance
+
+on:
+  schedule:
+    - cron: "` + p.cronSchedule + `"  # ` + p.scheduleDesc + ` (based on minimum expires: ` + strconv.Itoa(p.minExpiresDays) + ` days)
+`)
+
+	// Add push trigger in dev mode so compile-workflows runs when workflow files change
+	if p.actionMode == ActionModeDev {
+		b.WriteString(`  push:
+    branches:
+      - ` + p.defaultBranch + `
+    paths:
+      - '.github/workflows/*.md'
+`)
+	}
+
+	// Add label-event trigger only when the label-triggered jobs are enabled
+	if !p.disableLabelTrigger {
+		b.WriteString(`  issues:
+    types: [labeled]
+`)
+	}
+
+	b.WriteString(`  workflow_dispatch:
+    inputs:
+      operation:
+        description: 'Optional maintenance operation to run'
+        required: false
+        type: choice
+        default: ''
+        options:
+          - ''
+          - 'disable'
+          - 'enable'
+          - 'update'
+          - 'upgrade'
+          - 'safe_outputs'
+          - 'create_labels'
+          - 'activity_report'
+          - 'close_agentic_workflows_issues'
+          - 'clean_cache_memories'
+          - 'update_pull_request_branches'
+          - 'validate'
+      run_url:
+        description: 'Run URL or run ID to replay safe outputs from (e.g. https://github.com/owner/repo/actions/runs/12345 or 12345). Required when operation is safe_outputs.'
+        required: false
+        type: string
+        default: ''
+  workflow_call:
+    inputs:
+      operation:
+        description: 'Optional maintenance operation to run (disable, enable, update, upgrade, safe_outputs, create_labels, activity_report, close_agentic_workflows_issues, clean_cache_memories, update_pull_request_branches, validate)'
+        required: false
+        type: string
+        default: ''
+      run_url:
+        description: 'Run URL or run ID to replay safe outputs from (e.g. https://github.com/owner/repo/actions/runs/12345 or 12345). Required when operation is safe_outputs.'
+        required: false
+        type: string
+        default: ''
+    outputs:
+      operation_completed:
+        description: 'The maintenance operation that was completed (empty when none ran or a scheduled job ran)'
+        value: ${{ jobs.run_operation.outputs.operation || inputs.operation }}
+      applied_run_url:
+        description: 'The run URL that safe outputs were applied from'
+        value: ${{ jobs.apply_safe_outputs.outputs.run_url }}
+
+permissions: {}
+
+jobs:
+`)
+
+	return b.String()
+}
+
+// buildMaintenanceCloseExpiredEntitiesJob returns the YAML for the close-expired-entities job.
+func buildMaintenanceCloseExpiredEntitiesJob(p maintenanceWorkflowParams) string {
+	var b strings.Builder
+
+	b.WriteString(`  close-expired-entities:
+    if: ${{ ` + RenderCondition(buildNotForkAndScheduleOnly()) + ` }}
+    runs-on: ` + p.runsOnValue + `
+    permissions:
+      discussions: write
+      issues: write
+      pull-requests: write
+    steps:
+`)
+
+	// Add checkout step only in dev/script mode (for local action paths)
+	if p.actionMode == ActionModeDev || p.actionMode == ActionModeScript {
+		maintenanceWorkflowYAMLLog.Printf("Adding checkout step for close-expired-entities (actionMode=%s)", p.actionMode)
+		b.WriteString("      - name: Checkout actions folder\n")
+		b.WriteString("        uses: " + getActionPin("actions/checkout") + "\n")
+		b.WriteString("        with:\n")
+		b.WriteString("          sparse-checkout: |\n")
+		b.WriteString("            actions\n")
+		b.WriteString("          persist-credentials: false\n\n")
+	}
+
+	b.WriteString(`      - name: Setup Scripts
+        uses: ` + p.setupActionRef + `
+        with:
+          destination: ${{ runner.temp }}/gh-aw/actions
+
+      - name: Close expired discussions
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        with:
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/close_expired_discussions.cjs');
+            await main();
+
+      - name: Close expired issues
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        with:
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/close_expired_issues.cjs');
+            await main();
+
+      - name: Close expired pull requests
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        with:
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/close_expired_pull_requests.cjs');
+            await main();
+`)
+
+	return b.String()
+}
+
+// buildMaintenanceCleanupCacheMemoryJob returns the YAML for the cleanup-cache-memory job.
+// This job lists all caches starting with "memory-", groups them by key prefix,
+// keeps the latest run ID per group, and deletes the rest.
+func buildMaintenanceCleanupCacheMemoryJob(p maintenanceWorkflowParams) string {
+	var b strings.Builder
+
+	cleanupCacheCondition := buildNotForkAndScheduleOnlyOrOperation("clean_cache_memories")
+	b.WriteString(`
+  cleanup-cache-memory:
+    if: ${{ ` + RenderCondition(cleanupCacheCondition) + ` }}
+    runs-on: ` + p.runsOnValue + `
+    permissions:
+      actions: write
+    steps:
+`)
+
+	// Add checkout step only in dev/script mode (for local action paths)
+	if p.actionMode == ActionModeDev || p.actionMode == ActionModeScript {
+		b.WriteString("      - name: Checkout actions folder\n")
+		b.WriteString("        uses: " + getActionPin("actions/checkout") + "\n")
+		b.WriteString("        with:\n")
+		b.WriteString("          sparse-checkout: |\n")
+		b.WriteString("            actions\n")
+		b.WriteString("          persist-credentials: false\n\n")
+	}
+
+	b.WriteString(`      - name: Setup Scripts
+        uses: ` + p.setupActionRef + `
+        with:
+          destination: ${{ runner.temp }}/gh-aw/actions
+
+      - name: Cleanup outdated cache-memory entries
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        with:
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/cleanup_cache_memory.cjs');
+            await main();
+`)
+
+	return b.String()
+}
+
+// buildMaintenanceRunOperationJob returns the YAML for the run_operation job.
+// This job handles all dispatch operations except those with dedicated jobs
+// (safe_outputs, create_labels, activity_report, close_agentic_workflows_issues,
+// clean_cache_memories, update_pull_request_branches, validate).
+func buildMaintenanceRunOperationJob(p maintenanceWorkflowParams) string {
+	var b strings.Builder
+
+	runOperationCondition := buildRunOperationCondition("safe_outputs", "create_labels", "activity_report", "close_agentic_workflows_issues", "clean_cache_memories", "update_pull_request_branches", "validate")
+	b.WriteString(`
+  run_operation:
+    if: ${{ ` + RenderCondition(runOperationCondition) + ` }}
+    runs-on: ` + p.runsOnValue + `
+    permissions:
+      actions: write
+      contents: write
+      pull-requests: write
+    outputs:
+      operation: ${{ steps.record.outputs.operation }}
+    steps:
+      - name: Checkout repository
+        uses: ` + getActionPin("actions/checkout") + `
+        with:
+          persist-credentials: false
+
+      - name: Setup Scripts
+        uses: ` + p.setupActionRef + `
+        with:
+          destination: ${{ runner.temp }}/gh-aw/actions
+
+      - name: Check admin/maintainer permissions
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/check_team_member.cjs');
+            await main();
+
+`)
+
+	b.WriteString(generateInstallCLISteps(p.actionMode, p.version, p.actionTag, p.resolver))
+	b.WriteString(`      - name: Run operation
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_AW_OPERATION: ${{ inputs.operation }}
+          GH_AW_CMD_PREFIX: ` + getCLICmdPrefix(p.actionMode) + `
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/run_operation_update_upgrade.cjs');
+            await main();
+
+      - name: Record outputs
+        id: record
+        run: echo "operation=${{ inputs.operation }}" >> "$GITHUB_OUTPUT"
+`)
+
+	return b.String()
+}
+
+// buildMaintenanceUpdatePullRequestBranchesJob returns the YAML for the update_pull_request_branches job.
+func buildMaintenanceUpdatePullRequestBranchesJob(p maintenanceWorkflowParams) string {
+	var b strings.Builder
+
+	b.WriteString(`
+  update_pull_request_branches:
+    if: ${{ ` + RenderCondition(buildDispatchOperationCondition("update_pull_request_branches")) + ` }}
+    runs-on: ` + p.runsOnValue + `
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+`)
+
+	// Add checkout step only in dev/script mode (for local action paths)
+	if p.actionMode == ActionModeDev || p.actionMode == ActionModeScript {
+		b.WriteString("      - name: Checkout actions folder\n")
+		b.WriteString("        uses: " + getActionPin("actions/checkout") + "\n")
+		b.WriteString("        with:\n")
+		b.WriteString("          sparse-checkout: |\n")
+		b.WriteString("            actions\n")
+		b.WriteString("          persist-credentials: false\n\n")
+	}
+
+	b.WriteString(`      - name: Setup Scripts
+        uses: ` + p.setupActionRef + `
+        with:
+          destination: ${{ runner.temp }}/gh-aw/actions
+
+      - name: Check admin/maintainer permissions
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/check_team_member.cjs');
+            await main();
+
+      - name: Update pull request branches
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/update_pull_request_branches.cjs');
+            await main();
+`)
+
+	return b.String()
+}
+
+// buildMaintenanceApplySafeOutputsJob returns the YAML for the apply_safe_outputs job.
+func buildMaintenanceApplySafeOutputsJob(p maintenanceWorkflowParams) string {
+	return `
+  apply_safe_outputs:
+    if: ${{ ` + RenderCondition(buildDispatchOperationCondition("safe_outputs")) + ` }}
+    runs-on: ` + p.runsOnValue + `
+    permissions:
+      actions: read
+      contents: write
+      discussions: write
+      issues: write
+      pull-requests: write
+    outputs:
+      run_url: ${{ steps.record.outputs.run_url }}
+    steps:
+      - name: Checkout actions folder
+        uses: ` + getActionPin("actions/checkout") + `
+        with:
+          sparse-checkout: |
+            actions
+          persist-credentials: false
+
+      - name: Setup Scripts
+        uses: ` + p.setupActionRef + `
+        with:
+          destination: ${{ runner.temp }}/gh-aw/actions
+
+      - name: Check admin/maintainer permissions
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/check_team_member.cjs');
+            await main();
+
+      - name: Apply Safe Outputs
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_AW_RUN_URL: ${{ inputs.run_url }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/apply_safe_outputs_replay.cjs');
+            await main();
+
+      - name: Record outputs
+        id: record
+        run: echo "run_url=${{ inputs.run_url }}" >> "$GITHUB_OUTPUT"
+`
+}
+
+// buildMaintenanceCreateLabelsJob returns the YAML for the create_labels job.
+func buildMaintenanceCreateLabelsJob(p maintenanceWorkflowParams) string {
+	var b strings.Builder
+
+	b.WriteString(`
+  create_labels:
+    if: ${{ ` + RenderCondition(buildDispatchOperationCondition("create_labels")) + ` }}
+    runs-on: ` + p.runsOnValue + `
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: ` + getActionPin("actions/checkout") + `
+        with:
+          persist-credentials: false
+
+      - name: Setup Scripts
+        uses: ` + p.setupActionRef + `
+        with:
+          destination: ${{ runner.temp }}/gh-aw/actions
+
+      - name: Check admin/maintainer permissions
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/check_team_member.cjs');
+            await main();
+
+`)
+
+	b.WriteString(generateInstallCLISteps(p.actionMode, p.version, p.actionTag, p.resolver))
+	b.WriteString(`      - name: Create missing labels
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        env:
+          GH_AW_CMD_PREFIX: ` + getCLICmdPrefix(p.actionMode) + `
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/create_labels.cjs');
+            await main();
+`)
+
+	return b.String()
+}
+
+// buildMaintenanceActivityReportJob returns the YAML for the activity_report job.
+func buildMaintenanceActivityReportJob(p maintenanceWorkflowParams) string {
+	var b strings.Builder
+
+	b.WriteString(`
+  activity_report:
+    if: ${{ ` + RenderCondition(buildDispatchOperationCondition("activity_report")) + ` }}
+    runs-on: ` + p.runsOnValue + `
+    timeout-minutes: 120
+    permissions:
+      actions: read
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: ` + getActionPin("actions/checkout") + `
+        with:
+          persist-credentials: false
+
+      - name: Setup Scripts
+        uses: ` + p.setupActionRef + `
+        with:
+          destination: ${{ runner.temp }}/gh-aw/actions
+
+      - name: Check admin/maintainer permissions
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/check_team_member.cjs');
+            await main();
+
+`)
+
+	b.WriteString(generateInstallCLISteps(p.actionMode, p.version, p.actionTag, p.resolver))
+	b.WriteString(`      - name: Restore activity report logs cache
+        id: activity_report_logs_cache
+        uses: ` + getActionPin("actions/cache/restore") + `
+        with:
+          path: ./.cache/gh-aw/activity-report-logs
+          key: ${{ runner.os }}-activity-report-logs-${{ github.repository }}-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-activity-report-logs-${{ github.repository }}-
+            ${{ runner.os }}-activity-report-logs-
+`)
+	b.WriteString(`      - name: Download activity report logs
+        timeout-minutes: 20
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_AW_CMD_PREFIX: ` + getCLICmdPrefix(p.actionMode) + `
+        run: |
+          ${GH_AW_CMD_PREFIX} logs \
+            --repo "${{ github.repository }}" \
+            --start-date -1w \
+            --count 100 \
+            --output ./.cache/gh-aw/activity-report-logs \
+            --format markdown \
+            > ./.cache/gh-aw/activity-report-logs/report.md
+
+      - name: Save activity report logs cache
+        if: ${{ always() }}
+        uses: ` + getActionPin("actions/cache/save") + `
+        with:
+          path: ./.cache/gh-aw/activity-report-logs
+          key: ${{ steps.activity_report_logs_cache.outputs.cache-primary-key }}
+
+      - name: Generate activity report issue
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('node:fs');
+            const reportPath = './.cache/gh-aw/activity-report-logs/report.md';
+            if (!fs.existsSync(reportPath)) {
+              core.warning('Activity report markdown not found at ' + reportPath + '; skipping issue creation.');
+              return;
+            }
+            let reportBody = '';
+            try {
+              reportBody = fs.readFileSync(reportPath, 'utf8').trim();
+            } catch (error) {
+              core.warning('Failed to read activity report markdown at ' + reportPath + ': ' + error.message);
+              return;
+            }
+            if (!reportBody) {
+              core.warning('Activity report markdown is empty at ' + reportPath + '; skipping issue creation.');
+              return;
+            }
+            const repoSlug = context.repo.owner + '/' + context.repo.repo;
+            const body = [
+              '### Agentic workflow activity report',
+              '',
+              'Repository: ' + repoSlug,
+              'Generated at: ' + new Date().toISOString(),
+              '',
+              reportBody,
+            ].join('\n');
+            const createdIssue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '[aw] agentic status report',
+              body,
+              labels: ['agentic-workflows'],
+            });
+            core.info('Created issue #' + createdIssue.data.number + ': ' + createdIssue.data.html_url);
+`)
+
+	return b.String()
+}
+
+// buildMaintenanceCloseAgenticWorkflowsIssuesJob returns the YAML for the close_agentic_workflows_issues job.
+func buildMaintenanceCloseAgenticWorkflowsIssuesJob(p maintenanceWorkflowParams) string {
+	var b strings.Builder
+
+	b.WriteString(`
+  close_agentic_workflows_issues:
+    if: ${{ ` + RenderCondition(buildDispatchOperationCondition("close_agentic_workflows_issues")) + ` }}
+    runs-on: ` + p.runsOnValue + `
+    permissions:
+      issues: write
+    steps:
+`)
+
+	// Add checkout step only in dev/script mode (for local action paths)
+	if p.actionMode == ActionModeDev || p.actionMode == ActionModeScript {
+		b.WriteString("      - name: Checkout actions folder\n")
+		b.WriteString("        uses: " + getActionPin("actions/checkout") + "\n")
+		b.WriteString("        with:\n")
+		b.WriteString("          sparse-checkout: |\n")
+		b.WriteString("            actions\n")
+		b.WriteString("          persist-credentials: false\n\n")
+	}
+
+	b.WriteString(`      - name: Setup Scripts
+        uses: ` + p.setupActionRef + `
+        with:
+          destination: ${{ runner.temp }}/gh-aw/actions
+
+      - name: Check admin/maintainer permissions
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/check_team_member.cjs');
+            await main();
+
+      - name: Close no-repro agentic-workflows issues
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/close_agentic_workflows_issues.cjs');
+            await main();
+`)
+
+	return b.String()
+}
+
+// buildMaintenanceValidateWorkflowsJob returns the YAML for the validate_workflows job.
+// This job uses ubuntu-latest by default (needs full runner for CLI installation).
+func buildMaintenanceValidateWorkflowsJob(p maintenanceWorkflowParams) string {
+	var b strings.Builder
+
+	validateRunsOnValue := FormatRunsOn(p.configuredRunsOn, "ubuntu-latest")
+	b.WriteString(`
+  validate_workflows:
+    if: ${{ ` + RenderCondition(buildDispatchOperationCondition("validate")) + ` }}
+    runs-on: ` + validateRunsOnValue + `
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: ` + getActionPin("actions/checkout") + `
+        with:
+          persist-credentials: false
+
+      - name: Setup Scripts
+        uses: ` + p.setupActionRef + `
+        with:
+          destination: ${{ runner.temp }}/gh-aw/actions
+
+      - name: Check admin/maintainer permissions
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/check_team_member.cjs');
+            await main();
+
+`)
+
+	b.WriteString(generateInstallCLISteps(p.actionMode, p.version, p.actionTag, p.resolver))
+	b.WriteString(`      - name: Validate workflows and file issue on findings
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        env:
+          GH_AW_CMD_PREFIX: ` + getCLICmdPrefix(p.actionMode) + `
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/run_validate_workflows.cjs');
+            await main();
+`)
+
+	return b.String()
+}
+
+// buildMaintenanceLabelTriggerJobs returns the YAML for label-triggered jobs:
+// label_disable_agentic_workflow and label_apply_safe_outputs.
+// Only called when label triggers are enabled (disableLabelTrigger == false).
+func buildMaintenanceLabelTriggerJobs(p maintenanceWorkflowParams) string {
+	var b strings.Builder
+
+	disableLabelCondition := buildLabeledDisableCondition()
+	b.WriteString(`
+  label_disable_agentic_workflow:
+    if: ${{ ` + RenderCondition(disableLabelCondition) + ` }}
+    runs-on: ` + p.runsOnValue + `
+    permissions:
+      actions: write
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout actions folder
+        uses: ` + getActionPin("actions/checkout") + `
+        with:
+          sparse-checkout: |
+            actions
+          persist-credentials: false
+
+      - name: Setup Scripts
+        uses: ` + p.setupActionRef + `
+        with:
+          destination: ${{ runner.temp }}/gh-aw/actions
+
+      - name: Check admin/maintainer permissions
+        id: check_permissions
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/check_team_member.cjs');
+            await main();
+
+      - name: Disable agentic workflow
+        if: ${{ steps.check_permissions.outcome == 'success' }}
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/disable_agentic_workflow.cjs');
+            await main();
+`)
+
+	applySafeOutputsCondition := buildLabeledApplySafeOutputsCondition()
+	b.WriteString(`
+  label_apply_safe_outputs:
+    if: ${{ ` + RenderCondition(applySafeOutputsCondition) + ` }}
+    runs-on: ` + p.runsOnValue + `
+    permissions:
+      actions: read
+      contents: write
+      discussions: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout actions folder
+        uses: ` + getActionPin("actions/checkout") + `
+        with:
+          sparse-checkout: |
+            actions
+          persist-credentials: false
+
+      - name: Setup Scripts
+        uses: ` + p.setupActionRef + `
+        with:
+          destination: ${{ runner.temp }}/gh-aw/actions
+
+      - name: Check admin/maintainer permissions
+        id: check_permissions
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/check_team_member.cjs');
+            await main();
+
+      - name: Apply safe outputs from referenced run
+        if: ${{ steps.check_permissions.outcome == 'success' }}
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/label_apply_safe_outputs.cjs');
+            await main();
+`)
+
+	return b.String()
+}
+
+// buildMaintenanceDevModeJobs returns the YAML for dev-mode-only jobs:
+// compile-workflows and secret-validation.
+// Only called when actionMode == ActionModeDev.
+func buildMaintenanceDevModeJobs(p maintenanceWorkflowParams) string {
+	var b strings.Builder
+
+	b.WriteString(`
+  compile-workflows:
+    if: ${{ ` + RenderCondition(buildNotForkAndScheduled()) + ` }}
+    runs-on: ` + p.runsOnValue + `
+    concurrency:
+      group: ${{ github.workflow }}-compile-workflows-${{ github.repository }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+`)
+
+	b.WriteString(generateInstallCLISteps(p.actionMode, p.version, p.actionTag, p.resolver))
+	b.WriteString(`      - name: Compile workflows
+        run: |
+          ` + getCLICmdPrefix(p.actionMode) + ` compile --validate --validate-images --verbose
+          echo "✓ All workflows compiled successfully"
+
+      - name: Setup Scripts
+        uses: ` + p.setupActionRef + `
+        with:
+          destination: ${{ runner.temp }}/gh-aw/actions
+
+      - name: Check for out-of-sync workflows and create issue if needed
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        with:
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/check_workflow_recompile_needed.cjs');
+            await main();
+
+  secret-validation:
+    if: ${{ ` + RenderCondition(buildNotForkAndScheduleOnly()) + ` }}
+    runs-on: ` + p.runsOnValue + `
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout actions folder
+        uses: ` + getActionPin("actions/checkout") + `
+        with:
+          sparse-checkout: |
+            actions
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: '22'
+
+      - name: Setup Scripts
+        uses: ` + p.setupActionRef + `
+        with:
+          destination: ${{ runner.temp }}/gh-aw/actions
+
+      - name: Validate Secrets
+        uses: ` + getCachedActionPinFromResolver("actions/github-script", p.resolver) + `
+        env:
+          # GitHub tokens
+          GH_AW_GITHUB_TOKEN: ${{ secrets.GH_AW_GITHUB_TOKEN }}
+          GH_AW_GITHUB_MCP_SERVER_TOKEN: ${{ secrets.GH_AW_GITHUB_MCP_SERVER_TOKEN }}
+          GH_AW_PROJECT_GITHUB_TOKEN: ${{ secrets.GH_AW_PROJECT_GITHUB_TOKEN }}
+          GH_AW_COPILOT_TOKEN: ${{ secrets.GH_AW_COPILOT_TOKEN }}
+          # AI Engine API keys
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+          # Integration tokens
+          NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
+        with:
+          script: |
+            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
+            setupGlobals(core, github, context, exec, io, getOctokit);
+            const { main } = require('${{ runner.temp }}/gh-aw/actions/validate_secrets.cjs');
+            await main();
+
+      - name: Upload secret validation report
+        if: always()
+        uses: ` + getActionPin("actions/upload-artifact") + `
+        with:
+          name: secret-validation-report
+          path: secret-validation-report.md
+          retention-days: 30
+          if-no-files-found: warn
+`)
+
+	return b.String()
+}

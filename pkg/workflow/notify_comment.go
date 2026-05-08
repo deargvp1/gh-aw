@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"slices"
-	"strconv"
 	"strings"
 
 	"github.com/github/gh-aw/pkg/constants"
@@ -28,7 +27,6 @@ func (c *Compiler) buildConclusionJob(data *WorkflowData, mainJobName string, sa
 	notifyCommentLog.Printf("Building conclusion job: main_job=%s, safe_output_jobs_count=%d", mainJobName, len(safeOutputJobNames))
 
 	// Always create this job when safe-outputs exist (because noop is always enabled)
-	// This ensures noop messages can be handled even without reactions
 	if data.SafeOutputs == nil {
 		notifyCommentLog.Printf("Skipping job: no safe-outputs configured")
 		return nil, nil // No safe-outputs configured, no need for conclusion job
@@ -43,7 +41,6 @@ func (c *Compiler) buildConclusionJob(data *WorkflowData, mainJobName string, sa
 		// For dev mode (local action path), checkout the actions folder first
 		steps = append(steps, c.generateCheckoutActionsFolder(data)...)
 
-		// Notify comment job doesn't need project support
 		// Conclusion/notify job depends on activation, reuse its trace ID
 		notifyTraceID := fmt.Sprintf("${{ needs.%s.outputs.setup-trace-id }}", constants.ActivationJobName)
 		steps = append(steps, c.generateSetupStep(data, setupActionRef, SetupActionDestination, false, notifyTraceID)...)
@@ -51,11 +48,7 @@ func (c *Compiler) buildConclusionJob(data *WorkflowData, mainJobName string, sa
 
 	// Add GitHub App token minting step if app is configured
 	if data.SafeOutputs.GitHubApp != nil {
-		// Compute permissions based on configured safe outputs (principle of least privilege)
 		permissions := ComputePermissionsForSafeOutputs(data.SafeOutputs)
-		// For workflow_call relay workflows, scope the token to the platform repo name only
-		// (not the full slug) because actions/create-github-app-token expects repo names
-		// without the owner prefix when `owner` is also set.
 		var appTokenFallbackRepo string
 		if hasWorkflowCallTrigger(data.On) {
 			appTokenFallbackRepo = "${{ needs.activation.outputs.target_repo_name }}"
@@ -63,334 +56,36 @@ func (c *Compiler) buildConclusionJob(data *WorkflowData, mainJobName string, sa
 		steps = append(steps, c.buildGitHubAppTokenMintStep(data.SafeOutputs.GitHubApp, permissions, appTokenFallbackRepo)...)
 	}
 
-	// Add artifact download steps once (shared by noop and conclusion steps).
-	// In workflow_call context, use the per-invocation prefix to avoid artifact name clashes.
+	// Add artifact download steps once (shared by noop and conclusion steps)
 	steps = append(steps, buildAgentOutputDownloadSteps(artifactPrefixExprForDownstreamJob(data))...)
 
-	// Add noop processing step if noop is configured.
-	// This single step replaces the former two-step "Process No-Op Messages" + "Handle No-Op Message"
-	// sequence: handle_noop_message.cjs now loads agent output directly (no cross-step dep).
-	if data.SafeOutputs.NoOp != nil {
-		// Build custom environment variables for the merged noop step
-		var noopEnvVars []string
-		noopEnvVars = append(noopEnvVars, buildTemplatableIntEnvVar("GH_AW_NOOP_MAX", data.SafeOutputs.NoOp.Max)...)
+	// Add noop processing step if noop is configured
+	steps = append(steps, c.buildConclusionJobNoOpSteps(data, mainJobName)...)
 
-		// Add workflow metadata for consistency
-		noopEnvVars = append(noopEnvVars, buildWorkflowMetadataEnvVarsWithTrackerID(data.Name, data.Source, data.TrackerID)...)
-
-		// Agent conclusion and run URL are used to decide whether to post to the runs issue
-		noopEnvVars = append(noopEnvVars, "          GH_AW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n")
-		noopEnvVars = append(noopEnvVars, fmt.Sprintf("          GH_AW_AGENT_CONCLUSION: ${{ needs.%s.result }}\n", mainJobName))
-		noopEnvVars = append(noopEnvVars, buildTemplatableBoolEnvVar("GH_AW_NOOP_REPORT_AS_ISSUE", data.SafeOutputs.NoOp.ReportAsIssue)...)
-		if data.SafeOutputs.NoOp.ReportAsIssue == nil {
-			noopEnvVars = append(noopEnvVars, "          GH_AW_NOOP_REPORT_AS_ISSUE: \"true\"\n")
-		}
-
-		// Build the merged noop step (without artifact downloads - already added above)
-		noopSteps := c.buildGitHubScriptStepWithoutDownload(data, GitHubScriptStepConfig{
-			StepName:      "Process no-op messages",
-			StepID:        "noop",
-			MainJobName:   mainJobName,
-			CustomEnvVars: noopEnvVars,
-			ScriptFile:    "handle_noop_message.cjs",
-			CustomToken:   data.SafeOutputs.NoOp.GitHubToken,
-		})
-		steps = append(steps, noopSteps...)
-	}
-
-	// Add detection runs logging step if threat detection is enabled.
-	// This posts a comment to the "[aw] Detection Runs" tracking issue whenever
-	// the detection job produces a warning or failure conclusion.
-	if IsDetectionJobEnabled(data.SafeOutputs) {
-		var detectionRunsEnvVars []string
-		detectionRunsEnvVars = append(detectionRunsEnvVars, buildWorkflowMetadataEnvVarsWithTrackerID(data.Name, data.Source, data.TrackerID)...)
-		detectionRunsEnvVars = append(detectionRunsEnvVars, "          GH_AW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n")
-		detectionRunsEnvVars = append(detectionRunsEnvVars, fmt.Sprintf("          GH_AW_DETECTION_CONCLUSION: ${{ needs.%s.outputs.detection_conclusion }}\n", constants.DetectionJobName))
-		detectionRunsEnvVars = append(detectionRunsEnvVars, fmt.Sprintf("          GH_AW_DETECTION_REASON: ${{ needs.%s.outputs.detection_reason }}\n", constants.DetectionJobName))
-
-		detectionRunsSteps := c.buildGitHubScriptStepWithoutDownload(data, GitHubScriptStepConfig{
-			StepName:      "Log detection run",
-			StepID:        "detection_runs",
-			MainJobName:   mainJobName,
-			CustomEnvVars: detectionRunsEnvVars,
-			ScriptFile:    "handle_detection_runs.cjs",
-		})
-		steps = append(steps, detectionRunsSteps...)
-		notifyCommentLog.Print("Added detection runs logging step to conclusion job")
-	}
+	// Add detection runs logging step if threat detection is enabled
+	steps = append(steps, c.buildConclusionJobDetectionRunsSteps(data, mainJobName)...)
 
 	// Add missing_tool processing step if missing-tool is configured
-	if data.SafeOutputs.MissingTool != nil {
-		// Build custom environment variables specific to missing-tool
-		var missingToolEnvVars []string
-		missingToolEnvVars = append(missingToolEnvVars, buildTemplatableIntEnvVar("GH_AW_MISSING_TOOL_MAX", data.SafeOutputs.MissingTool.Max)...)
-
-		// Add create-issue configuration
-		missingToolEnvVars = append(missingToolEnvVars, buildTemplatableBoolEnvVar("GH_AW_MISSING_TOOL_CREATE_ISSUE", data.SafeOutputs.MissingTool.CreateIssue)...)
-
-		// Add title-prefix configuration
-		if data.SafeOutputs.MissingTool.TitlePrefix != "" {
-			missingToolEnvVars = append(missingToolEnvVars, fmt.Sprintf("          GH_AW_MISSING_TOOL_TITLE_PREFIX: %q\n", data.SafeOutputs.MissingTool.TitlePrefix))
-		}
-
-		// Add labels configuration
-		if len(data.SafeOutputs.MissingTool.Labels) > 0 {
-			labelsJSON, err := json.Marshal(data.SafeOutputs.MissingTool.Labels)
-			if err == nil {
-				missingToolEnvVars = append(missingToolEnvVars, fmt.Sprintf("          GH_AW_MISSING_TOOL_LABELS: %q\n", string(labelsJSON)))
-			}
-		}
-
-		// Add workflow metadata for consistency
-		missingToolEnvVars = append(missingToolEnvVars, buildWorkflowMetadataEnvVarsWithTrackerID(data.Name, data.Source, data.TrackerID)...)
-
-		// Build the missing_tool processing step (without artifact downloads - already added above)
-		missingToolSteps := c.buildGitHubScriptStepWithoutDownload(data, GitHubScriptStepConfig{
-			StepName:      "Record missing tool",
-			StepID:        "missing_tool",
-			MainJobName:   mainJobName,
-			CustomEnvVars: missingToolEnvVars,
-			Script:        "const { main } = require('${{ runner.temp }}/gh-aw/actions/missing_tool.cjs'); await main();",
-			ScriptFile:    "missing_tool.cjs",
-			CustomToken:   data.SafeOutputs.MissingTool.GitHubToken,
-		})
-		steps = append(steps, missingToolSteps...)
-	}
+	steps = append(steps, c.buildConclusionJobMissingToolSteps(data, mainJobName)...)
 
 	// Add report_incomplete processing step if report-incomplete is configured
-	if data.SafeOutputs.ReportIncomplete != nil {
-		// Build custom environment variables specific to report-incomplete
-		var reportIncompleteEnvVars []string
-		reportIncompleteEnvVars = append(reportIncompleteEnvVars, buildTemplatableIntEnvVar("GH_AW_REPORT_INCOMPLETE_MAX", data.SafeOutputs.ReportIncomplete.Max)...)
-
-		// Add create-issue configuration
-		reportIncompleteEnvVars = append(reportIncompleteEnvVars, buildTemplatableBoolEnvVar("GH_AW_REPORT_INCOMPLETE_CREATE_ISSUE", data.SafeOutputs.ReportIncomplete.CreateIssue)...)
-
-		// Add title-prefix configuration
-		if data.SafeOutputs.ReportIncomplete.TitlePrefix != "" {
-			reportIncompleteEnvVars = append(reportIncompleteEnvVars, fmt.Sprintf("          GH_AW_REPORT_INCOMPLETE_TITLE_PREFIX: %q\n", data.SafeOutputs.ReportIncomplete.TitlePrefix))
-		}
-
-		// Add labels configuration
-		if len(data.SafeOutputs.ReportIncomplete.Labels) > 0 {
-			labelsJSON, err := json.Marshal(data.SafeOutputs.ReportIncomplete.Labels)
-			if err == nil {
-				reportIncompleteEnvVars = append(reportIncompleteEnvVars, fmt.Sprintf("          GH_AW_REPORT_INCOMPLETE_LABELS: %q\n", string(labelsJSON)))
-			}
-		}
-
-		// Add workflow metadata for consistency
-		reportIncompleteEnvVars = append(reportIncompleteEnvVars, buildWorkflowMetadataEnvVarsWithTrackerID(data.Name, data.Source, data.TrackerID)...)
-
-		// Build the report_incomplete processing step (without artifact downloads - already added above)
-		reportIncompleteSteps := c.buildGitHubScriptStepWithoutDownload(data, GitHubScriptStepConfig{
-			StepName:      "Record incomplete",
-			StepID:        "report_incomplete",
-			MainJobName:   mainJobName,
-			CustomEnvVars: reportIncompleteEnvVars,
-			Script:        "const { main } = require('${{ runner.temp }}/gh-aw/actions/report_incomplete_handler.cjs'); await main();",
-			ScriptFile:    "report_incomplete_handler.cjs",
-			CustomToken:   data.SafeOutputs.ReportIncomplete.GitHubToken,
-		})
-		steps = append(steps, reportIncompleteSteps...)
-	}
-
-	// Add agent failure handling step - creates/updates an issue when agent job fails
-	// This step always runs and checks if the agent job failed
-	// Build environment variables for the agent failure handler
+	steps = append(steps, c.buildConclusionJobReportIncompleteSteps(data, mainJobName)...)
 
 	// Serialize messages config once for reuse in both handler steps below.
 	var messagesJSON string
 	if data.SafeOutputs != nil && data.SafeOutputs.Messages != nil {
-		if json, jsonErr := serializeMessagesConfig(data.SafeOutputs.Messages); jsonErr != nil {
+		if jsonStr, jsonErr := serializeMessagesConfig(data.SafeOutputs.Messages); jsonErr != nil {
 			notifyCommentLog.Printf("Warning: failed to serialize messages config: %v", jsonErr)
 		} else {
-			messagesJSON = json
+			messagesJSON = jsonStr
 		}
 	}
 
-	var agentFailureEnvVars []string
-	agentFailureEnvVars = append(agentFailureEnvVars, buildWorkflowMetadataEnvVarsWithTrackerID(data.Name, data.Source, data.TrackerID)...)
-	agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n")
-	agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_AGENT_CONCLUSION: ${{ needs.%s.result }}\n", mainJobName))
-	agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_WORKFLOW_ID: %q\n", data.WorkflowID))
-
-	actionFailureIssueExpiresHours := DefaultActionFailureIssueExpiresHours
-	repoConfig, repoConfigErr := c.loadRepoConfig()
-	if repoConfigErr != nil {
-		notifyCommentLog.Printf(
-			"Warning: failed to load repo config for action failure issue expiration (using default %d hours): %v. Check that %s exists and matches schema requirements",
-			DefaultActionFailureIssueExpiresHours,
-			repoConfigErr,
-			RepoConfigFileName,
-		)
-	} else {
-		actionFailureIssueExpiresHours = repoConfig.ActionFailureIssueExpiresHours()
-	}
-	agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_ACTION_FAILURE_ISSUE_EXPIRES_HOURS: %q\n", strconv.Itoa(actionFailureIssueExpiresHours)))
-
-	// Pass the engine ID so the failure handler can surface which AI engine terminated
-	if data.EngineConfig != nil && data.EngineConfig.ID != "" {
-		agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_ENGINE_ID: %q\n", data.EngineConfig.ID))
-	}
-
-	// Only add secret_verification_result if the engine provides a validate-secret step.
-	// The validate-secret step runs in the activation job, so the output is on needs.activation.
-	engine, err := c.getAgenticEngine(data.AI)
+	// Build and add agent failure handling step
+	agentFailureEnvVars, err := c.buildConclusionJobAgentFailureEnvVars(data, mainJobName, safeOutputJobNames, messagesJSON)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get agentic engine: %w", err)
+		return nil, err
 	}
-	if EngineHasValidateSecretStep(engine, data) {
-		agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_SECRET_VERIFICATION_RESULT: ${{ needs.%s.outputs.secret_verification_result }}\n", string(constants.ActivationJobName)))
-	}
-
-	// Add checkout_pr_success to detect PR checkout failures (e.g., PR merged and branch deleted)
-	// Only add if the checkout-pr step will be generated (requires contents read access)
-	if ShouldGeneratePRCheckoutStep(data) {
-		agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_CHECKOUT_PR_SUCCESS: ${{ needs.%s.outputs.checkout_pr_success }}\n", mainJobName))
-	}
-
-	// Pass Copilot-engine-specific error detection outputs to the conclusion job.
-	// These are set by the detect-copilot-errors step in the agent job and cover:
-	//   - inference_access_error: token lacks inference access
-	//   - mcp_policy_error: MCP servers blocked by enterprise/organization policy
-	//   - agentic_engine_timeout: engine process killed by signal (step timeout)
-	//   - model_not_supported_error: requested model unavailable for the subscription tier
-	if _, ok := engine.(*CopilotEngine); ok {
-		agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_INFERENCE_ACCESS_ERROR: ${{ needs.%s.outputs.inference_access_error }}\n", mainJobName))
-		agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_MCP_POLICY_ERROR: ${{ needs.%s.outputs.mcp_policy_error }}\n", mainJobName))
-		agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_AGENTIC_ENGINE_TIMEOUT: ${{ needs.%s.outputs.agentic_engine_timeout }}\n", mainJobName))
-		agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_MODEL_NOT_SUPPORTED_ERROR: ${{ needs.%s.outputs.model_not_supported_error }}\n", mainJobName))
-	}
-
-	// Pass the engine's primary AI inference API hosts so the failure handler can detect
-	// credential authentication rejections in the firewall audit log without relying solely
-	// on hardcoded patterns. The list is comma-separated (e.g. "api.enterprise.githubcopilot.com,api.githubcopilot.com").
-	if apiHosts := getEngineAPIHosts(data, engine); len(apiHosts) > 0 {
-		agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_ENGINE_API_HOSTS: %q\n", strings.Join(apiHosts, ",")))
-	}
-
-	// Pass assignment error outputs from safe_outputs job if assign-to-agent is configured
-	if data.SafeOutputs != nil && data.SafeOutputs.AssignToAgent != nil {
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_ASSIGNMENT_ERRORS: ${{ needs.safe_outputs.outputs.assign_to_agent_assignment_errors }}\n")
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_ASSIGNMENT_ERROR_COUNT: ${{ needs.safe_outputs.outputs.assign_to_agent_assignment_error_count }}\n")
-	}
-
-	// Pass copilot assignment failure outputs from safe_outputs job if create-issue with copilot assignee is configured
-	if data.SafeOutputs != nil && data.SafeOutputs.CreateIssues != nil && hasCopilotAssignee(data.SafeOutputs.CreateIssues.Assignees) {
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_ASSIGN_COPILOT_FAILURE_COUNT: ${{ needs.safe_outputs.outputs.assign_copilot_failure_count }}\n")
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_ASSIGN_COPILOT_ERRORS: ${{ needs.safe_outputs.outputs.assign_copilot_errors }}\n")
-	}
-
-	// Pass create_discussion error outputs from safe_outputs job if create-discussions is configured
-	if data.SafeOutputs != nil && data.SafeOutputs.CreateDiscussions != nil {
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_CREATE_DISCUSSION_ERRORS: ${{ needs.safe_outputs.outputs.create_discussion_errors }}\n")
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_CREATE_DISCUSSION_ERROR_COUNT: ${{ needs.safe_outputs.outputs.create_discussion_error_count }}\n")
-	}
-
-	// Pass code-push failure outputs from safe_outputs job if push-to-pull-request-branch or create-pull-request is configured
-	if data.SafeOutputs != nil && (data.SafeOutputs.PushToPullRequestBranch != nil || data.SafeOutputs.CreatePullRequests != nil) {
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_CODE_PUSH_FAILURE_ERRORS: ${{ needs.safe_outputs.outputs.code_push_failure_errors }}\n")
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_CODE_PUSH_FAILURE_COUNT: ${{ needs.safe_outputs.outputs.code_push_failure_count }}\n")
-	}
-
-	// Pass GitHub App token minting failure status so the handler can surface auth errors.
-	// The safe_outputs job tracks whether its token step failed as a job output.
-	// The conclusion job tracks its own app token step outcome directly via steps context.
-	if data.SafeOutputs != nil && data.SafeOutputs.GitHubApp != nil {
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_SAFE_OUTPUTS_APP_TOKEN_MINTING_FAILED: ${{ needs.safe_outputs.outputs.app_token_minting_failed }}\n")
-		// Also check the conclusion job's own app token step outcome; this is important because
-		// the Handle Agent Failure step must use if: always() to run even when this step fails.
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_CONCLUSION_APP_TOKEN_MINTING_FAILED: ${{ steps.safe-outputs-app-token.outcome == 'failure' }}\n")
-	}
-
-	// Pass activation job GitHub App token minting failure status if configured.
-	if data.ActivationGitHubApp != nil {
-		agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_ACTIVATION_APP_TOKEN_MINTING_FAILED: ${{ needs.%s.outputs.activation_app_token_minting_failed }}\n", string(constants.ActivationJobName)))
-	}
-
-	// Always pass lockdown check failure status so the handler can surface configuration
-	// errors even when the agent job was skipped due to the lockdown check failing.
-	agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_LOCKDOWN_CHECK_FAILED: ${{ needs.%s.outputs.lockdown_check_failed }}\n", string(constants.ActivationJobName)))
-
-	// Pass stale lock file check failure status so the handler can surface a specialised
-	// failure issue / comment with remediation guidance when the frontmatter hash check detects
-	// that the compiled lock file no longer matches its source markdown file.
-	// This output is only set when stale-check is enabled (the default); when disabled the
-	// expression evaluates to "" which handle_agent_failure treats as "not failed".
-	agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_STALE_LOCK_FILE_FAILED: ${{ needs.%s.outputs.stale_lock_file_failed }}\n", string(constants.ActivationJobName)))
-
-	// Pass custom messages config if present (JSON computed once above)
-	if messagesJSON != "" {
-		agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_SAFE_OUTPUT_MESSAGES: %q\n", messagesJSON))
-	}
-
-	// Pass repo-memory failure outputs if repo-memory is configured
-	// This allows the agent failure handler to report both job-level failures and validation issues
-	if data.RepoMemoryConfig != nil && len(data.RepoMemoryConfig.Memories) > 0 {
-		// Pass the overall push_repo_memory job result so the failure handler
-		// can report when the push job itself fails (e.g. permission or configuration errors)
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_PUSH_REPO_MEMORY_RESULT: ${{ needs.push_repo_memory.result }}\n")
-		for _, memory := range data.RepoMemoryConfig.Memories {
-			// Add validation status for each memory
-			agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_REPO_MEMORY_VALIDATION_FAILED_%s: ${{ needs.push_repo_memory.outputs.validation_failed_%s }}\n", memory.ID, memory.ID))
-			agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_REPO_MEMORY_VALIDATION_ERROR_%s: ${{ needs.push_repo_memory.outputs.validation_error_%s }}\n", memory.ID, memory.ID))
-			agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_REPO_MEMORY_PATCH_SIZE_EXCEEDED_%s: ${{ needs.push_repo_memory.outputs.patch_size_exceeded_%s }}\n", memory.ID, memory.ID))
-		}
-	}
-
-	// Pass group-reports configuration flag (defaults to false if not specified)
-	if data.SafeOutputs != nil && data.SafeOutputs.GroupReports {
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_GROUP_REPORTS: \"true\"\n")
-	} else {
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_GROUP_REPORTS: \"false\"\n")
-	}
-
-	// Pass report-failure-as-issue configuration flag (defaults to true if not specified)
-	if data.SafeOutputs != nil && data.SafeOutputs.ReportFailureAsIssue != nil && !*data.SafeOutputs.ReportFailureAsIssue {
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_FAILURE_REPORT_AS_ISSUE: \"false\"\n")
-	} else {
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_FAILURE_REPORT_AS_ISSUE: \"true\"\n")
-	}
-
-	// Pass missing-tool report-as-failure flag (defaults to true when not configured).
-	// When false, missing_tool signals will not activate failure handling.
-	if data.SafeOutputs != nil && data.SafeOutputs.MissingTool != nil && data.SafeOutputs.MissingTool.ReportAsFailure != nil {
-		agentFailureEnvVars = append(agentFailureEnvVars, buildTemplatableBoolEnvVar("GH_AW_MISSING_TOOL_REPORT_AS_FAILURE", data.SafeOutputs.MissingTool.ReportAsFailure)...)
-	} else {
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_MISSING_TOOL_REPORT_AS_FAILURE: \"true\"\n")
-	}
-
-	// Pass missing-data report-as-failure flag (defaults to true when not configured).
-	// When false, missing_data signals will not activate failure handling.
-	if data.SafeOutputs != nil && data.SafeOutputs.MissingData != nil && data.SafeOutputs.MissingData.ReportAsFailure != nil {
-		agentFailureEnvVars = append(agentFailureEnvVars, buildTemplatableBoolEnvVar("GH_AW_MISSING_DATA_REPORT_AS_FAILURE", data.SafeOutputs.MissingData.ReportAsFailure)...)
-	} else {
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_MISSING_DATA_REPORT_AS_FAILURE: \"true\"\n")
-	}
-
-	// Pass failure-issue-repo configuration (optional, defaults to current repo)
-	if data.SafeOutputs != nil && data.SafeOutputs.FailureIssueRepo != "" {
-		agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_FAILURE_ISSUE_REPO: %q\n", data.SafeOutputs.FailureIssueRepo))
-	}
-
-	// Pass timeout minutes value so the failure handler can provide an actionable hint when timed out
-	timeoutValue := strings.TrimPrefix(data.TimeoutMinutes, "timeout-minutes: ")
-	if timeoutValue != "" {
-		agentFailureEnvVars = append(agentFailureEnvVars, fmt.Sprintf("          GH_AW_TIMEOUT_MINUTES: %q\n", timeoutValue))
-	}
-
-	// Pass cache-memory availability flag so the failure handler can detect cache-miss
-	// misconfigurations: a cache_miss reported by the agent despite cache-memory being available
-	// indicates the prompt is referencing an incorrect file path within the cache directory.
-	if data.CacheMemoryConfig != nil && len(data.CacheMemoryConfig.Caches) > 0 {
-		agentFailureEnvVars = append(agentFailureEnvVars, "          GH_AW_CACHE_MEMORY_ENABLED: \"true\"\n")
-	}
-
-	// Build the agent failure handling step.
-	// Use if: always() so this step runs even when an earlier step in the conclusion job
-	// (such as the GitHub App token minting step) has failed. The handler uses the default
-	// GITHUB_TOKEN and does not depend on the app-minted token.
 	agentFailureSteps := c.buildGitHubScriptStepWithoutDownload(data, GitHubScriptStepConfig{
 		StepName:      "Handle agent failure",
 		StepID:        "handle_agent_failure",
@@ -398,7 +93,7 @@ func (c *Compiler) buildConclusionJob(data *WorkflowData, mainJobName string, sa
 		CustomEnvVars: agentFailureEnvVars,
 		Script:        "const { main } = require('${{ runner.temp }}/gh-aw/actions/handle_agent_failure.cjs'); await main();",
 		ScriptFile:    "handle_agent_failure.cjs",
-		CustomToken:   "", // Will use default GITHUB_TOKEN
+		CustomToken:   "",
 		StepCondition: "always()",
 	})
 	steps = append(steps, agentFailureSteps...)
@@ -409,27 +104,25 @@ func (c *Compiler) buildConclusionJob(data *WorkflowData, mainJobName string, sa
 	customEnvVars = append(customEnvVars, fmt.Sprintf("          GH_AW_COMMENT_REPO: ${{ needs.%s.outputs.comment_repo }}\n", constants.ActivationJobName))
 	customEnvVars = append(customEnvVars, "          GH_AW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n")
 	customEnvVars = append(customEnvVars, fmt.Sprintf("          GH_AW_WORKFLOW_NAME: %q\n", data.Name))
-	// Pass the tracker-id if present
 	if data.TrackerID != "" {
 		customEnvVars = append(customEnvVars, fmt.Sprintf("          GH_AW_TRACKER_ID: %q\n", data.TrackerID))
 	}
 	customEnvVars = append(customEnvVars, fmt.Sprintf("          GH_AW_AGENT_CONCLUSION: ${{ needs.%s.result }}\n", mainJobName))
 
 	// Pass safe_outputs job result so the conclusion script can detect when safe outputs failed
-	// to deliver even if the agent succeeded (e.g. a 422 error during PR review submission).
 	if slices.Contains(safeOutputJobNames, string(constants.SafeOutputsJobName)) {
 		customEnvVars = append(customEnvVars, fmt.Sprintf("          GH_AW_SAFE_OUTPUTS_RESULT: ${{ needs.%s.result }}\n", constants.SafeOutputsJobName))
 		notifyCommentLog.Print("Added safe_outputs job result environment variable to conclusion job")
 	}
 
-	// Pass detection conclusion and reason if threat detection is enabled (in separate detection job)
+	// Pass detection conclusion and reason if threat detection is enabled
 	if IsDetectionJobEnabled(data.SafeOutputs) {
 		customEnvVars = append(customEnvVars, fmt.Sprintf("          GH_AW_DETECTION_CONCLUSION: ${{ needs.%s.outputs.detection_conclusion }}\n", constants.DetectionJobName))
 		customEnvVars = append(customEnvVars, fmt.Sprintf("          GH_AW_DETECTION_REASON: ${{ needs.%s.outputs.detection_reason }}\n", constants.DetectionJobName))
 		notifyCommentLog.Print("Added detection conclusion and reason environment variables to conclusion job")
 	}
 
-	// Pass assignment error count to the conclusion step so the status comment reflects assignment failures
+	// Pass assignment error count to the conclusion step
 	if data.SafeOutputs != nil && data.SafeOutputs.AssignToAgent != nil {
 		customEnvVars = append(customEnvVars, "          GH_AW_ASSIGNMENT_ERROR_COUNT: ${{ needs.safe_outputs.outputs.assign_to_agent_assignment_error_count }}\n")
 	}
@@ -449,15 +142,12 @@ func (c *Compiler) buildConclusionJob(data *WorkflowData, mainJobName string, sa
 		}
 	}
 
-	// Get token from config
+	// Only add the conclusion update step if status comments are explicitly enabled
 	var token string
 	if data.SafeOutputs != nil && data.SafeOutputs.AddComments != nil {
 		token = data.SafeOutputs.AddComments.GitHubToken
 	}
-
-	// Only add the conclusion update step if status comments are explicitly enabled
 	if data.StatusComment != nil && *data.StatusComment {
-		// Build the conclusion GitHub Script step (without artifact downloads - already added above)
 		scriptSteps := c.buildGitHubScriptStepWithoutDownload(data, GitHubScriptStepConfig{
 			StepName:      "Update reaction comment with completion status",
 			StepID:        "conclusion",
@@ -470,80 +160,25 @@ func (c *Compiler) buildConclusionJob(data *WorkflowData, mainJobName string, sa
 		steps = append(steps, scriptSteps...)
 	}
 
-	// Note: Unlock step has been moved to a dedicated unlock job
-	// that always runs, even if this conclusion job doesn't run.
-	// See buildUnlockJob() in compiler_unlock_job.go
-
 	// Add GitHub App token invalidation step if app is configured
 	if data.SafeOutputs.GitHubApp != nil {
 		notifyCommentLog.Print("Adding GitHub App token invalidation step to conclusion job")
 		steps = append(steps, c.buildGitHubAppTokenInvalidationStep()...)
 	}
 
-	// Append OTLP conclusion span step (no-op when endpoint is not configured).
-	// Note: this step is now handled by the action post step (post.js) so no
-	// injected step is needed here.
-
-	// Build the condition for this job:
-	// 1. always() - run even if agent fails
-	// 2. agent was activated (not skipped) OR lockdown check failed in activation job
-	// 3. IF comment_id exists: add_comment job either doesn't exist OR hasn't created a comment yet
-	//
-	// Note: The job should always run to handle noop messages (either update comment or write to summary)
-	// The script (notify_comment_error.cjs) handles the case where there's no comment gracefully
-
-	alwaysFunc := BuildFunctionCall("always")
-
-	// Check that agent job was activated (not skipped)
-	agentNotSkipped := BuildNotEquals(
-		BuildPropertyAccess(fmt.Sprintf("needs.%s.result", constants.AgentJobName)),
-		BuildStringLiteral("skipped"),
-	)
-
-	// Check if the lockdown check failed in the activation job — when this happens the agent
-	// is skipped, but we still want the conclusion job to run so it can report the failure.
-	lockdownCheckFailed := BuildEquals(
-		BuildPropertyAccess(fmt.Sprintf("needs.%s.outputs.lockdown_check_failed", string(constants.ActivationJobName))),
-		BuildStringLiteral("true"),
-	)
-
-	// Check if the frontmatter hash (stale lock file) check failed in the activation job.
-	// When this happens the agent is skipped, but we still want the conclusion job to run
-	// so it can surface a specialised failure issue with remediation guidance.
-	staleLockFileFailed := BuildEquals(
-		BuildPropertyAccess(fmt.Sprintf("needs.%s.outputs.stale_lock_file_failed", string(constants.ActivationJobName))),
-		BuildStringLiteral("true"),
-	)
-
-	// Agent not skipped OR lockdown check failed OR stale lock file check failed
-	agentNotSkippedOrActivationFailed := BuildOr(BuildOr(agentNotSkipped, lockdownCheckFailed), staleLockFileFailed)
-
-	// Check if add_comment job exists in the safe output jobs
-	hasAddCommentJob := slices.Contains(safeOutputJobNames, "add_comment")
-
-	// Build the condition based on whether add_comment job exists
-	var condition ConditionNode
-	if hasAddCommentJob {
-		// If add_comment job exists, also check that it hasn't already created a comment
-		// This prevents duplicate updates when add_comment has already updated the activation comment
-		noAddCommentOutput := &NotNode{
-			Child: BuildPropertyAccess("needs.add_comment.outputs.comment_id"),
-		}
-		condition = BuildAnd(
-			BuildAnd(alwaysFunc, agentNotSkippedOrActivationFailed),
-			noAddCommentOutput,
-		)
-	} else {
-		// If add_comment job doesn't exist, just check the basic conditions
-		condition = BuildAnd(alwaysFunc, agentNotSkippedOrActivationFailed)
+	// In script mode, explicitly add a cleanup step
+	if c.actionMode.IsScript() {
+		steps = append(steps, c.generateScriptModeCleanupStep())
 	}
+
+	// Build the if-condition for this job
+	condition := buildConclusionJobCondition(mainJobName, safeOutputJobNames)
 
 	// Build dependencies - this job depends on all safe output jobs to ensure it runs last
 	needs := []string{mainJobName, string(constants.ActivationJobName)}
 	needs = append(needs, safeOutputJobNames...)
 
 	// When threat detection is enabled, the conclusion job also depends on the detection job
-	// so that needs.detection.outputs.detection_conclusion is accessible.
 	if IsDetectionJobEnabled(data.SafeOutputs) {
 		needs = append(needs, string(constants.DetectionJobName))
 		notifyCommentLog.Print("Added detection job dependency to conclusion job")
@@ -551,7 +186,7 @@ func (c *Compiler) buildConclusionJob(data *WorkflowData, mainJobName string, sa
 
 	notifyCommentLog.Printf("Job built successfully: dependencies_count=%d", len(needs))
 
-	// Create outputs for the job (include noop and missing_tool outputs if configured)
+	// Create outputs for the job
 	outputs := map[string]string{}
 	if data.SafeOutputs.NoOp != nil {
 		outputs["noop_message"] = "${{ steps.noop.outputs.noop_message }}"
@@ -567,24 +202,16 @@ func (c *Compiler) buildConclusionJob(data *WorkflowData, mainJobName string, sa
 	// Compute permissions based on configured safe outputs (principle of least privilege)
 	permissions := ComputePermissionsForSafeOutputs(data.SafeOutputs)
 
-	// Build concurrency config for the conclusion job using the workflow ID.
-	// This prevents concurrent agents on the same workflow from interfering with each other.
+	// Build concurrency config for the conclusion job using the workflow ID
 	var concurrency string
 	if data.WorkflowID != "" {
 		group := "gh-aw-conclusion-" + data.WorkflowID
-		// If the user specified a job-discriminator, append it so that concurrent
-		// runs with different inputs (fan-out pattern) do not share the same group.
 		if data.ConcurrencyJobDiscriminator != "" {
 			notifyCommentLog.Printf("Appending job discriminator to conclusion job concurrency group: %s", data.ConcurrencyJobDiscriminator)
 			group = fmt.Sprintf("%s-%s", group, data.ConcurrencyJobDiscriminator)
 		}
 		concurrency = c.indentYAMLLines(fmt.Sprintf("concurrency:\n  group: %q\n  cancel-in-progress: false", group), "    ")
 		notifyCommentLog.Printf("Configuring conclusion job concurrency group: %s", group)
-	}
-
-	// In script mode, explicitly add a cleanup step (mirrors post.js in dev/release/action mode).
-	if c.actionMode.IsScript() {
-		steps = append(steps, c.generateScriptModeCleanupStep())
 	}
 
 	job := &Job{
