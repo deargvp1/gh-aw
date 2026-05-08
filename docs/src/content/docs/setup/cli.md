@@ -136,7 +136,7 @@ Initialize repository for agentic workflows. Configures `.gitattributes`, create
 ```bash wrap
 gh aw init                              # Initialize repository with defaults (non-interactive)
 gh aw init --no-mcp                     # Skip MCP server integration
-gh aw init --codespaces                 # Configure devcontainer for current repo
+gh aw init --codespaces ""              # Configure devcontainer for current repo only
 gh aw init --codespaces repo1,repo2     # Configure devcontainer for additional repos
 gh aw init --completions                # Install shell completions
 gh aw init --create-pull-request        # Initialize and open a pull request
@@ -212,12 +212,12 @@ gh aw secrets set MY_SECRET --value-from-env MY_TOKEN          # From env var
 
 ##### `secrets bootstrap`
 
-Analyze workflows to determine required secrets and interactively prompt for missing ones. Auto-detects engines in use and validates tokens before uploading to the repository.
+Analyze all workflows in the repository to determine which secrets are required, check which ones are already configured, and interactively prompt for any missing required secrets.
 
 ```bash wrap
-gh aw secrets bootstrap                                  # Analyze all workflows and prompt for missing secrets
-gh aw secrets bootstrap --engine copilot                 # Check only Copilot secrets
+gh aw secrets bootstrap                                  # Check and set up all required secrets
 gh aw secrets bootstrap --non-interactive                # Display missing secrets without prompting
+gh aw secrets bootstrap --engine copilot                 # Check secrets for a specific engine
 ```
 
 **Options:** `--engine` (copilot, claude, codex, gemini, crush), `--non-interactive`, `--repo`
@@ -434,7 +434,7 @@ echo "1234567890" | gh aw logs --stdin --engine claude
 cat run-ids.txt | gh aw logs --stdin --repo owner/repo   # required for bare numeric IDs
 ```
 
-**Options:** `--after`, `--after-run-id`, `--artifacts`, `--before-run-id`, `--count/-c`, `--end-date`, `--engine/-e`, `--filtered-integrity`, `--firewall`, `--format`, `--json/-j`, `--last`, `--no-firewall`, `--no-staged`, `--output/-o`, `--parse`, `--ref`, `--repo/-r`, `--safe-output`, `--start-date`, `--stdin`, `--summary-file`, `--timeout`, `--tool-graph`, `--train`
+**Options:** `--after` (cache cleanup; see above), `--after-run-id`, `--artifacts`, `--before-run-id`, `--count/-c`, `--end-date`, `--engine/-e`, `--filtered-integrity`, `--firewall`, `--format`, `--json/-j`, `--last` (alias for `--count`; prefer `--count/-c` in new scripts), `--no-firewall`, `--no-staged`, `--output/-o`, `--parse`, `--ref`, `--repo/-r`, `--safe-output`, `--start-date`, `--stdin`, `--summary-file`, `--timeout`, `--tool-graph`, `--train`
 
 #### `audit`
 
@@ -561,7 +561,7 @@ gh aw enable ci-doctor --repo owner/repo    # Enable in specific repository
 
 #### `disable`
 
-Disable one or more workflows and cancel any in-progress runs.
+Disable one or more workflows by ID, or all workflows if no IDs provided. Any in-progress runs will be cancelled before disabling.
 
 ```bash wrap
 gh aw disable                               # Disable all workflows
@@ -629,8 +629,11 @@ Manage MCP (Model Context Protocol) servers in workflows. `mcp inspect` auto-det
 gh aw mcp list workflow                    # List servers for workflow
 gh aw mcp list-tools <mcp-server>          # List tools for server
 gh aw mcp inspect workflow                 # Inspect and test servers
-gh aw mcp add                              # Add MCP tool to workflow
+gh aw mcp add                              # List available MCP servers from the registry
+gh aw mcp add <workflow> <server>          # Add MCP server to a workflow
 ```
+
+`mcp add` with no arguments lists available servers from the MCP registry. Providing only a workflow ID (without a server name) is an error — both arguments are required to add a server.
 
 See [MCPs Guide](/gh-aw/guides/mcps/).
 
