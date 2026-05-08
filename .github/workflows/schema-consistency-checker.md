@@ -10,7 +10,7 @@ permissions:
   pull-requests: read
 engine:
   id: claude
-  max-turns: 60
+  max-turns: 40
 tools:
   edit:
   bash: ["*"]
@@ -132,6 +132,44 @@ pre-agent-steps:
         }
       }' /tmp/gh-aw/agent/schema-diff.json
 
+  - name: Determine analysis focus area for this run
+    run: |
+      set -e
+      mkdir -p /tmp/gh-aw/agent
+
+      # Rotate through the 4 analysis areas on each scheduled run so every
+      # run stays within the 40-turn budget.
+      FOCUS_AREAS=("schema-vs-parser" "schema-vs-docs" "schema-vs-workflows" "parser-vs-docs")
+      AREA_NAMES=("Schema vs Parser Implementation" "Schema vs Documentation" "Schema vs Actual Workflows" "Parser vs Documentation")
+
+      NEXT_INDEX=0
+      if [ -f /tmp/gh-aw/cache-memory/focus-state.json ]; then
+        NEXT_INDEX=$(jq -r '.next_area_index // 0' /tmp/gh-aw/cache-memory/focus-state.json 2>/dev/null || echo "0")
+        # Guard against out-of-range values
+        if ! [[ "$NEXT_INDEX" =~ ^[0-9]+$ ]] || [ "$NEXT_INDEX" -ge "${#FOCUS_AREAS[@]}" ]; then
+          NEXT_INDEX=0
+        fi
+      fi
+
+      FOCUS_AREA="${FOCUS_AREAS[$NEXT_INDEX]}"
+      FOCUS_AREA_NAME="${AREA_NAMES[$NEXT_INDEX]}"
+      NEXT_AREA_INDEX=$(( (NEXT_INDEX + 1) % ${#FOCUS_AREAS[@]} ))
+
+      jq -n \
+        --arg focus_area "$FOCUS_AREA" \
+        --arg focus_area_name "$FOCUS_AREA_NAME" \
+        --argjson next_area_index "$NEXT_AREA_INDEX" \
+        --argjson current_area_index "$NEXT_INDEX" \
+        '{
+          focus_area: $focus_area,
+          focus_area_name: $focus_area_name,
+          current_area_index: $current_area_index,
+          next_area_index: $next_area_index
+        }' > /tmp/gh-aw/agent/focus-area.json
+
+      echo "✓ Focus area for this run: $FOCUS_AREA_NAME ($FOCUS_AREA)"
+      echo "  Next run will analyze: ${AREA_NAMES[$NEXT_AREA_INDEX]}"
+
 ---
 # Schema Consistency Checker
 
@@ -141,16 +179,42 @@ You are an expert system that detects inconsistencies between:
 - The documentation (`docs/src/content/docs/**/*.md`)
 - The workflows in the project (`.github/workflows/*.md`)
 
+## ⚠️ Turn Budget (40 turns total)
+
+You have a strict budget of **40 turns**. Manage your turns carefully:
+
+- **By turn 10**: Read pre-computed data, load cache, begin targeted analysis
+- **By turn 25**: Complete all primary analysis and record findings
+- **By turn 30**: Start writing the discussion report
+- **Turn 35 or later (hard stop)**: Stop all new analysis immediately. Write whatever findings you have so far to the discussion and call `create_discussion`. It is better to report partial-but-accurate findings than to run out of turns with no output.
+
+If at any point you notice you are on turn 30 or beyond, **stop exploring and finalize your report immediately**.
+
+## This Run: Single Focus Area
+
+Each run is scoped to **one analysis area** to stay within the 40-turn budget. Read your focus area from the pre-computed file:
+
+```bash
+cat /tmp/gh-aw/agent/focus-area.json
+```
+
+This file contains `focus_area` (machine key) and `focus_area_name` (human-readable). Only analyze that one area this run. The 4 areas rotate across runs:
+
+1. `schema-vs-parser` — Schema vs Parser Implementation
+2. `schema-vs-docs` — Schema vs Documentation
+3. `schema-vs-workflows` — Schema vs Actual Workflows
+4. `parser-vs-docs` — Parser vs Documentation
+
 ## Mission
 
-Analyze the repository to find inconsistencies across these four key areas and create a discussion report with actionable findings.
+Analyze the repository for the **current run's focus area** and create a discussion report with actionable findings.
 
 ## Cache Memory Strategy Storage
 
 Use the cache memory folder at `/tmp/gh-aw/cache-memory/` to store and reuse successful analysis strategies:
 
 1. **Read Previous Strategies**: Check `/tmp/gh-aw/cache-memory/strategies.json` for previously successful detection methods
-2. **Strategy Selection**: 
+2. **Strategy Selection**:
    - 70% of the time: Use a proven strategy from the cache
    - 30% of the time: Try a radically different approach to discover new inconsistencies
    - Implementation: Use the day of year (e.g., `date +%j`) modulo 10 to determine selection: values 0-6 use proven strategies, 7-9 try new approaches
@@ -175,7 +239,7 @@ Strategy database structure:
 
 ## Analysis Areas
 
-### 1. Schema vs Parser Implementation
+### 1. Schema vs Parser Implementation (`schema-vs-parser`)
 
 **Check for:**
 - Fields defined in schema but not handled in parser/compiler
@@ -205,7 +269,7 @@ Strategy database structure:
 - `pkg/workflow/github_token.go` - github-token configuration
 - `pkg/workflow/*.go` (all workflow processing files that use frontmatter)
 
-### 2. Schema vs Documentation
+### 2. Schema vs Documentation (`schema-vs-docs`)
 
 **Check for:**
 - Schema fields not documented
@@ -220,7 +284,7 @@ Strategy database structure:
 - `docs/src/content/docs/reference/frontmatter-full.md`
 - `docs/src/content/docs/reference/*.md` (all reference docs)
 
-### 3. Schema vs Actual Workflows
+### 3. Schema vs Actual Workflows (`schema-vs-workflows`)
 
 **Check for:**
 - Workflows using fields not in schema
@@ -234,7 +298,7 @@ Strategy database structure:
 - `.github/workflows/*.md` (all workflow files)
 - `.github/workflows/shared/**/*.md` (shared components)
 
-### 4. Parser vs Documentation
+### 4. Parser vs Documentation (`parser-vs-docs`)
 
 **Check for:**
 - Parser/compiler features not documented
@@ -287,26 +351,19 @@ Here are proven strategies you can use or build upon:
 
 ## Implementation Steps
 
-### Step 0: Read Pre-Computed Data (Start Here)
+### Step 0: Read Pre-Computed Data and Focus Area (Start Here)
 
-Before doing anything else, read the schema diff that was computed before your session began:
+Read both files before doing anything else:
 
 ```bash
+cat /tmp/gh-aw/agent/focus-area.json
 cat /tmp/gh-aw/agent/schema-diff.json
 ```
 
-This file contains:
-- `schema_fields`: All top-level field names in the main JSON schema
-- `parser_yaml_fields`: All yaml-tagged struct fields in `pkg/parser/*.go`
-- `workflow_yaml_fields`: All yaml-tagged struct fields in `pkg/workflow/*.go`
-- `used_in_workflows`: All top-level frontmatter keys used in `.github/workflows/*.md`
-- `field_types`: Schema field types for all top-level fields
-- `field_gaps.in_schema_not_parser`: Fields in schema absent from parser yaml tags
-- `field_gaps.in_parser_not_schema`: Fields as parser yaml tags absent from schema
-- `field_gaps.in_schema_not_workflow`: Fields in schema absent from workflow compiler yaml tags
-- `field_gaps.in_used_not_schema`: Fields used in workflow files but not in schema
+The `focus-area.json` tells you which analysis area to investigate this run.
+The `schema-diff.json` contains pre-computed field gap data — use it as your primary starting point.
 
-**Use this pre-computed data as your primary starting point.** Do NOT re-run the field enumeration commands from scratch — instead, refine and supplement the pre-computed data with targeted follow-up queries (e.g., checking a specific file for a specific field).
+**Use the pre-computed data as your starting point.** Do NOT re-run the field enumeration commands from scratch — instead, refine and supplement with targeted follow-up queries.
 
 ### Step 1: Load Previous Strategies
 ```bash
@@ -318,24 +375,13 @@ fi
 
 ### Step 2: Choose Analysis Focus
 
-Using the pre-computed `field_gaps` from Step 0 plus the strategy cache from Step 1:
-- If `field_gaps` show promising leads, start there (they are likely high-signal)
+Focus **exclusively** on the area from `focus-area.json`. Using the pre-computed `field_gaps` from Step 0 plus the strategy cache from Step 1:
+- If `field_gaps` show promising leads for your focus area, start there
 - If cache has strategies, use a proven strategy 70% of the time; try a new approach 30% of the time
-
-```bash
-# Determine selection mode (0-6 = proven strategy, 7-9 = new approach)
-day_mod=$(( $(date +%j) % 10 ))
-if [ "$day_mod" -le 6 ]; then
-  echo "Use proven strategy from cache"
-else
-  echo "Try new approach"
-fi
-```
 
 ### Step 3: Execute Targeted Analysis
 
-Use the pre-computed data as context and run **targeted** follow-up commands only when
-deeper inspection is needed (e.g., checking how a specific field is actually processed in code).
+Use the pre-computed data as context and run **targeted** follow-up commands only when deeper inspection is needed for your **focus area only**.
 
 **Example: Verify a gap from pre-computed data**
 ```bash
@@ -347,44 +393,45 @@ grep -r "fieldName" pkg/parser/ pkg/workflow/ 2>/dev/null | grep -v "_test.go"
 ```bash
 # Find schema field types (handles different JSON Schema patterns)
 jq -r '
-  (.properties // {}) | to_entries[] | 
+  (.properties // {}) | to_entries[] |
   "\(.key): \(.value.type // .value.oneOf // .value.anyOf // .value.allOf // "complex")"
 ' pkg/parser/schemas/main_workflow_schema.json 2>/dev/null || echo "Failed to parse schema"
 ```
 
 ### Step 4: Record Findings
-Create a structured list of inconsistencies found:
+
+Create a structured list of inconsistencies found in your focus area:
 
 ```markdown
 ## Inconsistencies Found
 
-### Schema ↔ Parser Mismatches
-1. **Field `engine.version`**: 
+### [Focus Area Name] Mismatches
+1. **Field `engine.version`**:
    - Schema: defines as string
    - Parser: not validated in frontmatter.go
    - Impact: Invalid values could pass through
-
-### Schema ↔ Documentation Mismatches  
-1. **Field `cache-memory`**:
-   - Schema: defines array of objects with `id` and `key`
-   - Docs: only shows simple boolean example
-   - Impact: Advanced usage not documented
-
-### Parser ↔ Documentation Mismatches
-1. **Error message for invalid `on` field**:
-   - Parser: "trigger configuration is required"
-   - Docs: doesn't mention this error
-   - Impact: Users may not understand error
 ```
 
 ### Step 5: Update Cache
-Save successful strategy and findings to cache:
+
+Save successful strategy and focus-area rotation state to cache:
+
 ```bash
 # Update strategies.json with results
 cat > /tmp/gh-aw/cache-memory/strategies.json << 'EOF'
 {
   "strategies": [...],
   "last_updated": "2024-XX-XX"
+}
+EOF
+
+# IMPORTANT: Save the next focus area index so the next run picks up where this one left off.
+# Read the next_area_index from focus-area.json (already computed by the pre-agent step).
+NEXT_INDEX=$(jq -r '.next_area_index' /tmp/gh-aw/agent/focus-area.json)
+cat > /tmp/gh-aw/cache-memory/focus-state.json << EOF
+{
+  "next_area_index": $NEXT_INDEX,
+  "last_updated": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 }
 EOF
 ```
@@ -404,8 +451,8 @@ Create a well-structured discussion report:
 
 ## Summary
 
+- **Focus Area**: [FOCUS AREA NAME]
 - **Inconsistencies Found**: [NUMBER]
-- **Categories Analyzed**: Schema, Parser, Documentation, Workflows
 - **Strategy Used**: [STRATEGY NAME]
 - **New Strategy**: [YES/NO]
 
@@ -448,6 +495,10 @@ Create a well-structured discussion report:
 - [ ] Update parser validation
 - [ ] Update documentation
 - [ ] Fix workflow files
+
+## Coverage
+
+This run analyzed: **[FOCUS AREA NAME]**. Remaining areas will be covered in subsequent runs.
 ```
 
 ## Important Guidelines
@@ -466,12 +517,13 @@ Create a well-structured discussion report:
 - Include code snippets to illustrate issues
 - Suggest concrete fixes
 
-### Efficiency  
-- **Always start from `/tmp/gh-aw/agent/schema-diff.json`** — this pre-computed diff eliminates the need to re-read all source files
+### Efficiency
+- **Always start from the pre-computed files** — they eliminate the need to re-read all source files
 - Use targeted bash commands to verify specific leads from the pre-computed data
 - Cache results when re-analyzing same data
 - Don't re-check things found in previous runs (check cache first)
 - Focus on high-impact areas (field gaps with parser mismatches are usually most critical)
+- **Stay within the 40-turn budget** — if you reach turn 30, finalize immediately
 
 ### Strategy Evolution
 - Try genuinely different approaches when not using cached strategies
@@ -489,13 +541,14 @@ You have access to:
 ## Success Criteria
 
 A successful run:
-- ✅ Analyzes all 4 areas (schema, parser, docs, workflows)
+- ✅ Reads the focus area and only analyzes that area
+- ✅ Completes within 40 turns
 - ✅ Uses or creates an effective detection strategy
-- ✅ Updates cache with strategy results
+- ✅ Updates cache with strategy results **and** next focus area index
 - ✅ Finds at least one category of inconsistencies OR confirms consistency
 - ✅ Creates a detailed discussion report
 - ✅ Provides actionable recommendations
 
-Begin your analysis now. Check the cache, choose a strategy, execute it, and **call `create_discussion` with your findings** to complete the workflow.
+Begin your analysis now. Read the focus area, check the cache, choose a strategy, execute it, and **call `create_discussion` with your findings** to complete the workflow.
 
 {{#runtime-import shared/noop-reminder.md}}
