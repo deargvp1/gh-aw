@@ -694,6 +694,7 @@ sync-action-scripts:
 .PHONY: install-git-hooks
 install-git-hooks:
 	@git config core.hooksPath .githooks
+	@test -f .githooks/pre-commit || { echo "Error: .githooks/pre-commit not found"; exit 1; }
 	@chmod +x .githooks/pre-commit
 	@echo "✓ Git hooks installed (core.hooksPath=.githooks)"
 

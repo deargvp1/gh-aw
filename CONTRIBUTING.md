@@ -24,13 +24,13 @@ If you encounter errors about Node.js or Go versions when running `make deps` or
 
 ### Install Git Pre-Commit Hooks
 
-After opening the repository locally, install the project git hooks once:
+After opening the repository locally, install the project git hooks once (including in Dev Containers/Codespaces):
 
 ```bash
 make install-git-hooks
 ```
 
-The pre-commit hook automatically runs `make recompile` when staged changes include `.github/workflows/*.md`. If recompilation updates any `.lock.yml` files, the commit is blocked until you stage those lock file updates.
+The pre-commit hook automatically runs `make recompile` when staged changes include workflow markdown files under `.github/workflows/*.md`. If recompilation updates any corresponding `.lock.yml` files, the commit is blocked until you stage those lock file updates.
 
 ## 🤖 How Development Works
 

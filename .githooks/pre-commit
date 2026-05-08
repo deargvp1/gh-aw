@@ -5,17 +5,37 @@ set -euo pipefail
 repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
 
-staged_workflow_md_files="$(git diff --cached --name-only --diff-filter=ACMR | grep -E '^\.github/workflows/.*\.md$' || true)"
-if [ -z "$staged_workflow_md_files" ]; then
+mapfile -t staged_files < <(git diff --cached --name-only --diff-filter=ACMR)
+staged_workflow_md_files=()
+for staged_file in "${staged_files[@]}"; do
+	if [[ "$staged_file" =~ ^\.github/workflows/.*\.md$ ]]; then
+		staged_workflow_md_files+=("$staged_file")
+	fi
+done
+if [ "${#staged_workflow_md_files[@]}" -eq 0 ]; then
 	exit 0
 fi
 
-echo "Detected staged workflow markdown changes. Running make recompile..."
-make recompile
+echo "Detected staged workflow markdown changes:"
+printf '%s\n' "${staged_workflow_md_files[@]}"
+echo "Running make recompile..."
+if ! make recompile; then
+	echo "Pre-commit hook failed while recompiling workflows."
+	echo "Fix the recompilation errors, then retry the commit."
+	exit 1
+fi
 
-if ! git diff --quiet -- .github/workflows; then
+changed_lock_files=()
+for workflow_md_file in "${staged_workflow_md_files[@]}"; do
+	lock_file="${workflow_md_file%.md}.lock.yml"
+	if [ -f "$lock_file" ] && ! git diff --quiet -- "$lock_file"; then
+		changed_lock_files+=("$lock_file")
+	fi
+done
+
+if [ "${#changed_lock_files[@]}" -gt 0 ]; then
 	echo "Workflow lock files are out of sync after recompilation."
 	echo "Stage the updated .lock.yml files and commit again."
-	git --no-pager diff --name-only -- .github/workflows | grep -E '\.lock\.yml$' || true
+	printf '%s\n' "${changed_lock_files[@]}"
 	exit 1
 fi
