@@ -18,6 +18,24 @@ engine:
   id: copilot
   bare: true
 
+experiments:
+  output_format:
+    variants: [prose, structured, bullet_digest]
+    description: "Tests whether the structure of the daily news report body affects GitHub Discussion engagement (reactions + comments)"
+    hypothesis: "H0: no change in discussion engagement rate across formats. H1: structured format increases engagement by >=20% vs prose baseline."
+    metric: discussion_engagement_rate
+    secondary_metrics: [output_word_count, run_duration_ms]
+    guardrail_metrics:
+      - name: empty_output_rate
+        threshold: "==0"
+    min_samples: 21
+    weight: [34, 33, 33]
+    start_date: "2026-05-09"
+    analysis_type: proportion_test
+    tags: [daily-digest, ux, output-quality]
+    notify:
+      discussion: 1
+
 timeout-minutes: 30  # Reduced from 45 since pre-fetching data is faster
 runs-on: aw-gpu-runner-T4
 
@@ -307,7 +325,43 @@ features:
 
 # Daily News
 
+{{#if experiments.output_format == "structured"}}
+Write the daily news report using the following **fixed-section template** (always include every section, even if empty):
+
+```markdown
+## 📋 Daily Digest — {{date}}
+
+| Metric | Count |
+|--------|-------|
+| Issues opened | N |
+| PRs merged | N |
+| Commits | N |
+| Discussions active | N |
+
+### 🔴 Issues
+...
+### 🟢 Pull Requests
+...
+### 💬 Discussions
+...
+### 📊 Trend Charts
+...
+### 💡 Suggestions
+...
+```
+
+Use emojis sparingly (section headers only). End with a one-sentence "TL;DR" callout.
+{{else if experiments.output_format == "bullet_digest"}}
+Write an ultra-compact daily digest using only bullet points. Rules:
+- Total word count must not exceed 400 words
+- Use minimal headers (### Issues, ### PRs, ### Highlights)
+- One line per item, e.g. `- github/gh-aw#123 Fix login bug (merged by \`@alice\`)`
+- No paragraphs, no haiku, no embedded charts (list chart URLs under ### Charts)
+- No filler phrases ("Great news!", "The team has been busy")
+- Emoji allowed only as bullet prefixes (one per section max)
+{{else}}
 Write an upbeat, friendly, motivating summary of recent activity in the repo.
+{{/if}}
 
 ## 📁 Pre-Downloaded Data Available
 
