@@ -1,70 +1,6 @@
 {
   "analyses": [
     {
-      "date": "2026-04-23",
-      "sessions_analyzed": 50,
-      "completion_rate_pct": 24.0,
-      "copilot_coding_agents": 4,
-      "copilot_success_rate_pct": 100.0,
-      "avg_copilot_duration_min": 13.0,
-      "experimental_strategy": null,
-      "key_insights": [
-        "100% Copilot success rate - streak restored after Apr 22 break",
-        "24% overall success rate - new daily record"
-      ]
-    },
-    {
-      "date": "2026-04-24",
-      "sessions_analyzed": 50,
-      "completion_rate_pct": 2.0,
-      "copilot_coding_agents": 2,
-      "copilot_success_rate_pct": 50.0,
-      "avg_copilot_duration_min": 13.07,
-      "experimental_strategy": "Task Category to Copilot Assignment Correlation",
-      "key_insights": [
-        "Security/functional tasks get Copilot assigned; lib version bumps do not"
-      ]
-    },
-    {
-      "date": "2026-04-26",
-      "sessions_analyzed": 50,
-      "completion_rate_pct": 10.0,
-      "copilot_coding_agents": 5,
-      "copilot_success_rate_pct": 20.0,
-      "avg_copilot_duration_min": 1.8,
-      "experimental_strategy": null,
-      "key_insights": [
-        "Record 5 concurrent Copilot branches - highest parallelism observed",
-        "20% success rate with 5 agents - agent count inflates risk"
-      ]
-    },
-    {
-      "date": "2026-04-27",
-      "sessions_analyzed": 50,
-      "completion_rate_pct": 2.0,
-      "copilot_coding_agents": 2,
-      "copilot_success_rate_pct": 50.0,
-      "avg_copilot_duration_min": 8.3,
-      "experimental_strategy": "Sub-PR Iteration Pattern Analysis",
-      "key_insights": [
-        "startup_failure on create-agentic-workflows - new infra failure mode",
-        "Sub-PR model: single branch spawns multiple addressing-comment re-engagements"
-      ]
-    },
-    {
-      "date": "2026-04-29",
-      "sessions_analyzed": 50,
-      "completion_rate_pct": 8.0,
-      "copilot_coding_agents": 3,
-      "copilot_success_rate_pct": 0.0,
-      "avg_copilot_duration_min": 0.2,
-      "experimental_strategy": null,
-      "key_insights": [
-        "3 Copilot agents all in-progress at snapshot time - pending pattern",
-        "Orphaned branch count = 2: highest since Apr 26"
-      ]
-    },
-    {
       "date": "2026-04-30",
       "sessions_analyzed": 50,
       "completion_rate_pct": 2.0,
@@ -170,13 +106,28 @@
         "Human-reviewed PRs: 85% merge rate vs 0% bot-only - review bottleneck for bot-assigned PRs",
         "Avg merge duration 31.7min (highest since May 2) - complex tasks being tackled"
       ]
+    },
+    {
+      "date": "2026-05-08",
+      "sessions_analyzed": 50,
+      "completion_rate_pct": 2.0,
+      "copilot_coding_agents": 1,
+      "copilot_success_rate_pct": 100.0,
+      "avg_copilot_duration_min": 14.6,
+      "experimental_strategy": null,
+      "key_insights": [
+        "fix-http-new-request-context: 24 gates + Copilot agent SUCCESS in 14.6min",
+        "sergo-fix-redundant-type-assertion: 17 gates, no agent in snapshot (completed earlier)",
+        "0% orphaned branches - 11/11 open PRs have Copilot assigned",
+        "Conversation log returned gh auth error - no internal monologue available"
+      ]
     }
   ],
-  "last_updated": "2026-05-07",
+  "last_updated": "2026-05-08",
   "historical_summary": {
-    "avg_completion_rate_pct": 12.2,
-    "avg_copilot_success_rate_pct": 50.1,
-    "avg_copilot_duration_min": 17.3,
-    "note": "Averages computed across Apr 23 - May 7 (12 data days)"
+    "avg_completion_rate_pct": 11.5,
+    "avg_copilot_success_rate_pct": 51.7,
+    "avg_copilot_duration_min": 17.1,
+    "note": "Averages computed across Apr 23 - May 8 (13 data days)"
   }
 }
