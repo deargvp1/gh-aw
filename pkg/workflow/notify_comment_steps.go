@@ -10,6 +10,16 @@ import (
 	"github.com/github/gh-aw/pkg/constants"
 )
 
+// buildTitlePrefixEnvVar returns the env-var declaration line for a title-prefix field
+// if the prefix is non-empty, otherwise returns nil.  Used by both missing-tool and
+// report-incomplete step builders to avoid duplicated logic.
+func buildTitlePrefixEnvVar(envVarName, prefix string) []string {
+	if prefix == "" {
+		return nil
+	}
+	return []string{fmt.Sprintf("          %s: %q\n", envVarName, prefix)}
+}
+
 // buildConclusionJobNoOpSteps builds the noop processing step for the conclusion job.
 // Returns nil if noop is not configured in safe-outputs.
 func (c *Compiler) buildConclusionJobNoOpSteps(data *WorkflowData, mainJobName string) []string {
@@ -74,9 +84,7 @@ func (c *Compiler) buildConclusionJobMissingToolSteps(data *WorkflowData, mainJo
 	var missingToolEnvVars []string
 	missingToolEnvVars = append(missingToolEnvVars, buildTemplatableIntEnvVar("GH_AW_MISSING_TOOL_MAX", data.SafeOutputs.MissingTool.Max)...)
 	missingToolEnvVars = append(missingToolEnvVars, buildTemplatableBoolEnvVar("GH_AW_MISSING_TOOL_CREATE_ISSUE", data.SafeOutputs.MissingTool.CreateIssue)...)
-	if data.SafeOutputs.MissingTool.TitlePrefix != "" {
-		missingToolEnvVars = append(missingToolEnvVars, fmt.Sprintf("          GH_AW_MISSING_TOOL_TITLE_PREFIX: %q\n", data.SafeOutputs.MissingTool.TitlePrefix))
-	}
+	missingToolEnvVars = append(missingToolEnvVars, buildTitlePrefixEnvVar("GH_AW_MISSING_TOOL_TITLE_PREFIX", data.SafeOutputs.MissingTool.TitlePrefix)...)
 	if len(data.SafeOutputs.MissingTool.Labels) > 0 {
 		labelsJSON, err := json.Marshal(data.SafeOutputs.MissingTool.Labels)
 		if err == nil {
@@ -106,9 +114,7 @@ func (c *Compiler) buildConclusionJobReportIncompleteSteps(data *WorkflowData, m
 	var reportIncompleteEnvVars []string
 	reportIncompleteEnvVars = append(reportIncompleteEnvVars, buildTemplatableIntEnvVar("GH_AW_REPORT_INCOMPLETE_MAX", data.SafeOutputs.ReportIncomplete.Max)...)
 	reportIncompleteEnvVars = append(reportIncompleteEnvVars, buildTemplatableBoolEnvVar("GH_AW_REPORT_INCOMPLETE_CREATE_ISSUE", data.SafeOutputs.ReportIncomplete.CreateIssue)...)
-	if data.SafeOutputs.ReportIncomplete.TitlePrefix != "" {
-		reportIncompleteEnvVars = append(reportIncompleteEnvVars, fmt.Sprintf("          GH_AW_REPORT_INCOMPLETE_TITLE_PREFIX: %q\n", data.SafeOutputs.ReportIncomplete.TitlePrefix))
-	}
+	reportIncompleteEnvVars = append(reportIncompleteEnvVars, buildTitlePrefixEnvVar("GH_AW_REPORT_INCOMPLETE_TITLE_PREFIX", data.SafeOutputs.ReportIncomplete.TitlePrefix)...)
 	if len(data.SafeOutputs.ReportIncomplete.Labels) > 0 {
 		labelsJSON, err := json.Marshal(data.SafeOutputs.ReportIncomplete.Labels)
 		if err == nil {

@@ -444,8 +444,8 @@ func (c *Compiler) extractSafeOutputsGlobalConfig(outputMap map[string]any, conf
 	// Handle jobs (safe-jobs must be under safe-outputs)
 	if jobs, exists := outputMap["jobs"]; exists {
 		if jobsMap, ok := jobs.(map[string]any); ok {
-			cc := &Compiler{}
-			config.Jobs = cc.parseSafeJobsConfig(jobsMap)
+			compiler := &Compiler{}
+			config.Jobs = compiler.parseSafeJobsConfig(jobsMap)
 		}
 	}
 
