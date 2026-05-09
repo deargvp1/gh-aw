@@ -83,6 +83,17 @@ const AWFCliProxyMinVersion Version = "v0.25.17"
 // --allow-host-ports or the run will fail at startup with an unknown flag error.
 const AWFAllowHostPortsMinVersion Version = "v0.25.24"
 
+// AWFMaxRunsMinVersion is the minimum AWF version that supports the
+// container.maxRuns config field, which limits the number of times the agent
+// command may be re-launched within a single AWF container execution.
+// This is the AWF-level alternative to engine-specific continuation flags
+// (e.g. Copilot's --max-autopilot-continues). See:
+// specs/awf-container-max-runs-spec.md for the full specification.
+//
+// ⚠️  This version is a placeholder — update it when gh-aw-firewall ships
+// support for container.maxRuns and re-run: make build && make recompile && make recompile
+const AWFMaxRunsMinVersion Version = "v0.26.0"
+
 // CopilotNoAskUserMinVersion is the minimum Copilot CLI version that supports the --no-ask-user
 // flag, which enables fully autonomous agentic runs by suppressing interactive prompts.
 // Workflows using an older Copilot CLI version must not emit --no-ask-user or the run will fail.

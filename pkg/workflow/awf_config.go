@@ -182,6 +182,17 @@ type AWFContainerConfig struct {
 	// Format: "<tag>" or "<tag>,squid=sha256:...,agent=sha256:..."
 	// Maps to: --image-tag <value>
 	ImageTag string `json:"imageTag,omitempty"`
+
+	// MaxRuns is the maximum number of times the agent command may be re-launched
+	// within a single AWF container execution. Values greater than 1 enable multi-run
+	// mode where AWF orchestrates successive agent runs up to this limit. This is the
+	// AWF-level alternative to engine-specific continuation flags such as Copilot's
+	// --max-autopilot-continues.
+	//
+	// Requires AWF >= v0.26.0. Populated from engine.max-continuations in frontmatter.
+	// When the effective AWF version is older than AWFMaxRunsMinVersion this field is
+	// omitted and the engine-specific flag is used as a fallback instead.
+	MaxRuns int `json:"maxRuns,omitempty"`
 }
 
 // buildAWFConfigSchemaURL returns the release-pinned JSON schema URL for the AWF config file.
@@ -288,11 +299,25 @@ func BuildAWFConfigJSON(config AWFCommandConfig) (string, error) {
 
 	// ── Container section ─────────────────────────────────────────────────────
 	awfImageTag := buildAWFImageTagWithDigests(getAWFImageTag(firewallConfig), config.WorkflowData)
+	containerConfig := &AWFContainerConfig{}
 	if awfImageTag != "" {
-		awfConfig.Container = &AWFContainerConfig{
-			ImageTag: awfImageTag,
-		}
+		containerConfig.ImageTag = awfImageTag
 		awfConfigLog.Printf("Container section: image_tag=%s", awfImageTag)
+	}
+
+	// Populate maxRuns from engine.max-continuations when AWF supports it.
+	// When AWF is older than AWFMaxRunsMinVersion the field is left at zero (omitted from JSON)
+	// and the engine-specific flag is used as a fallback in the engine execution step.
+	if awfSupportsMaxRuns(firewallConfig) &&
+		config.WorkflowData != nil &&
+		config.WorkflowData.EngineConfig != nil &&
+		config.WorkflowData.EngineConfig.MaxContinuations > 1 {
+		containerConfig.MaxRuns = config.WorkflowData.EngineConfig.MaxContinuations
+		awfConfigLog.Printf("Container section: max_runs=%d (from engine.max-continuations)", containerConfig.MaxRuns)
+	}
+
+	if containerConfig.ImageTag != "" || containerConfig.MaxRuns > 0 {
+		awfConfig.Container = containerConfig
 	}
 
 	jsonStr, err := jsonutil.MarshalCompactNoHTMLEscape(awfConfig)

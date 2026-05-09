@@ -684,3 +684,35 @@ func awfSupportsAllowHostPorts(firewallConfig *FirewallConfig) bool {
 	minVersion := string(constants.AWFAllowHostPortsMinVersion)
 	return semverutil.Compare(versionStr, minVersion) >= 0
 }
+
+// awfSupportsMaxRuns returns true when the effective AWF version supports the
+// container.maxRuns config field, which controls how many times AWF re-launches
+// the agent command within a single container execution.
+//
+// The container.maxRuns field was introduced in AWF v0.26.0. When the effective
+// AWF version is older than AWFMaxRunsMinVersion this field must not be set in the
+// generated AWF config; the engine-specific continuation flag (e.g.
+// --max-autopilot-continues for Copilot) is used as a fallback instead.
+//
+// Special cases:
+//   - No version override (firewallConfig is nil or has no Version): use DefaultFirewallVersion
+//     and compare against AWFMaxRunsMinVersion.
+//   - "latest": always returns true (latest is always a new release).
+//   - Any semver string ≥ AWFMaxRunsMinVersion: returns true.
+//   - Any semver string < AWFMaxRunsMinVersion: returns false.
+//   - Non-semver string (e.g. a branch name): returns false (conservative).
+func awfSupportsMaxRuns(firewallConfig *FirewallConfig) bool {
+	var versionStr string
+	if firewallConfig != nil && firewallConfig.Version != "" {
+		versionStr = firewallConfig.Version
+	} else {
+		versionStr = string(constants.DefaultFirewallVersion)
+	}
+
+	if strings.EqualFold(versionStr, "latest") {
+		return true
+	}
+
+	minVersion := string(constants.AWFMaxRunsMinVersion)
+	return semverutil.Compare(versionStr, minVersion) >= 0
+}

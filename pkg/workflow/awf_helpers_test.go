@@ -1173,6 +1173,58 @@ func TestAWFSupportsAllowHostPorts(t *testing.T) {
 	}
 }
 
+// TestAWFSupportsMaxRuns tests the awfSupportsMaxRuns version gate function.
+func TestAWFSupportsMaxRuns(t *testing.T) {
+	tests := []struct {
+		name           string
+		firewallConfig *FirewallConfig
+		want           bool
+	}{
+		{
+			name:           "nil firewall config uses default version (below min)",
+			firewallConfig: nil,
+			want:           false, // DefaultFirewallVersion (v0.25.42) < AWFMaxRunsMinVersion (v0.26.0)
+		},
+		{
+			name:           "empty version uses default version (below min)",
+			firewallConfig: &FirewallConfig{},
+			want:           false,
+		},
+		{
+			name:           "latest returns true",
+			firewallConfig: &FirewallConfig{Version: "latest"},
+			want:           true,
+		},
+		{
+			name:           "exact minimum version returns true",
+			firewallConfig: &FirewallConfig{Version: "v0.26.0"},
+			want:           true,
+		},
+		{
+			name:           "version above minimum returns true",
+			firewallConfig: &FirewallConfig{Version: "v0.27.0"},
+			want:           true,
+		},
+		{
+			name:           "v0.25.42 (current default) does not support maxRuns",
+			firewallConfig: &FirewallConfig{Version: "v0.25.42"},
+			want:           false,
+		},
+		{
+			name:           "v0.1.0 does not support maxRuns",
+			firewallConfig: &FirewallConfig{Version: "v0.1.0"},
+			want:           false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := awfSupportsMaxRuns(tt.firewallConfig)
+			assert.Equal(t, tt.want, got, "awfSupportsMaxRuns result")
+		})
+	}
+}
+
 // TestGetGeminiAPITarget tests the GetGeminiAPITarget helper that resolves the effective
 // Gemini API target from GEMINI_API_BASE_URL in engine.env or the default endpoint.
 func TestGetGeminiAPITarget(t *testing.T) {

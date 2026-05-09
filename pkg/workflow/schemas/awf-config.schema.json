@@ -219,6 +219,11 @@
         "dockerHost": {
           "type": "string",
           "description": "Docker daemon socket or host to connect to (e.g. \"unix:///var/run/docker.sock\")."
+        },
+        "maxRuns": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum number of times the agent command may be re-launched within a single AWF container execution. Values greater than 1 enable multi-run mode where AWF restarts the agent after each completed run, up to this limit. This is the AWF-level alternative to engine-specific continuation flags (e.g. --max-autopilot-continues for Copilot). Requires AWF v0.26.0+."
         }
       }
     },

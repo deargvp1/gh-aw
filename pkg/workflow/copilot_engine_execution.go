@@ -89,12 +89,21 @@ func (e *CopilotEngine) GetExecutionSteps(workflowData *WorkflowData, logFile st
 		copilotArgs = append(copilotArgs, "--agent", agentIdentifier)
 	}
 
-	// Add --autopilot and --max-autopilot-continues when max-continuations > 1
+	// Add --autopilot and --max-autopilot-continues when max-continuations > 1.
+	// This is the engine-specific fallback used when the AWF version is older than
+	// AWFMaxRunsMinVersion. When AWF supports container.maxRuns (>= v0.26.0) the
+	// multi-run orchestration is handled by AWF via the generated config file instead,
+	// and these flags are not emitted.
 	// Never apply autopilot flags to detection jobs; they are only meaningful for the agent run.
 	if !isDetectionJob && workflowData.EngineConfig != nil && workflowData.EngineConfig.MaxContinuations > 1 {
-		maxCont := workflowData.EngineConfig.MaxContinuations
-		copilotExecLog.Printf("Enabling autopilot mode with max-autopilot-continues=%d", maxCont)
-		copilotArgs = append(copilotArgs, "--autopilot", "--max-autopilot-continues", strconv.Itoa(maxCont))
+		firewallConfig := getFirewallConfig(workflowData)
+		if !awfSupportsMaxRuns(firewallConfig) {
+			maxCont := workflowData.EngineConfig.MaxContinuations
+			copilotExecLog.Printf("Enabling autopilot mode with max-autopilot-continues=%d (AWF maxRuns not supported; fallback)", maxCont)
+			copilotArgs = append(copilotArgs, "--autopilot", "--max-autopilot-continues", strconv.Itoa(maxCont))
+		} else {
+			copilotExecLog.Printf("Skipping --max-autopilot-continues: AWF maxRuns handles multi-run orchestration")
+		}
 	}
 
 	// Add tool permission arguments based on configuration

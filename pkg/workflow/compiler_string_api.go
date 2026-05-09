@@ -121,7 +121,7 @@ func (c *Compiler) ParseWorkflowString(content string, virtualPath string) (*Wor
 	}
 
 	// Process tools and markdown
-	toolsResult, err := c.processToolsAndMarkdown(parseResult.frontmatterResult, parseResult.cleanPath, parseResult.markdownDir, engineSetup.agenticEngine, engineSetup.engineSetting, engineSetup.importsResult)
+	toolsResult, err := c.processToolsAndMarkdown(parseResult.frontmatterResult, parseResult.cleanPath, parseResult.markdownDir, engineSetup.agenticEngine, engineSetup.engineSetting, engineSetup.importsResult, engineSetup.networkPermissions)
 	if err != nil {
 		return nil, err
 	}

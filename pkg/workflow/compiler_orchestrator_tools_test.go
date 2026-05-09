@@ -53,6 +53,7 @@ tools:
 		agenticEngine,
 		"copilot",
 		importsResult,
+		nil, // networkPermissions: nil defaults to DefaultFirewallVersion
 	)
 
 	require.NoError(t, err)
@@ -111,6 +112,7 @@ tools:
 		agenticEngine,
 		"copilot",
 		importsResult,
+		nil, // networkPermissions: nil defaults to DefaultFirewallVersion
 	)
 
 	require.NoError(t, err)
@@ -157,6 +159,7 @@ mcp-servers:
 		agenticEngine,
 		"copilot",
 		importsResult,
+		nil, // networkPermissions: nil defaults to DefaultFirewallVersion
 	)
 
 	require.NoError(t, err)
@@ -203,6 +206,7 @@ runtimes:
 		agenticEngine,
 		"copilot",
 		importsResult,
+		nil, // networkPermissions: nil defaults to DefaultFirewallVersion
 	)
 
 	require.NoError(t, err)
@@ -247,6 +251,7 @@ tools:
 		agenticEngine,
 		"copilot",
 		importsResult,
+		nil, // networkPermissions: nil defaults to DefaultFirewallVersion
 	)
 
 	require.NoError(t, err)
@@ -291,6 +296,7 @@ tools:
 		agenticEngine,
 		"copilot",
 		importsResult,
+		nil, // networkPermissions: nil defaults to DefaultFirewallVersion
 	)
 
 	require.NoError(t, err)
@@ -335,6 +341,7 @@ tools:
 		agenticEngine,
 		"copilot",
 		importsResult,
+		nil, // networkPermissions: nil defaults to DefaultFirewallVersion
 	)
 
 	// Should error with invalid timeout
@@ -378,6 +385,7 @@ tools:
 		agenticEngine,
 		"copilot",
 		importsResult,
+		nil, // networkPermissions: nil defaults to DefaultFirewallVersion
 	)
 
 	require.NoError(t, err)
@@ -435,6 +443,7 @@ engine: copilot
 				agenticEngine,
 				"copilot",
 				importsResult,
+		nil, // networkPermissions: nil defaults to DefaultFirewallVersion
 			)
 
 			require.NoError(t, err)
@@ -491,6 +500,7 @@ func TestProcessToolsAndMarkdown_TextOutputDetection(t *testing.T) {
 				agenticEngine,
 				"copilot",
 				importsResult,
+		nil, // networkPermissions: nil defaults to DefaultFirewallVersion
 			)
 
 			require.NoError(t, err)
@@ -537,6 +547,7 @@ safe-outputs:
 		agenticEngine,
 		"copilot",
 		importsResult,
+		nil, // networkPermissions: nil defaults to DefaultFirewallVersion
 	)
 
 	require.NoError(t, err)
@@ -579,6 +590,7 @@ secret-masking:
 		agenticEngine,
 		"copilot",
 		importsResult,
+		nil, // networkPermissions: nil defaults to DefaultFirewallVersion
 	)
 
 	require.NoError(t, err)
@@ -622,6 +634,7 @@ tracker-id: TEST-123
 		agenticEngine,
 		"copilot",
 		importsResult,
+		nil, // networkPermissions: nil defaults to DefaultFirewallVersion
 	)
 
 	require.NoError(t, err)
@@ -665,6 +678,7 @@ tools:
 		agenticEngine,
 		"codex",
 		importsResult,
+		nil, // networkPermissions: nil defaults to DefaultFirewallVersion
 	)
 
 	require.NoError(t, err)
@@ -708,6 +722,7 @@ engine: copilot
 		agenticEngine,
 		"copilot",
 		importsResult,
+		nil, // networkPermissions: nil defaults to DefaultFirewallVersion
 	)
 
 	// Include expansion happens via parser.ExpandIncludesWithManifest

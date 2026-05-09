@@ -51,6 +51,7 @@ import (
 	"strings"
 
 	"github.com/github/gh-aw/pkg/console"
+	"github.com/github/gh-aw/pkg/constants"
 	"github.com/goccy/go-yaml"
 )
 
@@ -134,8 +135,13 @@ func (c *Compiler) validateMaxTurnsSupport(frontmatter map[string]any, engine Co
 	return nil
 }
 
-// validateMaxContinuationsSupport validates that max-continuations is only used with engines that support this feature
-func (c *Compiler) validateMaxContinuationsSupport(frontmatter map[string]any, engine CodingAgentEngine) error {
+// validateMaxContinuationsSupport validates that max-continuations is only used with engines
+// that support this feature, or with AWF versions that implement it engine-agnostically.
+//
+// When AWF >= AWFMaxRunsMinVersion, the multi-run orchestration is handled by AWF itself
+// via the container.maxRuns config field, so any engine may use engine.max-continuations.
+// For older AWF versions, the constraint falls back to the engine-specific capability check.
+func (c *Compiler) validateMaxContinuationsSupport(frontmatter map[string]any, engine CodingAgentEngine, networkPermissions *NetworkPermissions) error {
 	// Check if max-continuations is specified in the engine config
 	_, engineConfig := c.ExtractEngineConfig(frontmatter)
 
@@ -145,6 +151,14 @@ func (c *Compiler) validateMaxContinuationsSupport(frontmatter map[string]any, e
 	}
 
 	agentValidationLog.Printf("Validating max-continuations support: engine=%s, maxContinuations=%d", engine.GetID(), engineConfig.MaxContinuations)
+
+	// When AWF supports container.maxRuns, any engine may use engine.max-continuations.
+	// The multi-run orchestration is delegated to AWF rather than the engine CLI.
+	firewallConfig := getFirewallConfig(&WorkflowData{NetworkPermissions: networkPermissions})
+	if awfSupportsMaxRuns(firewallConfig) {
+		agentValidationLog.Printf("AWF supports maxRuns (>= %s); engine-specific capability check skipped", constants.AWFMaxRunsMinVersion)
+		return nil
+	}
 
 	// max-continuations is specified, check if the engine supports it
 	if !engine.GetCapabilities().MaxContinuations {

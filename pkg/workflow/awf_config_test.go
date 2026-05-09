@@ -541,3 +541,85 @@ func TestBuildAWFCommand_ConfigFileWithPathSetup(t *testing.T) {
 	assert.Less(t, pathSetupIdx, configWriteIdx, "path setup must precede config file write")
 	assert.Less(t, configWriteIdx, awfIdx, "config file write must precede AWF invocation")
 }
+
+// TestBuildAWFConfigJSON_MaxRuns verifies that container.maxRuns is populated from
+// engine.max-continuations when the AWF version supports it (>= AWFMaxRunsMinVersion),
+// and is omitted when the AWF version is older.
+func TestBuildAWFConfigJSON_MaxRuns(t *testing.T) {
+	t.Run("maxRuns is omitted when AWF version does not support it", func(t *testing.T) {
+		// Pin an AWF version older than AWFMaxRunsMinVersion so the field is not emitted.
+		config := AWFCommandConfig{
+			EngineName:     "copilot",
+			AllowedDomains: "github.com",
+			WorkflowData: &WorkflowData{
+				EngineConfig: &EngineConfig{ID: "copilot", MaxContinuations: 3},
+				NetworkPermissions: &NetworkPermissions{
+					Firewall: &FirewallConfig{Enabled: true, Version: "v0.25.0"},
+				},
+			},
+		}
+
+		jsonStr, err := BuildAWFConfigJSON(config)
+		require.NoError(t, err)
+
+		assert.NotContains(t, jsonStr, `"maxRuns"`, "maxRuns must NOT be emitted for old AWF versions")
+	})
+
+	t.Run("maxRuns is emitted when AWF version supports it", func(t *testing.T) {
+		// Pin an AWF version at or above AWFMaxRunsMinVersion so the field IS emitted.
+		config := AWFCommandConfig{
+			EngineName:     "copilot",
+			AllowedDomains: "github.com",
+			WorkflowData: &WorkflowData{
+				EngineConfig: &EngineConfig{ID: "copilot", MaxContinuations: 5},
+				NetworkPermissions: &NetworkPermissions{
+					Firewall: &FirewallConfig{Enabled: true, Version: string(constants.AWFMaxRunsMinVersion)},
+				},
+			},
+		}
+
+		jsonStr, err := BuildAWFConfigJSON(config)
+		require.NoError(t, err)
+
+		assert.Contains(t, jsonStr, `"maxRuns":5`, "maxRuns must be emitted when AWF supports it")
+	})
+
+	t.Run("maxRuns is omitted when max-continuations is 0 or 1", func(t *testing.T) {
+		// max-continuations <= 1 means single-run (no multi-run mode) — never emit maxRuns.
+		for _, maxCont := range []int{0, 1} {
+			config := AWFCommandConfig{
+				EngineName:     "copilot",
+				AllowedDomains: "github.com",
+				WorkflowData: &WorkflowData{
+					EngineConfig: &EngineConfig{ID: "copilot", MaxContinuations: maxCont},
+					NetworkPermissions: &NetworkPermissions{
+						Firewall: &FirewallConfig{Enabled: true, Version: string(constants.AWFMaxRunsMinVersion)},
+					},
+				},
+			}
+
+			jsonStr, err := BuildAWFConfigJSON(config)
+			require.NoError(t, err)
+
+			assert.NotContains(t, jsonStr, `"maxRuns"`, "maxRuns must not be emitted for max-continuations=%d", maxCont)
+		}
+	})
+
+	t.Run("maxRuns is emitted with latest AWF version", func(t *testing.T) {
+		config := AWFCommandConfig{
+			EngineName:     "copilot",
+			AllowedDomains: "github.com",
+			WorkflowData: &WorkflowData{
+				EngineConfig: &EngineConfig{ID: "copilot", MaxContinuations: 7},
+				NetworkPermissions: &NetworkPermissions{
+					Firewall: &FirewallConfig{Enabled: true, Version: "latest"},
+				},
+			},
+		}
+
+		jsonStr, err := BuildAWFConfigJSON(config)
+		require.NoError(t, err)
+
+		assert.Contains(t, jsonStr, `"maxRuns":7`, "maxRuns must be emitted for 'latest' AWF version")
+	})
+}
