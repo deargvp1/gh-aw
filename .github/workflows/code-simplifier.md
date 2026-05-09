@@ -22,6 +22,7 @@ imports:
       expires: "1d"
       labels: [refactoring, code-quality, automation]
       reviewers: [copilot]
+  - shared/lsdf.md
 
   - shared/observability-otlp.md
 network:
@@ -54,6 +55,28 @@ Analyze recently modified code from the last 24 hours and apply refinements that
 - **Repository**: ${{ github.repository }}
 - **Analysis Date**: $(date +%Y-%m-%d)
 - **Workspace**: ${{ github.workspace }}
+
+## LSDF-First Navigation
+
+Before broad repository navigation, use L-SDF indices first when available:
+
+1. Read `project.lsdf`
+2. Read nearest `INDEX.lsdf`
+3. Read nearest `INDEX.detail.lsdf` when needed
+4. Open raw source only after index review
+
+If LSDF files are missing and deeper structural analysis is needed, initialize and generate:
+
+```bash
+lsdf init
+lsdf gen . --recursive
+```
+
+After structural edits, regenerate indices:
+
+```bash
+lsdf gen . --recursive
+```
 
 ## Phase 1: Identify Recently Modified Code
 

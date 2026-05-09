@@ -19,6 +19,7 @@ imports:
       expires: "3d"
       labels: [chore, dead-code]
       reviewers: [copilot]
+  - shared/lsdf.md
   - shared/observability-otlp.md
 network:
   allowed:
@@ -65,6 +66,28 @@ Run the `deadcode` static analyzer, select a batch of up to 5 unreachable functi
 
 - **Repository**: ${{ github.repository }}
 - **Run ID**: ${{ github.run_id }}
+
+## LSDF-First Navigation
+
+Before broad source navigation, use LSDF files when available:
+
+1. Read `project.lsdf`
+2. Read nearest `INDEX.lsdf`
+3. Read nearest `INDEX.detail.lsdf` as needed
+4. Open raw source files only after index review
+
+If LSDF files are missing and deeper structural mapping is needed:
+
+```bash
+lsdf init
+lsdf gen . --recursive
+```
+
+After structural removals, regenerate indices:
+
+```bash
+lsdf gen . --recursive
+```
 
 ## Phase 1: Discover Dead Functions
 
