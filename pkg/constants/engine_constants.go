@@ -239,6 +239,15 @@ const (
 	// Sent as a Bearer token in the Authorization header. Takes precedence over COPILOT_PROVIDER_API_KEY.
 	CopilotProviderBearerToken = "COPILOT_PROVIDER_BEARER_TOKEN"
 
+	// CopilotProviderWireAPI (OPTIONAL) sets the wire API variant for Copilot BYOK mode.
+	// Use "responses" for GPT-5 series models; defaults to "completions" when unset.
+	// The compiler automatically injects this when a GPT-5 family model is statically detected.
+	CopilotProviderWireAPI = "COPILOT_PROVIDER_WIRE_API"
+
+	// CopilotProviderWireAPIResponses is the responses wire API value required for GPT-5 series
+	// models in Copilot BYOK/offline mode.
+	CopilotProviderWireAPIResponses = "responses"
+
 	// CopilotCLIIntegrationIDEnvVar is the native environment variable name supported by the Copilot CLI
 	// for identifying the calling integration. This tells the Copilot CLI that it is being invoked
 	// by agentic workflows.

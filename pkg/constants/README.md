@@ -133,8 +133,10 @@ constants.EnvVarGitHubTrustedUsers   // "GH_AW_GITHUB_TRUSTED_USERS"   (tools.gi
 ### Copilot BYOK
 
 ```go
-constants.CopilotBYOKDummyAPIKey // "dummy-byok-key-for-offline-mode" — placeholder key used for AWF runtime BYOK detection
-constants.CopilotBYOKDefaultModel // "claude-sonnet-4.6" — explicit fallback model when GH_AW_MODEL_*_COPILOT is unset
+constants.CopilotBYOKDummyAPIKey          // "dummy-byok-key-for-offline-mode" — placeholder key used for AWF runtime BYOK detection
+constants.CopilotBYOKDefaultModel         // "claude-sonnet-4.6" — explicit fallback model when GH_AW_MODEL_*_COPILOT is unset
+constants.CopilotProviderWireAPI          // "COPILOT_PROVIDER_WIRE_API" — wire API variant env var name
+constants.CopilotProviderWireAPIResponses // "responses" — wire API value required for GPT-5 series models
 ```
 
 ### Copilot Stem Commands

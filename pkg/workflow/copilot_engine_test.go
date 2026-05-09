@@ -1846,6 +1846,155 @@ func TestCopilotEngineSetsDummyAPIKey(t *testing.T) {
 	})
 }
 
+func TestCopilotModelRequiresResponsesAPI(t *testing.T) {
+	tests := []struct {
+		name     string
+		model    string
+		expected bool
+	}{
+		{"empty string", "", false},
+		{"claude model", "claude-sonnet-4.6", false},
+		{"gpt-4.1", "gpt-4.1", false},
+		{"gpt-5 bare", "gpt-5", true},
+		{"gpt-5-mini", "gpt-5-mini", true},
+		{"gpt-5-nano", "gpt-5-nano", true},
+		{"gpt-5-codex", "gpt-5-codex", true},
+		{"gpt-5-pro", "gpt-5-pro", true},
+		{"gpt-5.4", "gpt-5.4", true},
+		{"gpt-5 with provider prefix", "copilot/gpt-5", true},
+		{"gpt-5-mini with provider prefix", "openai/gpt-5-mini", true},
+		{"gpt-5 with query params", "gpt-5?effort=high", true},
+		{"gpt-5-pro with prefix and params", "copilot/gpt-5-pro?effort=high", true},
+		{"gpt-5 uppercase", "GPT-5", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := copilotModelRequiresResponsesAPI(tt.model)
+			if result != tt.expected {
+				t.Errorf("copilotModelRequiresResponsesAPI(%q) = %v, want %v", tt.model, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestCopilotEngineSetsWireAPIForGPT5Models(t *testing.T) {
+	engine := NewCopilotEngine()
+	sandboxConfig := &SandboxConfig{
+		Agent: &AgentSandboxConfig{Type: SandboxTypeAWF},
+	}
+
+	t.Run("sets COPILOT_PROVIDER_WIRE_API=responses for gpt-5 model in sandbox", func(t *testing.T) {
+		workflowData := &WorkflowData{
+			Name:          "test-workflow",
+			EngineConfig:  &EngineConfig{ID: "copilot", Model: "gpt-5"},
+			SandboxConfig: sandboxConfig,
+		}
+
+		steps := engine.GetExecutionSteps(workflowData, "/tmp/gh-aw/test.log")
+		if len(steps) != 1 {
+			t.Fatalf("Expected 1 step, got %d", len(steps))
+		}
+		stepContent := strings.Join([]string(steps[0]), "\n")
+		if !strings.Contains(stepContent, "COPILOT_PROVIDER_WIRE_API: responses") {
+			t.Errorf("Expected COPILOT_PROVIDER_WIRE_API=responses for gpt-5 in sandbox mode, got:\n%s", stepContent)
+		}
+	})
+
+	t.Run("sets COPILOT_PROVIDER_WIRE_API=responses for gpt-5-mini model in sandbox", func(t *testing.T) {
+		workflowData := &WorkflowData{
+			Name:          "test-workflow",
+			EngineConfig:  &EngineConfig{ID: "copilot", Model: "gpt-5-mini"},
+			SandboxConfig: sandboxConfig,
+		}
+
+		steps := engine.GetExecutionSteps(workflowData, "/tmp/gh-aw/test.log")
+		stepContent := strings.Join([]string(steps[0]), "\n")
+		if !strings.Contains(stepContent, "COPILOT_PROVIDER_WIRE_API: responses") {
+			t.Errorf("Expected COPILOT_PROVIDER_WIRE_API=responses for gpt-5-mini in sandbox mode, got:\n%s", stepContent)
+		}
+	})
+
+	t.Run("sets COPILOT_PROVIDER_WIRE_API=responses for provider-scoped gpt-5 model in sandbox", func(t *testing.T) {
+		workflowData := &WorkflowData{
+			Name:          "test-workflow",
+			EngineConfig:  &EngineConfig{ID: "copilot", Model: "copilot/gpt-5"},
+			SandboxConfig: sandboxConfig,
+		}
+
+		steps := engine.GetExecutionSteps(workflowData, "/tmp/gh-aw/test.log")
+		stepContent := strings.Join([]string(steps[0]), "\n")
+		if !strings.Contains(stepContent, "COPILOT_PROVIDER_WIRE_API: responses") {
+			t.Errorf("Expected COPILOT_PROVIDER_WIRE_API=responses for copilot/gpt-5 in sandbox mode, got:\n%s", stepContent)
+		}
+	})
+
+	t.Run("does NOT set COPILOT_PROVIDER_WIRE_API for claude model in sandbox", func(t *testing.T) {
+		workflowData := &WorkflowData{
+			Name:          "test-workflow",
+			EngineConfig:  &EngineConfig{ID: "copilot", Model: "claude-sonnet-4.6"},
+			SandboxConfig: sandboxConfig,
+		}
+
+		steps := engine.GetExecutionSteps(workflowData, "/tmp/gh-aw/test.log")
+		stepContent := strings.Join([]string(steps[0]), "\n")
+		if strings.Contains(stepContent, "COPILOT_PROVIDER_WIRE_API") {
+			t.Errorf("Expected COPILOT_PROVIDER_WIRE_API to be absent for claude model, got:\n%s", stepContent)
+		}
+	})
+
+	t.Run("does NOT set COPILOT_PROVIDER_WIRE_API when model is not statically configured", func(t *testing.T) {
+		workflowData := &WorkflowData{
+			Name:          "test-workflow",
+			EngineConfig:  &EngineConfig{ID: "copilot"},
+			SandboxConfig: sandboxConfig,
+		}
+
+		steps := engine.GetExecutionSteps(workflowData, "/tmp/gh-aw/test.log")
+		stepContent := strings.Join([]string(steps[0]), "\n")
+		if strings.Contains(stepContent, "COPILOT_PROVIDER_WIRE_API") {
+			t.Errorf("Expected COPILOT_PROVIDER_WIRE_API to be absent when model is dynamic, got:\n%s", stepContent)
+		}
+	})
+
+	t.Run("does NOT set COPILOT_PROVIDER_WIRE_API for gpt-5 when sandbox is disabled", func(t *testing.T) {
+		workflowData := &WorkflowData{
+			Name:         "test-workflow",
+			EngineConfig: &EngineConfig{ID: "copilot", Model: "gpt-5"},
+			SandboxConfig: &SandboxConfig{
+				Agent: &AgentSandboxConfig{Disabled: true},
+			},
+		}
+
+		steps := engine.GetExecutionSteps(workflowData, "/tmp/gh-aw/test.log")
+		stepContent := strings.Join([]string(steps[0]), "\n")
+		if strings.Contains(stepContent, "COPILOT_PROVIDER_WIRE_API") {
+			t.Errorf("Expected COPILOT_PROVIDER_WIRE_API to be absent when sandbox is disabled, got:\n%s", stepContent)
+		}
+	})
+
+	t.Run("respects user-set COPILOT_PROVIDER_WIRE_API and does not override it", func(t *testing.T) {
+		workflowData := &WorkflowData{
+			Name: "test-workflow",
+			EngineConfig: &EngineConfig{
+				ID:    "copilot",
+				Model: "gpt-5",
+				Env:   map[string]string{constants.CopilotProviderWireAPI: "completions"},
+			},
+			SandboxConfig: sandboxConfig,
+		}
+
+		steps := engine.GetExecutionSteps(workflowData, "/tmp/gh-aw/test.log")
+		stepContent := strings.Join([]string(steps[0]), "\n")
+		if strings.Contains(stepContent, "COPILOT_PROVIDER_WIRE_API: responses") {
+			t.Errorf("Expected compiler to not override user-set COPILOT_PROVIDER_WIRE_API, got:\n%s", stepContent)
+		}
+		if !strings.Contains(stepContent, "COPILOT_PROVIDER_WIRE_API: completions") {
+			t.Errorf("Expected user-set COPILOT_PROVIDER_WIRE_API=completions to be preserved, got:\n%s", stepContent)
+		}
+	})
+}
+
 func TestCopilotEngineHarnessScript(t *testing.T) {
 	engine := NewCopilotEngine()
 

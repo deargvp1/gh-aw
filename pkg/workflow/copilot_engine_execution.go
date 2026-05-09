@@ -448,6 +448,20 @@ touch %s
 	if sandboxEnabled {
 		env["COPILOT_API_KEY"] = constants.CopilotBYOKDummyAPIKey
 		env["AWF_REFLECT_ENABLED"] = "1"
+
+		// When the selected model is a GPT-5 family model, automatically set
+		// COPILOT_PROVIDER_WIRE_API=responses. GPT-5 models require the responses wire API
+		// in BYOK/offline mode; the default wire API ("completions") does not support them.
+		// Only inject when not already explicitly set by the user in engine.env.
+		if _, alreadySet := env[constants.CopilotProviderWireAPI]; !alreadySet {
+			modelToCheck := ""
+			if modelConfigured {
+				modelToCheck = workflowData.EngineConfig.Model
+			}
+			if copilotModelRequiresResponsesAPI(modelToCheck) {
+				env[constants.CopilotProviderWireAPI] = constants.CopilotProviderWireAPIResponses
+			}
+		}
 	}
 
 	// Add HTTP MCP header secrets to env for passthrough
@@ -602,4 +616,29 @@ func generateCopilotSessionFileCopyStep() GitHubActionStep {
 	step = append(step, "        run: bash \"${RUNNER_TEMP}/gh-aw/actions/copy_copilot_session_state.sh\"")
 
 	return GitHubActionStep(step)
+}
+
+// copilotModelRequiresResponsesAPI reports whether the given model string is a GPT-5 family
+// model that requires the responses wire API in Copilot BYOK/offline mode.
+//
+// It handles:
+//   - bare model names:          "gpt-5", "gpt-5-mini", "gpt-5.4"
+//   - provider-scoped names:     "copilot/gpt-5", "openai/gpt-5-mini"
+//   - names with query params:   "gpt-5?effort=high"
+//
+// Returns false for an empty string or any non-GPT-5 model.
+func copilotModelRequiresResponsesAPI(model string) bool {
+	if model == "" {
+		return false
+	}
+	// Strip provider prefix (e.g., "copilot/gpt-5" → "gpt-5").
+	if idx := strings.LastIndex(model, "/"); idx >= 0 {
+		model = model[idx+1:]
+	}
+	// Strip query parameters (e.g., "gpt-5?effort=high" → "gpt-5").
+	if idx := strings.Index(model, "?"); idx >= 0 {
+		model = model[:idx]
+	}
+	// GPT-5 family: gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-codex, gpt-5-pro, gpt-5.x, etc.
+	return strings.HasPrefix(strings.ToLower(model), "gpt-5")
 }
