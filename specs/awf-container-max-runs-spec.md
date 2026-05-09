@@ -55,7 +55,7 @@ The gh-aw plumbing is already implemented in:
 - `pkg/workflow/agent_validation.go` — relaxed engine check when AWF handles multi-run
 
 The version gate constant is `constants.AWFMaxRunsMinVersion = "v0.26.0"`. Update this constant
-when `gh-aw-firewall` ships the `container.maxRuns` feature, then run `make build && make recompile && make recompile`.
+when `gh-aw-firewall` ships the `container.maxRuns` feature, then run `make build && make recompile`.
 
 ## Expected AWF Behavior
 
