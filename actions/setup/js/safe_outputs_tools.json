@@ -517,7 +517,7 @@
         },
         "item_number": {
           "type": "number",
-          "description": "Issue or PR number to add labels to. This is the numeric ID from the GitHub URL (e.g., 456 in github.com/owner/repo/issues/456). If omitted, adds labels to the item that triggered this workflow."
+          "description": "Issue or PR number to add labels to. This is the numeric ID from the GitHub URL (e.g., 456 in github.com/owner/repo/issues/456). This field is required so label operations work on schedule, workflow_dispatch, and other non-issue triggers."
         },
         "secrecy": {
           "type": "string",
@@ -528,7 +528,7 @@
           "description": "Trustworthiness level of the message source (e.g., \"low\", \"medium\", \"high\")."
         }
       },
-      "required": ["labels"],
+      "required": ["labels", "item_number"],
       "additionalProperties": false
     }
   },

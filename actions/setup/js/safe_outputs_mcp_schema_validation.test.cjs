@@ -61,6 +61,12 @@ describe("Safe Outputs MCP Schema Validation", () => {
         }
       });
     });
+
+    it("should require item_number for add_labels", () => {
+      const addLabelsTool = tools.find(tool => tool.name === "add_labels");
+      expect(addLabelsTool).toBeDefined();
+      expect(addLabelsTool.inputSchema.required).toContain("item_number");
+    });
   });
 
   describe("Required Parameter Descriptions", () => {
