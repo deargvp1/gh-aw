@@ -56,28 +56,6 @@ Analyze all Go source files (`.go` files, excluding test files) in the repositor
 5. Use Serena's semantic analysis to detect potential duplicates
 6. Suggest refactoring fixes
 
-## LSDF-First Navigation
-
-Before scanning source broadly, use LSDF maps when available:
-
-1. Read `project.lsdf`
-2. Read nearest `INDEX.lsdf` files to map structure
-3. Read `INDEX.detail.lsdf` for signatures and call edges
-4. Open raw source only for targeted verification
-
-If LSDF files are missing and deep structural analysis is required, initialize and generate:
-
-```bash
-lsdf init
-lsdf gen . --recursive
-```
-
-After structural code changes, regenerate indices:
-
-```bash
-lsdf gen . --recursive
-```
-
 ## Important Constraints
 
 1. **Only analyze `.go` files** - Ignore all other file types

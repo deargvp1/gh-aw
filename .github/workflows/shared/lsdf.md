@@ -29,6 +29,12 @@ steps:
       export PATH="${HOME}/.local/bin:${PATH}"
       lsdf --help >/dev/null
       lsdf --version
+
+  - name: Generate LSDF indices
+    run: |
+      export PATH="${HOME}/.local/bin:${PATH}"
+      lsdf init
+      lsdf gen . --recursive
 ---
 
 <!--
@@ -49,7 +55,7 @@ Use LSDF-first navigation whenever possible:
 3. Read `INDEX.detail.lsdf` when signatures/call edges are needed.
 4. Open raw source files only after LSDF map review.
 
-If the repository does not have LSDF files yet and your task benefits from structural indexing, initialize and generate indices before deep analysis:
+The workflow setup already initializes and generates LSDF indices:
 
 ```bash
 lsdf init
