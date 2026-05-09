@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-05-09T06:58:00Z",
-  "run_id": "25594705571",
+  "run_date": "2026-05-09T12:34:38Z",
+  "run_id": "25601219663",
   "fork_prs": 0,
-  "agent_prs_found": 0,
-  "agent_prs_excluded": 0,
-  "notes": "GitHub API unavailable (HTTP 403). No fork PRs found. Consistent with multiple previous runs.",
+  "agent_prs_found": 6,
+  "agent_prs_excluded": 6,
+  "notes": "6 open PRs found from app/copilot-swe-agent, all from same repository (not forks). No fork PRs to triage.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -17,8 +17,8 @@
     "by_action": {}
   },
   "previous_run": {
-    "run_id": "25573166912",
-    "run_date": "2026-05-08T18:44:36Z",
+    "run_id": "25594705571",
+    "run_date": "2026-05-09T06:58:00Z",
     "fork_prs": 0,
     "agent_prs_found": 0,
     "agent_prs_excluded": 0
