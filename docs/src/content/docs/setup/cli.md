@@ -133,6 +133,9 @@ Commands are organized by workflow lifecycle: creating, building, testing, monit
 
 Initialize repository for agentic workflows. Configures `.gitattributes`, creates the dispatcher agent file (`.github/agents/agentic-workflows.agent.md`), and performs non-interactive setup. Enables MCP server integration by default (use `--no-mcp` to skip).
 
+> [!NOTE]
+> The dispatcher agent file (`.github/agents/agentic-workflows.agent.md`) is only used by the **Copilot** engine. If you use Claude, Codex, or Gemini exclusively, you can safely delete this file; it has no effect on other engines.
+
 ```bash wrap
 gh aw init                              # Initialize repository with defaults (non-interactive)
 gh aw init --no-mcp                     # Skip MCP server integration
@@ -143,6 +146,8 @@ gh aw init --create-pull-request        # Initialize and open a pull request
 ```
 
 **Options:** `--no-mcp`, `--codespaces`, `--completions`, `--create-pull-request`
+
+`gh aw init` has no public `--engine` option.
 
 #### `add-wizard`
 
