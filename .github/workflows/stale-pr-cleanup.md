@@ -19,6 +19,7 @@ tools:
     mode: gh-proxy
     toolsets: [pull_requests, repos, issues]
   bash:
+    - "gh *"
     - "jq *"
     - "date *"
 safe-outputs:
