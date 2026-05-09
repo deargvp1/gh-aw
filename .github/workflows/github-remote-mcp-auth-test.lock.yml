@@ -655,7 +655,7 @@ jobs:
           
           export GH_AW_ENGINE="copilot"
           export GH_AW_MCP_CLI_SERVERS='["safeoutputs"]'
-          echo 'GH_AW_MCP_CLI_SERVERS=["safeoutputs"]' >> "$GITHUB_ENV"
+          echo GH_AW_MCP_CLI_SERVERS='["safeoutputs"]' >> "$GITHUB_ENV"
           export GITHUB_PERSONAL_ACCESS_TOKEN="$GITHUB_MCP_SERVER_TOKEN"
           MCP_GATEWAY_UID=$(id -u 2>/dev/null || echo '0')
           MCP_GATEWAY_GID=$(id -g 2>/dev/null || echo '0')
