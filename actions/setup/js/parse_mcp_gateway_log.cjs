@@ -111,20 +111,30 @@ function parseTokenUsageJsonl(jsonlContent) {
       m.requests++;
       m.durationMs += entry.duration_ms || 0;
 
-      contributorsByKey.set(contributorKey, {
+      const contributor = contributorsByKey.get(contributorKey) || {
         label: contributorKey,
         sessionId,
         requestId,
-        models: new Set([model]),
-        inputTokens: (contributorsByKey.get(contributorKey)?.inputTokens || 0) + inputTokens,
-        outputTokens: (contributorsByKey.get(contributorKey)?.outputTokens || 0) + outputTokens,
-        cacheReadTokens: (contributorsByKey.get(contributorKey)?.cacheReadTokens || 0) + cacheReadTokens,
-        cacheWriteTokens: (contributorsByKey.get(contributorKey)?.cacheWriteTokens || 0) + cacheWriteTokens,
-        requests: (contributorsByKey.get(contributorKey)?.requests || 0) + 1,
-        durationMs: (contributorsByKey.get(contributorKey)?.durationMs || 0) + (entry.duration_ms || 0),
-        effectiveTokens: (contributorsByKey.get(contributorKey)?.effectiveTokens || 0) + requestEffectiveTokens,
-        baseWeightedTokens: (contributorsByKey.get(contributorKey)?.baseWeightedTokens || 0) + requestBaseWeightedTokens,
-      });
+        models: new Set(),
+        inputTokens: 0,
+        outputTokens: 0,
+        cacheReadTokens: 0,
+        cacheWriteTokens: 0,
+        requests: 0,
+        durationMs: 0,
+        effectiveTokens: 0,
+        baseWeightedTokens: 0,
+      };
+      contributor.models.add(model);
+      contributor.inputTokens += inputTokens;
+      contributor.outputTokens += outputTokens;
+      contributor.cacheReadTokens += cacheReadTokens;
+      contributor.cacheWriteTokens += cacheWriteTokens;
+      contributor.requests += 1;
+      contributor.durationMs += entry.duration_ms || 0;
+      contributor.effectiveTokens += requestEffectiveTokens;
+      contributor.baseWeightedTokens += requestBaseWeightedTokens;
+      contributorsByKey.set(contributorKey, contributor);
     } catch {
       // skip malformed lines
     }

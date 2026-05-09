@@ -50,7 +50,7 @@ function formatSpanStatus(status) {
   return "UNSET";
 }
 
-function collectTracePreview(traceId) {
+function collectTracePreview(traceId = "") {
   if (!fs.existsSync(OTEL_JSONL_PATH)) {
     return null;
   }
