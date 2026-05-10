@@ -1,53 +1,17 @@
 {
-  "last_updated": "2026-05-08",
+  "last_updated": "2026-05-10",
   "pending_tasks": [
     {
-      "file": "docs/src/content/docs/blog/2026-01-27-operational-patterns.md",
-      "created": "2026-05-07",
+      "file": "docs/src/content/docs/introduction/slides.mdx",
+      "created": "2026-05-10",
       "status": "pending",
-      "description": "Fix 9 broken 'Learn more' links: replace https://github.github.com/gh-aw/patterns/ with /gh-aw/patterns/ at lines 79, 127, 178, 227, 277, 340, 391, 430, 455"
+      "description": "Convert bare URLs and fix empty entries in walkthroughs section"
     },
     {
-      "file": "docs/src/content/docs/blog/2026-01-27-operational-patterns.md",
-      "created": "2026-05-07",
+      "file": "docs/src/content/docs/patterns/task-ops.md",
+      "created": "2026-05-10",
       "status": "pending",
-      "description": "Replace fictional narrative intro (lines 15-19) with professional context-setting paragraph"
-    },
-    {
-      "file": "docs/src/content/docs/guides/self-hosted-runners.md",
-      "created": "2026-05-03",
-      "status": "pending",
-      "description": "Fix broken NOTE callout: add '> ' prefix to line 17"
-    },
-    {
-      "file": "docs/src/content/docs/reference/github-tools.md",
-      "created": "2026-05-03",
-      "status": "pending",
-      "description": "Rename 'Using a magic secret' section to 'Using a reserved secret name'"
-    },
-    {
-      "file": "docs/src/content/docs/examples/manual.md",
-      "created": "2026-05-06",
-      "status": "pending",
-      "description": "Clarify UI steps 3 and 5 — both say 'Run workflow'; step 3 should read 'Click Run workflow to open the input form', step 5 'Click the green Run workflow button to start the run'"
-    },
-    {
-      "file": "pkg/cli/validate_command.go",
-      "created": "2026-05-06",
-      "status": "pending",
-      "description": "Trim --strict flag description from 189 chars to one concise sentence; move default-behaviour note into Long: block"
-    },
-    {
-      "file": "docs/src/content/docs/blog/2026-01-13-meet-the-workflows-tool-infrastructure.md",
-      "created": "2026-05-08",
-      "status": "pending",
-      "description": "Line 47: fix broken Quick Start URL from https://github.github.com/gh-aw/setup/quick-start/ to correct URL; line 21: replace informal narrative intro with professional paragraph"
-    },
-    {
-      "file": ".github/workflows/mattpocock-skills-reviewer.md",
-      "created": "2026-05-08",
-      "status": "pending",
-      "description": "Line 61: replace 🧠 emoji in run-failure with ❌ — brain emoji is identical to run-started/run-success, making failure state visually indistinguishable"
+      "description": "Convert Limitations prose paragraph to bullet list"
     }
   ]
 }

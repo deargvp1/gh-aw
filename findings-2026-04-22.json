@@ -1,1 +1,1 @@
-{"date":"2026-04-22","files":["troubleshooting/common-issues.md","triggers.md","brave.md","archie.md","approach-validator.md","engine_validation.go"],"improvements":[{"file":"docs/src/content/docs/troubleshooting/common-issues.md","issue":"Lines 204-212: 'Key gotchas:' is informal; critical warning at line 208 uses inline emoji instead of callout block."},{"file":".github/workflows/brave.md","issue":"Line 23: {status} mid-sentence between workflow link and continuation creates redundant or broken prose."}]}
+[]

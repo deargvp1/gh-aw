@@ -1,1 +1,1 @@
-{"date":"2026-04-15","files":["troubleshooting/errors.md","engine_validation.go","breaking-change-checker.md","security-review.md"],"improvements":[{"file":"docs/src/content/docs/troubleshooting/errors.md","issue":"Line 215: heading 'Top User-Facing Errors' is misleading; rename to 'Strict Mode and Configuration Errors'"},{"file":".github/workflows/breaking-change-checker.md","issue":"run-failure uses analysis emoji (🔬) not warning indicator; run-success has informal tone"}]}
+[]

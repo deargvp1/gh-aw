@@ -1,1 +1,1 @@
-{"date":"2026-04-17","files":["reference/tokens.md","reference/faq.md","delight.md","craft.md","call_workflow_validation.go"],"improvements":[{"file":"docs/src/content/docs/reference/faq.md","issue":"Line 173: typo 'Security Architectur' missing 'e'"},{"file":"pkg/workflow/call_workflow_validation.go","issue":"Lines 112,144,162: workflow_call trigger error lacks 'To fix' example showing how to declare workflow_call in on: section"}]}
+[]

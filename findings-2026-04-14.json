@@ -1,1 +1,1 @@
-{"date":"2026-04-14","files":["tools.md","triggers.md","logs_command.go","archie.md","permissions_validation.go"],"improvements":[{"file":"pkg/workflow/permissions_validation.go","issue":"Line 293: 'ERROR: ' prefix inside error string causes double-prefix in final message: 'error: permission validation failed: ERROR: ...'"},{"file":"docs/src/content/docs/reference/tools.md","issue":"Custom MCP Servers Options section is dense single sentence; bulleted list would match rest of file"}]}
+[]

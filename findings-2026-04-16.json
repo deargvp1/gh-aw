@@ -1,1 +1,1 @@
-{"date":"2026-04-16","files":["setup/quick-start.mdx","main.go","architecture-guardian.md","template_injection_validation.go"],"improvements":[{"file":".github/workflows/architecture-guardian.md","issue":"run-failure (line 42) uses 🏛️ identity emoji same as run-started — visually indistinguishable; use ⚠️ for failure"},{"file":"docs/src/content/docs/setup/quick-start.mdx","issue":"Lines 95-96: Step 4 opens with 3 sentences of marketing copy before actionable instructions; replace with single direct transition sentence"}]}
+[]
