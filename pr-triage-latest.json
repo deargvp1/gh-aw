@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-05-10T01:15:07Z",
-  "run_id": "25616322487",
+  "run_date": "2026-05-10T07:09:46Z",
+  "run_id": "25622553318",
   "fork_prs": 0,
   "agent_prs_found": 0,
   "agent_prs_excluded": 0,
-  "notes": "No open PRs found in repository. Previous run (25608654203) also found 0 fork PRs to triage.",
+  "notes": "No open PRs found. Previous runs (25616322487, 25608654203) also found 0 fork PRs.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -18,10 +18,9 @@
   },
   "prs_seen": [],
   "previous_run": {
-    "run_id": "25608654203",
-    "run_date": "2026-05-09T18:32:33Z",
+    "run_id": "25616322487",
+    "run_date": "2026-05-10T01:15:07Z",
     "fork_prs": 0,
-    "agent_prs_found": 3,
-    "agent_prs_excluded": 3
+    "agent_prs_found": 0
   }
 }
