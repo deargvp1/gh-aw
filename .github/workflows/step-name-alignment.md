@@ -82,7 +82,7 @@ Check your cache-memory to see:
 
 This ensures consistency across runs and avoids duplicate issues.
 
-> **Important:** Use the `Read` tool (not Bash `cat`) to read the cache file at `/tmp/gh-aw/cache-memory/step-name-alignment.json`, and use the `Write` tool to update it. Do not use Bash commands like `cat` or `jq` with the cache file path — the Read and Write tools are the correct mechanism for accessing cache-memory files.
+> **Important:** Use the `Read` tool to read `/tmp/gh-aw/cache-memory/step-name-alignment.json` and the `Write` tool to update it. Do not use Bash `cat` or `jq` with cache-memory paths — although those commands appear in the Bash allow-list, Claude Code's working-directory security restriction blocks Bash access to `/tmp/` paths at runtime. The `Read` and `Write` tools have explicit grants (`Read(/tmp/gh-aw/cache-memory/*)` and `Write(/tmp/gh-aw/cache-memory/*)`) that bypass this restriction.
 
 **Cache file structure:**
 ```json
