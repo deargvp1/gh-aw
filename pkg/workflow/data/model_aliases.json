@@ -2,7 +2,7 @@
   "version": "1",
   "description": "Built-in model alias map for GitHub Agentic Workflows. Each key is an alias name; the value is an ordered list of model patterns tried in sequence until one resolves.",
   "aliases": {
-    "sonnet": ["copilot/*sonnet*", "anthropic/*sonnet*"],
+    "sonnet": ["claude-sonnet-4.6", "copilot/*sonnet*", "anthropic/*sonnet*"],
     "haiku": ["copilot/*haiku*", "anthropic/*haiku*"],
     "opus": ["copilot/*opus*", "anthropic/*opus*"],
     "gpt-4.1": ["copilot/gpt-4.1*", "openai/gpt-4.1*"],

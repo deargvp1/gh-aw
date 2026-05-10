@@ -529,7 +529,7 @@ AWF ships the following builtin aliases. Workflow frontmatter definitions (and i
 
 | Alias | Patterns (in order) |
 |-------|---------------------|
-| `sonnet` | `copilot/*sonnet*`, `anthropic/*sonnet*` |
+| `sonnet` | `claude-sonnet-4.6`, `copilot/*sonnet*`, `anthropic/*sonnet*` |
 | `haiku` | `copilot/*haiku*`, `anthropic/*haiku*` |
 | `opus` | `copilot/*opus*`, `anthropic/*opus*` |
 | `gpt-4.1` | `copilot/gpt-4.1*`, `openai/gpt-4.1*` |
@@ -666,7 +666,7 @@ At compile time, an implementation SHOULD:
 
 #### 12.1.2 Resolution Tests
 
-- **T-MAF-020**: `sonnet` resolves to first catalog match for `copilot/*sonnet*` or `anthropic/*sonnet*`
+- **T-MAF-020**: `sonnet` resolves to `claude-sonnet-4.6` when available; falls back to first catalog match for `copilot/*sonnet*` or `anthropic/*sonnet*`
 - **T-MAF-021**: `auto` transitively resolves through `large` → `sonnet` → concrete model
 - **T-MAF-022**: `opus?effort=high` propagates `effort=high` to resolved concrete model
 - **T-MAF-023**: Caller `opus?effort=high` + alias entry `opus?effort=medium` → resolved with `effort=high` (caller wins)
