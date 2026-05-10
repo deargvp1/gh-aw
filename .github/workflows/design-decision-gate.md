@@ -57,6 +57,8 @@ tools:
     - "wc:*"
     - "find:*"
     - "echo:*"
+    - "jq:*"
+    - "mkdir:*"
 steps:
   - name: Pre-fetch ADR gate PR context
     env:
@@ -65,30 +67,31 @@ steps:
     run: |
       set -euo pipefail
 
-      mkdir -p /tmp/gh-aw/agent
+      CONTEXT_DIR="${{ github.workspace }}/.gh-aw-context"
+      mkdir -p "$CONTEXT_DIR"
 
       gh pr view "$PR_NUMBER" \
         --repo "${{ github.repository }}" \
         --json number,title,body,labels,baseRefName,headRefName,author,url \
-        > /tmp/gh-aw/agent/pr.json
+        > "$CONTEXT_DIR/pr.json"
 
       gh pr diff "$PR_NUMBER" \
         --repo "${{ github.repository }}" \
-        > /tmp/gh-aw/agent/pr.diff
+        > "$CONTEXT_DIR/pr.diff"
 
       gh api --paginate "repos/${{ github.repository }}/pulls/$PR_NUMBER/files?per_page=100" \
-        --jq '.[]' | jq -s '.' > /tmp/gh-aw/agent/pr-files.json
+        --jq '.[]' | jq -s '.' > "$CONTEXT_DIR/pr-files.json"
 
       if [ -f "${{ github.workspace }}/.design-gate.yml" ]; then
-        cp "${{ github.workspace }}/.design-gate.yml" /tmp/gh-aw/agent/design-gate-config.yml
+        cp "${{ github.workspace }}/.design-gate.yml" "$CONTEXT_DIR/design-gate-config.yml"
         HAS_CUSTOM_CONFIG=true
       else
-        echo "No .design-gate.yml found — using defaults" > /tmp/gh-aw/agent/design-gate-config.yml
+        echo "No .design-gate.yml found — using defaults" > "$CONTEXT_DIR/design-gate-config.yml"
         HAS_CUSTOM_CONFIG=false
       fi
 
-      BUSINESS_ADDITIONS_DEFAULT=$(jq '[.[] | select(.filename | test("^(src|lib|pkg|internal|app|core|domain|services|api)/")) | .additions] | add // 0' /tmp/gh-aw/agent/pr-files.json)
-      HAS_IMPLEMENTATION_LABEL=$(jq '[.labels[]?.name] | index("implementation") != null' /tmp/gh-aw/agent/pr.json)
+      BUSINESS_ADDITIONS_DEFAULT=$(jq '[.[] | select(.filename | test("^(src|lib|pkg|internal|app|core|domain|services|api)/")) | .additions] | add // 0' "$CONTEXT_DIR/pr-files.json")
+      HAS_IMPLEMENTATION_LABEL=$(jq '[.labels[]?.name] | index("implementation") != null' "$CONTEXT_DIR/pr.json")
 
       jq -n \
         --argjson default_business_additions "$BUSINESS_ADDITIONS_DEFAULT" \
@@ -103,7 +106,7 @@ steps:
           has_implementation_label: $has_implementation_label,
           default_business_additions: $default_business_additions,
           requires_adr_by_default_volume: ($default_business_additions > ($threshold | tonumber))
-        }' > /tmp/gh-aw/agent/adr-prefetch-summary.json
+        }' > "$CONTEXT_DIR/adr-prefetch-summary.json"
 
 ---
 
@@ -146,7 +149,7 @@ Stop and emit a safe output **immediately** when any of the following is true:
 
 ### Mandatory Efficiency Rules
 
-1. Start with pre-fetched files in `/tmp/gh-aw/agent/` before calling any GitHub tool:
+1. Start with pre-fetched files in `.gh-aw-context/` (within the repository workspace) before calling any GitHub tool:
    - `pr.json`
    - `pr-files.json`
    - `pr.diff`
@@ -166,7 +169,7 @@ Stop and emit a safe output **immediately** when any of the following is true:
 Read the pre-fetched summary first:
 
 ```bash
-cat /tmp/gh-aw/agent/adr-prefetch-summary.json
+cat .gh-aw-context/adr-prefetch-summary.json
 ```
 
 Decide if this PR needs ADR enforcement using the following deterministic checks:
@@ -179,7 +182,7 @@ If `has_custom_config` is `false` and `default_business_additions` is `> 100`, e
 
 Configuration snapshot is pre-fetched:
 ```bash
-cat /tmp/gh-aw/agent/design-gate-config.yml
+cat .gh-aw-context/design-gate-config.yml
 ```
 
 If `has_custom_config` is `true` and the config defines custom business directories or thresholds, recompute Condition B from `pr-files.json` using that config before deciding. Do not use `default_business_additions` for the final decision in that case.
@@ -210,9 +213,9 @@ If ADR enforcement is required by either condition, continue to Step 2.
 Use pre-fetched files first:
 
 ```bash
-cat /tmp/gh-aw/agent/pr.json
-cat /tmp/gh-aw/agent/pr-files.json
-cat /tmp/gh-aw/agent/pr.diff
+cat .gh-aw-context/pr.json
+cat .gh-aw-context/pr-files.json
+cat .gh-aw-context/pr.diff
 ```
 
 Only if one of these files is missing required fields, make a targeted GitHub tool call for the missing field only.

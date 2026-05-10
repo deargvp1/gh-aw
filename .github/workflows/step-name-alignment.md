@@ -40,6 +40,7 @@ tools:
     - "find .github/workflows -name '*.lock.yml' -type f"
     - "cat docs/src/content/docs/reference/glossary.md"
     - "git log --since='24 hours ago' --oneline --name-only -- '.github/workflows/*.lock.yml'"
+    - "jq:*"
 
 timeout-minutes: 30
 
@@ -80,6 +81,8 @@ Check your cache-memory to see:
 - Glossary terms you've referenced
 
 This ensures consistency across runs and avoids duplicate issues.
+
+> **Important:** Use the `Read` tool (not Bash `cat`) to read the cache file at `/tmp/gh-aw/cache-memory/step-name-alignment.json`, and use the `Write` tool to update it. Do not use Bash commands like `cat` or `jq` with the cache file path — the Read and Write tools are the correct mechanism for accessing cache-memory files.
 
 **Cache file structure:**
 ```json
@@ -342,7 +345,7 @@ This issue is **[High/Medium/Low] Priority** based on the severity of inconsiste
 
 ### 8. Update Cache Memory
 
-After creating issues, update your cache-memory:
+After creating issues, update your cache-memory using the `Write` tool (not Bash redirection) to write to `/tmp/gh-aw/cache-memory/step-name-alignment.json`:
 
 ```json
 {
