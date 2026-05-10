@@ -59,14 +59,12 @@ func downloadAgentFileFromGitHub(verbose bool) (string, error) {
 		}
 
 		if resp.StatusCode == http.StatusNotFound {
-			_, _ = io.Copy(io.Discard, resp.Body)
-			_ = resp.Body.Close()
+			discardAndClose(resp)
 			continue
 		}
 
 		if resp.StatusCode != http.StatusOK {
-			_, _ = io.Copy(io.Discard, resp.Body)
-			_ = resp.Body.Close()
+			discardAndClose(resp)
 			return "", fmt.Errorf("failed to download agent file: HTTP %d", resp.StatusCode)
 		}
 
@@ -95,16 +93,16 @@ func downloadAgentFileFromGitHub(verbose bool) (string, error) {
 		if verbose {
 			fmt.Fprintln(os.Stderr, console.FormatInfoMessage("Retrying download with gh CLI authentication..."))
 		}
-		if content, ghErr := downloadAgentFileViaGHCLI(ref, agentPaths); ghErr == nil {
-			patchedContent := patchAgentFileURLs(content, ref)
+		if ghContent, err := downloadAgentFileViaGHCLI(ref, agentPaths); err == nil {
+			patchedContent := patchAgentFileURLs(ghContent, ref)
 			agentDownloadLog.Printf("Successfully downloaded agent file via gh CLI (%d bytes)", len(patchedContent))
 			return patchedContent, nil
 		} else {
-			agentDownloadLog.Printf("gh CLI fallback failed: %v", ghErr)
+			agentDownloadLog.Printf("gh CLI fallback failed: %v", err)
 		}
 	}
 
-	return "", fmt.Errorf("failed to download agent file: HTTP %d", http.StatusNotFound)
+	return "", errors.New("failed to download agent file from all known dispatcher paths")
 }
 
 // patchAgentFileURLs patches URLs in the agent file to use the correct ref
@@ -141,4 +139,13 @@ func downloadAgentFileViaGHCLI(ref string, agentPaths []string) (string, error) 
 func isGHCLIAvailable() bool {
 	cmd := exec.Command("gh", "--version")
 	return cmd.Run() == nil
+}
+
+// discardAndClose drains and closes an HTTP response body safely, including nil responses.
+func discardAndClose(resp *http.Response) {
+	if resp == nil || resp.Body == nil {
+		return
+	}
+	_, _ = io.Copy(io.Discard, resp.Body)
+	_ = resp.Body.Close()
 }
