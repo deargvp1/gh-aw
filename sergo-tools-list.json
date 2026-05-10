@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-05-09T00:00:00Z",
+  "last_updated": "2026-05-10T00:00:00Z",
   "tools": [
     {"name": "activate_project", "description": "Activates the project with the given name or path (param: --project)"},
     {"name": "check_onboarding_performed", "description": "Checks whether project onboarding was already performed"},
     {"name": "delete_memory", "description": "Delete a memory file"},
     {"name": "edit_memory", "description": "Replaces content matching a regular expression in a memory"},
     {"name": "find_file", "description": "Finds non-gitignored files matching the given file mask within the given relative path"},
-    {"name": "find_referencing_symbols", "description": "Finds references to the symbol at the given name_path (params: --name_path, --relative_path required)"},
-    {"name": "find_symbol", "description": "Retrieves information on all symbols/code entities (param: --name_path_pattern required, optional --relative_path)"},
-    {"name": "get_current_config", "description": "Print the current configuration of the agent, including active and available projects"},
+    {"name": "find_referencing_symbols", "description": "Finds references to the symbol at the given name_path (params: --name_path, --relative_path required - file path, not dir)"},
+    {"name": "find_symbol", "description": "Retrieves information on all symbols/code entities (param: --name_path_pattern required, requires file path or qualified path like (*Compiler).method - bare method name returns [] for receiver methods)"},
+    {"name": "get_current_config", "description": "Print the current configuration of the agent"},
     {"name": "get_symbols_overview", "description": "Get a high-level understanding of the code symbols in a file (param: --relative_path required)"},
     {"name": "initial_instructions", "description": "Provides the Serena Instructions Manual"},
     {"name": "insert_after_symbol", "description": "Inserts the given body/content after the end of the definition of the given symbol"},
@@ -19,11 +19,11 @@
     {"name": "read_memory", "description": "Read the content of a memory file"},
     {"name": "rename_symbol", "description": "Renames the symbol with the given name_path to new_name throughout the entire codebase"},
     {"name": "replace_symbol_body", "description": "Replaces the body of the symbol with the given name_path"},
-    {"name": "search_for_pattern", "description": "Flexible search for arbitrary patterns in the codebase (param: --substring_pattern required, not regex)"},
+    {"name": "search_for_pattern", "description": "Flexible search for arbitrary patterns in the codebase (param: --substring_pattern required)"},
     {"name": "think_about_collected_information", "description": "Think about collected information"},
     {"name": "think_about_task_adherence", "description": "Think about task adherence"},
     {"name": "think_about_whether_you_are_done", "description": "Think about whether you are done"},
     {"name": "write_memory", "description": "Write a memory file"}
   ],
-  "notes": "Run 4 (2026-05-09): No tool changes vs Run 3. 23 tools total. Confirmed find_symbol uses --name_path_pattern (not --name_path). LSP fully operational; find_symbol on StartDockerImageDownload returned function bounds in 78ms."
+  "notes": "Run 5 (2026-05-10): No tool changes vs Run 4. 23 tools total. New observation: find_symbol on a bare receiver-method name (e.g. 'extractSafeOutputsConfig') returns [] - must use qualified form '(*Compiler).extractSafeOutputsConfig' to get a hit. get_symbols_overview is the easy way to discover the qualified form. Confirmed body_location for 2 long functions in this run."
 }

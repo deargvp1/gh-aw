@@ -1,12 +1,16 @@
 {
-  "total_runs": 4,
-  "total_findings": 33,
-  "total_tasks": 12,
-  "avg_success_score": 8.0,
-  "last_run": "2026-05-09",
-  "most_successful_strategy": "concurrency-safety-and-resource-lifecycle",
-  "serena_lsp_status": "OPERATIONAL as of 2026-05-07. Key parameter changes: activate_project uses --project, find_symbol uses --name_path_pattern (NOT --name_path), find_referencing_symbols requires --name_path and --relative_path (file, not dir). search_for_pattern requires --substring_pattern (literal string, not regex). Use JSON stdin pipe with '.' sentinel for multi-param calls.",
+  "total_runs": 5,
+  "total_findings": 50,
+  "total_tasks": 15,
+  "avg_success_score": 8.2,
+  "last_run": "2026-05-10",
+  "most_successful_strategy": "concurrency-safety-and-resource-lifecycle (Run 4) tied with function-complexity-and-long-function-hot-spots (Run 5), both 9/10",
+  "serena_lsp_status": "OPERATIONAL as of 2026-05-07. Key parameter changes: activate_project uses --project, find_symbol uses --name_path_pattern (NOT --name_path), find_referencing_symbols requires --name_path and --relative_path (file, not dir). search_for_pattern requires --substring_pattern (literal string, not regex). Use JSON stdin pipe with '.' sentinel for multi-param calls. NEW (Run 5): bare receiver-method names like 'extractSafeOutputsConfig' return [] from find_symbol - must qualify as '(*Compiler).extractSafeOutputsConfig' (Go pointer-receiver form). get_symbols_overview reveals the qualified form.",
   "type_assertion_scan_result": "Only 5 type assertions found in all of pkg/ (non-test). All 5 use safe comma-ok pattern. No unsafe raw assertions. Run 3 2026-05-08.",
   "http_request_scan_result": "1 remaining http.NewRequest (without context) in pkg/cli/mcp_registry.go:56. All others use http.NewRequestWithContext. Run 3 2026-05-08.",
-  "production_goroutine_inventory": "6 production goroutines in pkg/ (non-test): pkg/cli/update_check.go:273 (recover OK), pkg/cli/compile_update_check.go:67 (recover OK), pkg/cli/docker_images.go:148 (NO recover - issue created Run 4), pkg/cli/mcp_inspect_inspector.go:139 + 201 (waitgroup-bounded, no recover), pkg/console/spinner.go:140 (NO recover - issue created Run 4). Convention: production goroutines should have defer recover() per update_check.go pattern."
+  "production_goroutine_inventory": "6 production goroutines in pkg/ (non-test): pkg/cli/update_check.go:273 (recover OK), pkg/cli/compile_update_check.go:67 (recover OK), pkg/cli/docker_images.go:148 (NO recover - issue created Run 4), pkg/cli/mcp_inspect_inspector.go:139 + 201 (waitgroup-bounded, no recover), pkg/console/spinner.go:140 (NO recover - issue created Run 4). Convention: production goroutines should have defer recover() per update_check.go pattern.",
+  "function_length_scan_result": "Run 5 2026-05-10: 17 non-test funcs in pkg/ exceed 400 lines. Top 5: buildMaintenanceWorkflowYAML (822, generated YAML - acceptable), extractSafeOutputsConfig (637 - issue created), buildConclusionJob (607), commentOutProcessedFieldsInOnSection (554), DownloadWorkflowLogs (513 + 26 params - issue created). Tracking issue covers remaining 12. Total non-test pkg/*.go files: 766.",
+  "error_wrapping_scan_result": "Run 5 2026-05-10: Of 1704 fmt.Errorf calls in pkg/, only 1 documented exception uses %v with err (compiler_orchestrator_frontmatter.go:41 with //nolint:errorlint to avoid exposing os.PathError). %w wrapping is consistent. NOT a finding worth issue.",
+  "panic_scan_result": "Run 5 2026-05-10: 16 panic() calls in pkg/ non-test. All examined are legitimate fail-fast at init/embed-load or 'BUG:' guards on programmer error or crypto/rand failure. NOT a finding worth issue.",
+  "long_parameter_lists": "Run 5 2026-05-10: DownloadWorkflowLogs has 26 positional parameters (1 ctx + 25 others) - issue created. No other functions sampled exceed 15. Worth a future scan."
 }
