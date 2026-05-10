@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-05-10T12:34:21Z",
-  "run_id": "25628828046",
+  "run_date": "2026-05-10T18:32:07Z",
+  "run_id": "25636449835",
   "fork_prs": 0,
   "agent_prs_found": 0,
   "agent_prs_excluded": 0,
-  "notes": "No open PRs found. Previous runs (25622553318, 25616322487, 25608654203) also found 0 fork PRs.",
+  "notes": "No open PRs found. Previous runs (25628828046, 25622553318, 25616322487) also found 0 fork PRs.",
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
   "fast_track_needed": [],
@@ -18,8 +18,8 @@
   },
   "prs_seen": [],
   "previous_run": {
-    "run_id": "25622553318",
-    "run_date": "2026-05-10T07:09:46Z",
+    "run_id": "25628828046",
+    "run_date": "2026-05-10T12:34:21Z",
     "fork_prs": 0,
     "agent_prs_found": 0
   }
