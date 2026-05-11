@@ -461,8 +461,10 @@ async function main() {
   // re-run.
   const [targetOwner, targetRepoName] = targetRepo.split("/");
   // URL with embedded token used for the pull-on-retry merge step only;
-  // pushSignedCommits authenticates via the git extraheader set by
-  // actions/checkout (and the gitAuthEnv fallback for the git-push path).
+  // pushSignedCommits authenticates via the gitAuthEnv passed below for both
+  // ls-remote (branch HEAD resolution) and the git-push fallback path.
+  // The checkout step in this job runs with persist-credentials: false, so
+  // git credentials are NOT available via the http.extraheader mechanism.
   const repoUrlWithToken = `https://x-access-token:${ghToken}@${serverHost}/${targetRepo}.git`;
 
   // Point origin at the memory target repo so pushSignedCommits can resolve

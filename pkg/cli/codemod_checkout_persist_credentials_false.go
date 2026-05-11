@@ -17,9 +17,18 @@ func getCheckoutPersistCredentialsFalseCodemod() Codemod {
 		Description:  "Ensures actions/checkout steps set with.persist-credentials: false in steps-like sections for strict-mode safety.",
 		IntroducedIn: "1.0.44",
 		Apply: func(content string, frontmatter map[string]any) (string, bool, error) {
-			sections := []string{"pre-steps", "steps", "post-steps", "pre-agent-steps"}
+			// These are the top-level frontmatter sections that map exclusively to
+			// the agent job in the generated workflow. They must NOT include any
+			// section that could appear in other generated jobs (e.g., push_repo_memory,
+			// activation, conclusion) because those jobs manage their own auth and may
+			// need credentials set by actions/checkout.
+			//
+			// Sections under jobs.<jobname>.* (e.g., jobs.push_repo_memory.pre-steps)
+			// are nested in the YAML and are NOT top-level keys, so isTopLevelKey()
+			// inside transformSectionCheckoutPersistCredentials will skip them.
+			agentJobSections := []string{"pre-steps", "steps", "post-steps", "pre-agent-steps"}
 			hasTargetSection := false
-			for _, section := range sections {
+			for _, section := range agentJobSections {
 				if _, ok := frontmatter[section]; ok {
 					hasTargetSection = true
 					break
@@ -32,7 +41,7 @@ func getCheckoutPersistCredentialsFalseCodemod() Codemod {
 			newContent, applied, err := applyFrontmatterLineTransform(content, func(lines []string) ([]string, bool) {
 				modified := false
 				current := lines
-				for _, section := range sections {
+				for _, section := range agentJobSections {
 					var sectionChanged bool
 					current, sectionChanged = transformSectionCheckoutPersistCredentials(current, section)
 					modified = modified || sectionChanged

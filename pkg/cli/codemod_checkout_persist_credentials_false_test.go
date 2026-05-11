@@ -124,4 +124,43 @@ post-steps:
 		assert.Contains(t, result, "pre-steps:\n  - uses: actions/checkout@v5\n    with:\n      persist-credentials: false")
 		assert.Contains(t, result, "uses: actions/checkout@v5\n    with:\n      persist-credentials: false")
 	})
+
+	t.Run("does not modify checkout steps nested under jobs.<jobname> (non-agent jobs)", func(t *testing.T) {
+		// This test confirms the codemod is restricted to the agent job only.
+		// Checkout steps under jobs.<jobname>.pre-steps or jobs.<jobname>.steps
+		// (e.g., jobs.push_repo_memory.pre-steps) are indented in the YAML and are
+		// NOT top-level keys, so the codemod must leave them untouched.
+		content := `---
+on: push
+jobs:
+  push_repo_memory:
+    pre-steps:
+      - uses: actions/checkout@v5
+    steps:
+      - name: Custom checkout
+        uses: actions/checkout@v5
+---
+`
+		frontmatter := map[string]any{
+			"on": "push",
+			"jobs": map[string]any{
+				"push_repo_memory": map[string]any{
+					"pre-steps": []any{
+						map[string]any{"uses": "actions/checkout@v5"},
+					},
+					"steps": []any{
+						map[string]any{
+							"name": "Custom checkout",
+							"uses": "actions/checkout@v5",
+						},
+					},
+				},
+			},
+		}
+
+		result, applied, err := codemod.Apply(content, frontmatter)
+		require.NoError(t, err)
+		assert.False(t, applied, "codemod must not modify checkout steps in jobs.<jobname> sections")
+		assert.Equal(t, content, result)
+	})
 }

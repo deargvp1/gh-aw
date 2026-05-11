@@ -174,7 +174,7 @@ function makeRealExec(cwd) {
       const result = spawnSync(program, args, {
         encoding: "utf8",
         cwd: opts.cwd ?? cwd,
-        env: {
+        env: opts.env ?? {
           ...process.env,
           GIT_CONFIG_NOSYSTEM: "1",
           HOME: os.tmpdir(),
@@ -1394,6 +1394,51 @@ describe("push_signed_commits integration tests", () => {
       const remoteOid = lsRemote.stdout.trim().split(/\s+/)[0];
       const localOid = execGit(["rev-parse", "HEAD"], { cwd: workDir }).stdout.trim();
       expect(remoteOid).toBe(localOid);
+    });
+  });
+
+  describe("ls-remote authentication via gitAuthEnv", () => {
+    it("should pass gitAuthEnv to the ls-remote call used to resolve the remote HEAD OID", async () => {
+      // This test verifies the fix for the regression where git ls-remote origin
+      // was called without gitAuthEnv, causing auth failures when the checkout
+      // step runs with persist-credentials: false (no http.extraheader in .git/config).
+      execGit(["checkout", "-b", "auth-env-branch"], { cwd: workDir });
+      fs.writeFileSync(path.join(workDir, "auth-env.txt"), "auth env test\n");
+      execGit(["add", "auth-env.txt"], { cwd: workDir });
+      execGit(["commit", "-m", "Add auth-env.txt"], { cwd: workDir });
+      execGit(["push", "-u", "origin", "auth-env-branch"], { cwd: workDir });
+
+      // Wrap getExecOutput to capture all calls and their env options.
+      const realExec = makeRealExec(workDir);
+      const capturedCalls = [];
+      global.exec = {
+        ...realExec,
+        getExecOutput: async (program, args, opts = {}) => {
+          capturedCalls.push({ program, args, env: opts.env });
+          return realExec.getExecOutput(program, args, opts);
+        },
+      };
+
+      const gitAuthEnv = { GIT_ASKPASS: "echo", GH_TOKEN: "test-token-value" };
+      const githubClient = makeMockGithubClient();
+
+      await pushSignedCommits({
+        githubClient,
+        owner: "test-owner",
+        repo: "test-repo",
+        branch: "auth-env-branch",
+        baseRef: "main",
+        cwd: workDir,
+        gitAuthEnv,
+      });
+
+      // Find the ls-remote call made by pushSignedCommits.
+      const lsRemoteCall = capturedCalls.find(c => c.program === "git" && c.args.includes("ls-remote"));
+      expect(lsRemoteCall).toBeDefined();
+      // The env passed to ls-remote must include the gitAuthEnv keys so that
+      // authentication succeeds even when persist-credentials: false is set on checkout.
+      expect(lsRemoteCall.env).toBeDefined();
+      expect(lsRemoteCall.env).toMatchObject(gitAuthEnv);
     });
   });
 });
