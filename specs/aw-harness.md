@@ -22,6 +22,24 @@ This document specifies the **AW Harness** (`aw_harness.cjs`), a Node.js executi
 
 This is an internal design specification for the GitHub gh-aw project. It is not a W3C standard, nor is it on the W3C standards track. The document describes the intended architecture, contracts, and implementation plan for `aw_harness.cjs`. Feedback and corrections **SHOULD** be submitted via the project's standard pull request process.
 
+### Implementation Status (2026-05-11)
+
+`aw_harness.cjs` **does not yet exist** in `actions/setup/js/`. This spec is a Working Draft describing the intended implementation. The `engine: aw` mode is **not yet operational**. No Pi SDK dependency has been added to the repository. All five built-in extensions (Sections 8.1–8.5) are **spec-only** — no TypeScript source exists in `aw-harness/`.
+
+| Component | Status |
+|-----------|--------|
+| `actions/setup/js/aw_harness.cjs` | ❌ Not implemented |
+| `aw-harness/` TypeScript project | ❌ Not scaffolded |
+| Extension 1: Provider Setup | ❌ Spec-only |
+| Extension 2: Cost Tracker | ❌ Spec-only |
+| Extension 3: Steering | ❌ Spec-only |
+| Extension 4: Session Repair | ❌ Spec-only |
+| Extension 5: Observability | ❌ Spec-only |
+| `engine: aw` compiler support | ❌ Not implemented |
+| Compliance tests (Section 12) | ⚠️ Stubs added in `tests/aw-harness/` |
+
+The next step toward **Last Call** status is completing the implementation plan in Section 10.8 and passing all compliance tests in Section 12.
+
 ---
 
 ## Table of Contents
@@ -60,7 +78,7 @@ This specification covers:
 - The entry-point invocation contract for `aw_harness.cjs`.
 - The frontmatter schema for `engine: aw` workflows.
 - The prompt loading and session execution algorithm.
-- The normative requirements for each of the six gh-aw Pi extensions.
+- The normative requirements for each of the five gh-aw Pi extensions.
 - The model connection contract via provider environment variables.
 - The build and deployment configuration.
 
@@ -527,6 +545,41 @@ A conforming implementation **MUST** execute the workflow as follows:
 4. Extensions handle events (cost tracking, steering, observability)
 5. session.dispose()
 ```
+
+### 7.3 Edge Case Handling
+
+The execution algorithm in Section 7.1 describes the normal (happy-path) flow. The following edge cases **MUST** be handled by a conforming implementation. Full normative requirements for each case are in [Section 11.2 (Safeguards)](#112-safeguards).
+
+#### 7.3.1 Session Timeout
+
+**Trigger:** The GitHub Actions job timeout (`timeout-minutes`) expires while `session.prompt()` is still executing.
+
+**Summary:** GitHub Actions terminates the process with `SIGTERM`, allowing the Node.js runtime approximately 30 seconds to clean up. The harness **SHOULD** register a `SIGTERM` handler that:
+1. Calls the steering extension's abort path (or directly invokes `session.abort()` if accessible) to halt the Pi agent loop.
+2. Emits a `session_timeout` JSONL event to stderr.
+3. Appends a timeout notice to `$GITHUB_STEP_SUMMARY` (if set).
+4. Calls `session.dispose()`.
+5. Exits with code `1` to fail the job.
+
+Note: Because timeout is enforced at the job level by GitHub Actions, harness-level timeout handling is best-effort. The primary timeout gate **SHOULD** be set via `harness.budget.timeout-minutes` which the steering extension enforces proactively via `session.abort()` before the job-level timeout fires.
+
+#### 7.3.2 Budget Exceeded During Session
+
+**Trigger:** Cumulative effective tokens exceed `harness.budget.max-effective-tokens` while `session.prompt()` is executing.
+
+**Summary:** The cost-tracker extension (Section 8.2) handles this transparently within the Pi event loop. From the execution algorithm's perspective:
+- The hard-limit abort from the cost-tracker causes `session.prompt()` to return (or throw) early.
+- The implementation **MUST** treat this return as a failed session and exit with code `1`.
+- See Section 11.2.2 for the full normative response.
+
+#### 7.3.3 Extension Registration Failure
+
+**Trigger:** A built-in or user-supplied extension fails during initialization (before `session.prompt()` is called).
+
+**Summary:**
+- **Built-in extensions** (Sections 8.1–8.5): any initialization failure is fatal. The harness **MUST** exit with code `2` without starting a session.
+- **User extensions** (`harness.extensions`): by default, a failing user extension is skipped with a warning. If `harness.extensions-required: true` is set, failure is fatal (exit code `2`).
+- See Section 11.2.3 for the full normative response.
 
 ---
 

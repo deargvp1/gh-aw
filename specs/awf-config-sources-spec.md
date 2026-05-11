@@ -150,3 +150,61 @@ A scheduled GitHub Actions workflow in `github/gh-aw` SHOULD automate this proce
 - Fail the check (non-zero exit) when any "missing in gh-aw" drift is found.
 - Post a summary comment on PRs with the drift report.
 - Create a tracking issue when drift is detected on the scheduled run.
+
+The workflow implementing this procedure is located at `.github/workflows/awf-config-drift.yml` in this repository. It runs weekly (Mondays at 08:00 UTC) and on pull requests that modify AWF config handling paths.
+
+---
+
+## 5. Safeguards
+
+This section describes what `gh-aw` does when AWF config drift is detected. Safeguards apply both in CI (automated runs) and when agents execute drift detection interactively.
+
+### 5.1 CI Failure on Detected Drift
+
+**Trigger:** The drift detection workflow (`.github/workflows/awf-config-drift.yml`) finds a property of category "missing in gh-aw" or "spec mismatch".
+
+**Response:**
+- The workflow step exits with a non-zero code, causing the GitHub Actions job to fail.
+- A summary of the detected drift is written to `$GITHUB_STEP_SUMMARY`, identifying each drifted property path, its category, and the suggested corrective action.
+- The failing job blocks merging on pull requests where the check is required.
+
+### 5.2 Tracking Issue Creation
+
+**Trigger:** The scheduled (weekly) drift detection run finds any drift.
+
+**Response:**
+- The workflow opens a new GitHub issue in `github/gh-aw` with:
+  - Title: `AWF Config Drift Detected — <date>`
+  - Body: Full drift report (property paths, categories, suggested actions)
+  - Label: `awf-config-drift`
+- If an open issue with label `awf-config-drift` already exists, the workflow appends a comment to the existing issue instead of opening a duplicate.
+
+### 5.3 Agent Corrective PR
+
+**Trigger:** An agent running drift detection (interactively or in CI) finds drift of category "missing in gh-aw" or "spec mismatch" (per CR-05).
+
+**Response:**
+- The agent SHOULD open a corrective pull request to `github/gh-aw` that:
+  - Adds coverage for the missing property in `pkg/workflow/` or `actions/setup/`.
+  - References the drifted property path(s) and this spec in the PR description.
+  - Assigns the `awf-config-drift` label.
+- The PR description MUST include the drift report and reference Section 4.2 of this specification.
+
+---
+
+## 6. Spec Maintenance
+
+This section tracks when the canonical sources in Section 2 were last verified against the `gh-aw` implementation.
+
+| Canonical Source | Last Verified | Verified By | Notes |
+|-----------------|---------------|-------------|-------|
+| `docs/awf-config.schema.json` | 2026-05-10 | Daily SPDD agent | Drift example in Section 4 identified; apiProxy fields added |
+| `src/awf-config-schema.json` | 2026-05-10 | Daily SPDD agent | Cross-referenced with published schema |
+| `docs/awf-config-spec.md` | 2026-05-10 | Daily SPDD agent | CLI mapping table in Section 4 added |
+| `docs/environment.md` | — | — | Not yet verified |
+| `docs/authentication-architecture.md` | — | — | Not yet verified |
+| `schemas/audit.schema.json` | — | — | Not yet verified |
+| `schemas/token-usage.schema.json` | — | — | Not yet verified |
+| `schemas/README.md` | — | — | Not yet verified |
+
+**Next scheduled verification:** Week of 2026-05-18 (automated via `.github/workflows/awf-config-drift.yml`)

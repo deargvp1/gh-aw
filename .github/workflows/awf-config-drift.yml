@@ -1,0 +1,168 @@
+name: AWF Config Drift Detection
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'  # Weekly on Mondays at 08:00 UTC
+  pull_request:
+    paths:
+      - 'pkg/workflow/**'
+      - 'actions/setup/**'
+      - 'specs/awf-config-sources-spec.md'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  drift-detection:
+    name: AWF Config Drift Detection
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout gh-aw
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 1
+
+      - name: Fetch AWF canonical sources
+        id: fetch-sources
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "## AWF Config Drift Detection" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Fetching canonical sources from gh-aw-firewall..." >> "$GITHUB_STEP_SUMMARY"
+
+          mkdir -p /tmp/awf-drift
+
+          # Attempt to fetch published schema from gh-aw-firewall
+          # Note: requires read access to github/gh-aw-firewall
+          if gh api repos/github/gh-aw-firewall/contents/docs/awf-config.schema.json \
+               --jq '.content' 2>/dev/null | base64 -d > /tmp/awf-drift/published-schema.json; then
+            echo "✅ Fetched docs/awf-config.schema.json" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "⚠️  Could not fetch docs/awf-config.schema.json (repo may be private or inaccessible)" >> "$GITHUB_STEP_SUMMARY"
+            echo '{}' > /tmp/awf-drift/published-schema.json
+          fi
+
+          if gh api repos/github/gh-aw-firewall/contents/src/awf-config-schema.json \
+               --jq '.content' 2>/dev/null | base64 -d > /tmp/awf-drift/runtime-schema.json; then
+            echo "✅ Fetched src/awf-config-schema.json" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "⚠️  Could not fetch src/awf-config-schema.json" >> "$GITHUB_STEP_SUMMARY"
+            echo '{}' > /tmp/awf-drift/runtime-schema.json
+          fi
+
+      - name: Extract schema property inventory
+        id: extract-inventory
+        run: |
+          # Extract all unique property keys from both schema files
+          jq -r '[.. | objects | keys[]] | unique | sort[]' \
+            /tmp/awf-drift/published-schema.json \
+            /tmp/awf-drift/runtime-schema.json 2>/dev/null | sort -u \
+            > /tmp/awf-drift/schema-keys.txt || true
+
+          echo "Schema property count: $(wc -l < /tmp/awf-drift/schema-keys.txt)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Compare against gh-aw implementation
+        id: compare
+        run: |
+          DRIFT_FOUND=false
+          DRIFT_REPORT=""
+
+          # Extract property references from gh-aw source
+          grep -rh \
+            'apiProxy\|awf-config\|awf_config\|AWF_CONFIG\|AWF_AUTH\|anthropicAutoCache\|anthropicCacheTailTtl\|dockerHostPathPrefix' \
+            pkg/workflow/ actions/setup/ 2>/dev/null | sort -u \
+            > /tmp/awf-drift/ghaw-refs.txt || true
+
+          # Check each known drift-prone property category
+          CATEGORIES=("apiProxy" "container" "network" "model" "auth")
+          for cat in "${CATEGORIES[@]}"; do
+            SCHEMA_COUNT=$(grep -c "\"${cat}" /tmp/awf-drift/schema-keys.txt 2>/dev/null || echo 0)
+            GHAW_COUNT=$(grep -c "${cat}" /tmp/awf-drift/ghaw-refs.txt 2>/dev/null || echo 0)
+
+            if [ "$SCHEMA_COUNT" -gt 0 ] && [ "$GHAW_COUNT" -eq 0 ]; then
+              DRIFT_FOUND=true
+              DRIFT_REPORT="${DRIFT_REPORT}\n- ❌ **Missing in gh-aw**: \`${cat}.*\` (${SCHEMA_COUNT} schema properties, 0 gh-aw references)"
+            fi
+          done
+
+          if [ "$DRIFT_FOUND" = "true" ]; then
+            echo "drift_found=true" >> "$GITHUB_OUTPUT"
+            echo "### ❌ Drift Detected" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo -e "$DRIFT_REPORT" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "**Corrective action required**: Open a PR to add coverage for missing properties per \`specs/awf-config-sources-spec.md\` Section 4.2." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "drift_found=false" >> "$GITHUB_OUTPUT"
+            echo "### ✅ No Drift Detected" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "All checked AWF config property categories have corresponding gh-aw implementation references." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Create tracking issue on scheduled drift
+        if: >
+          steps.compare.outputs.drift_found == 'true' &&
+          github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DATE=$(date -u +%Y-%m-%d)
+          TITLE="AWF Config Drift Detected — ${DATE}"
+
+          # Check if an open drift issue already exists
+          EXISTING=$(gh issue list \
+            --label awf-config-drift \
+            --state open \
+            --json number,title \
+            --jq '.[0].number' 2>/dev/null || echo "")
+
+          if [ -n "$EXISTING" ]; then
+            echo "Adding comment to existing issue #${EXISTING}"
+            gh issue comment "$EXISTING" \
+              --body "### Drift re-detected on ${DATE}
+
+Scheduled drift detection found AWF config property categories with no coverage in gh-aw. See the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for the full drift report.
+
+**Action required**: Review and address per \`specs/awf-config-sources-spec.md\` Section 4.2 and 5.3."
+          else
+            echo "Creating new tracking issue"
+            gh issue create \
+              --title "$TITLE" \
+              --label awf-config-drift \
+              --body "### AWF Config Drift Detected
+
+The scheduled AWF config drift detection workflow found property categories present in the canonical AWF config schemas (\`github/gh-aw-firewall\`) with no corresponding coverage in \`github/gh-aw\`.
+
+**Detection Date**: ${DATE}
+**Workflow Run**: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+### Required Actions
+
+1. Review the drift report in the workflow run summary.
+2. For each missing category, add coverage per \`specs/awf-config-sources-spec.md\` Section 4.2 (Step-by-Step Procedure).
+3. Open a corrective PR per CR-05 in \`specs/awf-config-sources-spec.md\`.
+
+### References
+
+- Spec: \`specs/awf-config-sources-spec.md\`
+- Procedure: Section 4.2 (Step-by-Step Procedure)
+- Safeguards: Section 5"
+          fi
+
+      - name: Fail on PR drift
+        if: >
+          steps.compare.outputs.drift_found == 'true' &&
+          github.event_name == 'pull_request'
+        run: |
+          echo "❌ AWF config drift detected. This PR touches AWF config handling but drift was found."
+          echo "See the step summary for details and required corrective actions."
+          exit 1

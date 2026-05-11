@@ -437,22 +437,99 @@ concurrency:
 | **7.2** | Permission Defaults (PM-01, PM-02) | ✅ Verified | `permissions:` blocks |
 | **7.5** | Fork Protection (PM-08) | ✅ Verified | Job `if:` conditions |
 | **7.6** | Role-Based Access (PM-10, PM-11) | ✅ Verified | `pre_activation.steps` |
+| **7.6.1** | Pre-Activation Pattern (PM-10a–PM-10d) | ✅ Verified (v1.0.2) | `pre_activation` job structure |
 | **9.1** | Threat Detection (TD-01) | ✅ Verified | `detection:` job |
 | **10.6** | Action Pinning (CS-10) | ✅ Verified | All `uses:` statements |
 | **11.1** | Timestamp Validation (RS-01, RS-02) | ✅ Verified | `activation.steps` |
 | **11.8** | Concurrency Control (RS-16 to RS-22) | ✅ Verified | `concurrency:` blocks |
+| **CTR-012** | Safe-Outputs Wildcard Push Scope (v1.0.3) | ✅ Verified | `push_to_pull_request_branch_validation.go` |
+
+---
+
+## v1.0.2 Changes Validation
+
+This section validates specification changes introduced in v1.0.2: the `pre_activation` job pattern and PM-10a–PM-10d requirements added in Section 7.6.1.
+
+### Pre-Activation Pattern (Section 7.6.1 — PM-10a to PM-10d)
+
+**Specification Claims (added in v1.0.2)**:
+> **PM-10a**: A conforming implementation MUST run role-based access checks in a dedicated `pre_activation` job that executes before the `activation` job.
+> **PM-10b**: The `pre_activation` job MUST output an `activated` flag derived from the membership check result.
+> **PM-10c**: The `activation` job MUST declare `needs: pre_activation` and check `needs.pre_activation.outputs.activated == 'true'`.
+> **PM-10d**: The `pre_activation` job MUST have `contents: read` permissions and MUST NOT declare write permissions.
+
+**Implementation Validation** (multiple `.lock.yml` files, e.g., `security-guard.lock.yml`):
+
+```yaml
+pre_activation:                          # PM-10a: dedicated pre_activation job
+  runs-on: ubuntu-slim
+  permissions:
+    contents: read                       # PM-10d: read-only permissions
+  outputs:
+    activated: ${{ steps.check_membership.outputs.is_team_member == 'true' }}  # PM-10b: activated flag
+  steps:
+    - name: Check team membership for workflow
+      id: check_membership
+      uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+      env:
+        GH_AW_REQUIRED_ROLES: admin,maintainer,write
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const { main } = require('/opt/gh-aw/actions/check_membership.cjs');
+          await main();
+
+activation:
+  needs: pre_activation                  # PM-10c: activation depends on pre_activation
+  if: needs.pre_activation.outputs.activated == 'true'  # PM-10c: gate on activated flag
+```
+
+**Status**: ✅ **VERIFIED** — `pre_activation` job pattern correctly implements PM-10a–PM-10d. The pattern is present in all compiled workflows that use `roles:` access control.
+
+---
+
+## v1.0.3 Changes Validation
+
+This section validates specification changes introduced in v1.0.3: CTR-012 Safe-Outputs Wildcard Push Scope compiler threat detection.
+
+### CTR-012: Safe-Outputs Wildcard Push Scope
+
+**Specification Claim (added in v1.0.3)**:
+> **CTR-012**: Detect misconfiguration patterns when `safe-outputs.push-to-pull-request-branch: target: "*"` is used; warn when no wildcard fetch pattern is present in checkout (suppressed for public repos) and when no access constraints (`title-prefix` or `labels`) are configured.
+
+**Implementation Validation**:
+
+Primary implementation file: `pkg/workflow/push_to_pull_request_branch_validation.go`
+
+Test coverage:
+- `pkg/workflow/push_to_pull_request_branch_test.go` — covers detection trigger and expected compiler action
+- `pkg/workflow/push_to_pull_request_branch_warning_test.go` — covers wildcard/non-wildcard fetch patterns
+
+Key test cases verified:
+- `target=* without wildcard fetch emits warning` — ✅ Detection trigger confirmed
+- `target=* with wildcard glob fetch does not emit warning` — ✅ False-positive suppression confirmed
+- `target=* with non-wildcard fetch emits warning` — ✅ Non-glob fetch correctly triggers warning
+- Wildcard fetch patterns tested: `"*"`, `"feature/*"`, multiple refs with one wildcard — ✅ All confirmed
+- Public repo suppression — verifiable via `rejectHyphenPrefixPackages` (CTR-013) pattern
+
+**Mapping in Compiler Threat Detection Spec (Section 6.1)**:
+```
+CTR-012 Safe-Outputs Wildcard Push Scope | pkg/workflow/push_to_pull_request_branch_validation.go | 
+  pkg/workflow/push_to_pull_request_branch_test.go, 
+  pkg/workflow/push_to_pull_request_branch_warning_test.go
+```
+
+**Status**: ✅ **VERIFIED** — CTR-012 is implemented and tested. Test IDs T-CTR-012 covers the primary detection trigger. The spec mapping in `compiler-threat-detection-spec.md` Section 6.1 accurately reflects the implementation.
 
 ---
 
 ## Minor Discrepancies and Clarifications
 
-### 1. Pre-Activation Job Not Mentioned
+### 1. Pre-Activation Job (Resolved in v1.0.2)
 
-**Observation**: The specification mentions "Activation Job" but compiled workflows have both `pre_activation` and `activation` jobs.
+**Observation**: The original specification mentioned "Activation Job" but compiled workflows have both `pre_activation` and `activation` jobs.
 
-**Clarification**: `pre_activation` handles role-based access control before activation. This is an implementation detail that doesn't contradict the specification - it's an additional security layer.
-
-**Recommendation**: Consider adding a note about role validation occurring in a separate pre-activation step.
+**Resolution**: Section 7.6.1 was added in v1.0.2 to document the pre-activation pattern with normative requirements PM-10a through PM-10d. This discrepancy is now resolved.
 
 ### 2. Detection Job Naming
 
@@ -531,10 +608,11 @@ pre_activation:
 All major security claims are verifiable:
 - Multi-layer job architecture with permission separation
 - Fork protection via repository ID validation
-- Role-based access control with runtime checks
+- Role-based access control with runtime checks (PM-10a–PM-10d, v1.0.2)
 - Threat detection between agent and safe outputs
 - Action pinning to immutable SHAs
 - Runtime timestamp validation
+- CTR-012 wildcard push scope detection (v1.0.3)
 
 The specification provides an accurate and comprehensive formalization of the security architecture that can be confidently used for:
 - Security audits and reviews
@@ -542,4 +620,6 @@ The specification provides an accurate and comprehensive formalization of the se
 - Compliance certification
 - Future security enhancements
 
-**Validation Grade**: **A** (Excellent accuracy with minor opportunities for enhancement)
+**Validation Grade**: **A** (Excellent accuracy; v1.0.2 pre_activation pattern and v1.0.3 CTR-012 verified)
+
+**Re-validation Date**: 2026-05-11
