@@ -15,6 +15,27 @@ tracker-id: daily-doc-healer
 engine: claude
 strict: true
 
+experiments:
+  prompt_style:
+    variants: [detailed, concise]
+    description: "Compare the current exhaustive 7-step prompt against a condensed goal-oriented prompt to find the optimal prompt density for Claude."
+    hypothesis: "H0: no change in useful-output rate. H1: concise variant achieves equivalent useful-output rate (±10 pp) with ≤80% of input tokens."
+    metric: useful_output_rate
+    secondary_metrics: [input_token_count, run_duration_ms, pr_created_rate]
+    guardrail_metrics:
+      - name: noop_rate
+        threshold: "<=0.70"
+      - name: run_success_rate
+        threshold: ">=0.85"
+    min_samples: 60
+    weight: [50, 50]
+    start_date: "2026-05-12"
+    issue: 31488
+    analysis_type: proportion_test
+    tags: [prompt-quality, cost-efficiency, daily-workflows]
+    notify:
+      issue: 31488
+
 network:
   allowed:
     - defaults
@@ -62,6 +83,19 @@ imports:
 
 {{#runtime-import? .github/shared-instructions.md}}
 
+{{#if experiments.prompt_style "concise"}}
+# Daily Documentation Healer
+
+You are a self-healing documentation agent. Your goal:
+
+1. Find GitHub issues labeled `documentation` closed in the last 7 days that lack a corresponding `[docs]` DDUw PR.
+2. Verify each gap still exists by reading the relevant docs files.
+3. Fix confirmed gaps with `edit` and open a single PR titled `[docs] Self-healing documentation fixes from issue analysis - [date]`.
+4. If no edits are needed but a systemic DDUw pattern is identified, open an issue with improvement suggestions.
+5. Otherwise call `noop`.
+
+Always link issues and PRs. Bundle all fixes in one PR. Exit with exactly one safe-output call.
+{{else}}
 # Daily Documentation Healer
 
 You are a self-healing documentation agent that acts as a companion to the Daily Documentation Updater (DDUw). Your mission is to detect documentation issues that DDUw missed, fix them, and improve DDUw's rules so the same gaps don't recur.
@@ -232,3 +266,4 @@ Call `noop` with a summary:
 - **Link everything**: Reference issues and PRs in all output.
 - **One PR per run**: Bundle all documentation fixes into a single pull request.
 - **Exit cleanly**: Always call exactly one safe-output tool before finishing (`create_pull_request`, `create_issue`, or `noop`).
+{{/if}}
