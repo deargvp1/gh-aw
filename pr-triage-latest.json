@@ -1,14 +1,14 @@
 {
-  "run_date": "2026-05-11T13:19:23Z",
-  "run_id": "25672582628",
+  "run_date": "2026-05-11T18:51:09Z",
+  "run_id": "25690398739",
   "fork_prs": 0,
   "agent_prs_found": 3,
   "agent_prs_excluded": 3,
-  "notes": "3 open PRs found (all app/copilot-swe-agent), all from branches within the github org (github/gh-aw) — not fork PRs. No PRs from app/github-copilot. This is consistent with previous runs.",
+  "notes": "3 open PRs found (all app/copilot-swe-agent), all from branches within github/gh-aw — not fork PRs. No fork PRs to triage.",
   "open_prs_summary": [
-    {"number": 31503, "author": "app/copilot-swe-agent", "title": "Integrate Repo Mind Light into Issue Arborist workflow", "createdAt": "2026-05-11T13:09:21Z"},
-    {"number": 31483, "author": "app/copilot-swe-agent", "title": "Improve portfolio yield telemetry ingestion and evidence classification", "createdAt": "2026-05-11T11:17:23Z"},
-    {"number": 31422, "author": "app/copilot-swe-agent", "title": "Add forecast operation to generated agentic maintenance workflow", "createdAt": "2026-05-11T05:08:11Z"}
+    {"number": 31561, "author": "app/copilot-swe-agent", "title": "fix: use github/gh-aw instead of githubnext/agentics in integration-update test", "headRef": "copilot/fix-tests", "isFork": false, "createdAt": "2026-05-11T18:46:42Z"},
+    {"number": 31553, "author": "app/copilot-swe-agent", "title": "Fix Codex engine: replace -c model= TOML override with --model flag for Codex CLI v0.128+", "headRef": "copilot/fix-codex-model-issue", "isFork": false, "createdAt": "2026-05-11T18:05:51Z"},
+    {"number": 31510, "author": "app/copilot-swe-agent", "title": "Integrate Repo Mind Light into Issue Arborist workflow", "headRef": "copilot/integrate-repo-mind-light", "isFork": false, "isDraft": true, "createdAt": "2026-05-11T13:54:19Z"}
   ],
   "total_prs_triaged": 0,
   "auto_merge_candidates": [],
@@ -23,8 +23,8 @@
   },
   "prs_seen": [],
   "previous_run": {
-    "run_id": "25656563043",
-    "run_date": "2026-05-11T07:33:01Z",
+    "run_id": "25672582628",
+    "run_date": "2026-05-11T13:19:23Z",
     "fork_prs": 0,
     "agent_prs_found": 3,
     "agent_prs_excluded": 3
