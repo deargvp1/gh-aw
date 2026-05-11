@@ -852,6 +852,9 @@ async function sendJobSetupSpan(options = {}) {
   const rawInputParentSpanId = (process.env.INPUT_PARENT_SPAN_ID || process.env["INPUT_PARENT-SPAN-ID"] || "").trim().toLowerCase();
   const inputParentSpanId = isValidSpanId(rawInputParentSpanId) ? rawInputParentSpanId : "";
 
+  // Read aw_info.json first: setup spans use it for cross-workflow trace/parent/trigger
+  // context and as a fallback source for engine_id when GH_AW_INFO_ENGINE_ID is not
+  // available to later action steps.
   // When this job was dispatched by a parent workflow, the parent's trace ID is
   // propagated via aw_context.otel_trace_id → aw_info.context.otel_trace_id so that
   // composite-action spans share a single trace with their caller.
