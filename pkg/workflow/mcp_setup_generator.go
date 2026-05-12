@@ -605,6 +605,7 @@ func writeMCPGatewayExports(yaml *strings.Builder, tools map[string]any, engine 
 	}
 	yaml.WriteString("          export MCP_GATEWAY_PAYLOAD_DIR=\"" + payloadDir + "\"\n")
 	yaml.WriteString("          mkdir -p \"${MCP_GATEWAY_PAYLOAD_DIR}\"\n")
+	yaml.WriteString("          chmod 700 \"${MCP_GATEWAY_PAYLOAD_DIR}\"\n")
 	if payloadPathPrefix != "" {
 		yaml.WriteString("          export MCP_GATEWAY_PAYLOAD_PATH_PREFIX=\"" + payloadPathPrefix + "\"\n")
 	}

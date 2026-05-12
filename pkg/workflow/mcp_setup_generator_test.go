@@ -784,3 +784,59 @@ Test that OIDC env vars are NOT added when no server uses github-oidc auth.
 	assert.NotContains(t, yamlStr, "-e ACTIONS_ID_TOKEN_REQUEST_TOKEN",
 		"ACTIONS_ID_TOKEN_REQUEST_TOKEN should NOT be in docker command without github-oidc auth")
 }
+
+// TestMCPGatewayPayloadDirHasRestrictedPermissions verifies that the generated setup step
+// applies chmod 700 to MCP_GATEWAY_PAYLOAD_DIR immediately after creating it.
+// The MCP gateway container creates a session subdirectory named after the bearer token,
+// so a world-readable (0755) payload directory would expose the token to any process on
+// the runner host via a simple `ls` — no runner identity required.
+func TestMCPGatewayPayloadDirHasRestrictedPermissions(t *testing.T) {
+	frontmatter := `---
+on: workflow_dispatch
+engine: copilot
+tools:
+  github:
+    mode: remote
+    toolsets: [repos]
+---
+
+# Test Payload Dir Permissions
+`
+
+	compiler := NewCompiler()
+
+	tmpDir := t.TempDir()
+	inputFile := filepath.Join(tmpDir, "test.md")
+
+	err := os.WriteFile(inputFile, []byte(frontmatter), 0644)
+	require.NoError(t, err, "Failed to write test input file")
+
+	err = compiler.CompileWorkflow(inputFile)
+	require.NoError(t, err, "Compilation should succeed")
+
+	outputFile := stringutil.MarkdownToLockFile(inputFile)
+	content, err := os.ReadFile(outputFile)
+	require.NoError(t, err, "Failed to read output file")
+	yamlStr := string(content)
+
+	mkdirSnippet := `mkdir -p "${MCP_GATEWAY_PAYLOAD_DIR}"`
+	chmodSnippet := `chmod 700 "${MCP_GATEWAY_PAYLOAD_DIR}"`
+
+	assert.Contains(t, yamlStr, mkdirSnippet,
+		"Generated script should create MCP_GATEWAY_PAYLOAD_DIR")
+	assert.Contains(t, yamlStr, chmodSnippet,
+		"Generated script should restrict MCP_GATEWAY_PAYLOAD_DIR to owner-only (0700) to prevent bearer token exposure")
+
+	// chmod must come immediately after mkdir so the directory is never world-readable
+	mkdirIdx := strings.Index(yamlStr, mkdirSnippet)
+	chmodIdx := strings.Index(yamlStr, chmodSnippet)
+	require.Less(t, mkdirIdx, chmodIdx,
+		"chmod 700 must appear after mkdir -p for MCP_GATEWAY_PAYLOAD_DIR")
+
+	// The two lines must be adjacent (no other chmod or mkdir in between)
+	between := yamlStr[mkdirIdx+len(mkdirSnippet) : chmodIdx]
+	assert.NotContains(t, between, "mkdir",
+		"No additional mkdir should appear between the payload dir mkdir and chmod")
+	assert.NotContains(t, between, "chmod",
+		"No additional chmod should appear between the payload dir mkdir and chmod")
+}
