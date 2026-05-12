@@ -55,9 +55,7 @@ Focus on:
    - Use `status` to list workflows/runs.
    - Use `logs` to download parsed logs for recent runs.
    - Use `audit` for selected failing or high-latency runs.
-2. Only after collecting run data with MCP tools, use local telemetry artifacts when available:
-   - `/tmp/gh-aw/otel.jsonl`
-   - `/tmp/gh-aw/copilot-otel.jsonl`
+2. Use only MCP-downloaded run data and logs as the telemetry source.
 3. Use Python in `/tmp/agentrx` to avoid polluting the repository.
 4. Install AgentRx from GitHub:
    - `python -m venv /tmp/agentrx/.venv`
@@ -69,7 +67,7 @@ Focus on:
 
 ### 1) Build AgentRx input trajectory
 
-Create `/tmp/agentrx/trajectory.json` from MCP-downloaded run data and telemetry by mapping spans to ordered workflow steps. Include:
+Create `/tmp/agentrx/trajectory.json` from MCP-downloaded run data and logs by mapping spans to ordered workflow steps. Include:
 - step index
 - span name
 - workflow/run identifiers (`github.workflow_ref`, `github.run_id`, trace ID)
