@@ -173,7 +173,7 @@ Tags may appear on their own line (block form) or inline. Block form (tag on its
 
 ```markdown
 {{#if experiments.skill_hint == "enabled" }}
-Check `.github/skills/` for SKILL.md files relevant to this task and apply their guidance.
+Check `skills/`, `.github/skills/`, or `.agents/skills/` for SKILL.md files relevant to this task and apply their guidance.
 {{#endif}}
 ```
 

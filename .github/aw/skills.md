@@ -4,7 +4,7 @@ description: Guide for leveraging skills (SKILL.md files) in agentic workflows �
 
 # Skills in Agentic Workflows
 
-Consult this file when you want a workflow to take advantage of skills — domain-specific knowledge files (`SKILL.md`) that live in the repository under `.github/skills/`.
+Consult this file when you want a workflow to take advantage of skills — domain-specific knowledge files (`SKILL.md`) that live in the repository under `skills/`, `.github/skills/`, or `.agents/skills/`.
 
 ---
 
@@ -29,7 +29,7 @@ The workflow prompt hints that skills exist and asks the agent to discover and a
 **Pattern**:
 
 ```markdown
-If the repository contains `SKILL.md` files under `.github/skills/`, check which ones are
+If the repository contains `SKILL.md` files under `skills/`, `.github/skills/`, or `.agents/skills/`, check which ones are
 relevant to this task. For each relevant skill, read its content and apply the
 guidance it provides.
 ```
@@ -85,7 +85,7 @@ permissions:
 
 Triage the newly opened issue.
 
-If there are relevant skills under `.github/skills/`, read them and apply their guidance.
+If there are relevant skills under `skills/`, `.github/skills/`, or `.agents/skills/`, read them and apply their guidance.
 Focus on skills related to issue classification or project conventions.
 ```
 

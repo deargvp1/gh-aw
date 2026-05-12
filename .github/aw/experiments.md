@@ -203,7 +203,7 @@ experiments:
 
 ```markdown
 {{#if experiments.skill_hint == "enabled" }}
-Check `.github/skills/` for SKILL.md files relevant to this task and apply their guidance.
+Check `skills/`, `.github/skills/`, or `.agents/skills/` for SKILL.md files relevant to this task and apply their guidance.
 {{#endif}}
 ```
 
