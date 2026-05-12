@@ -7,6 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
   issues: read
   pull-requests: read
@@ -344,6 +345,7 @@ steps:
 
 tools:
   cli-proxy: true
+  agentic-workflows:
   playwright:
     mode: cli
   bash:
