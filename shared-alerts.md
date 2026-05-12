@@ -29,3 +29,17 @@
 - #29863 Smoke Copilot regression → RECOVERED ✅
 - #30205 Auto-Triage Issues → CLOSED ✅
 - #30188 Documentation Unbloat → CLOSED ✅
+
+---
+## Update — 2026-05-12T05:39Z (Workflow Health Manager)
+
+### RESOLVED
+- APM Unpack #30252: CLOSED ✅
+- PR #31411 (on.labels fix): MERGED ✅
+- PR #31418 (engine.max-runs): MERGED ✅
+
+### NEW/ESCALATED
+- **Daily Fact parse failures**: still occurring post-PR#31411 merge; issues #31432 #31524 open.
+- **Smoke Gemini fetch failed**: issue #31575 open — 100% failure.
+- **Firewall reporting broken** (#31607, #31620): no safe outputs from agent job.
+- **Multiple workflow failures** today: Design Decision Gate #31626, Go Logger Enhancement #31628, Step Name Alignment #31636, jsweep #31637.

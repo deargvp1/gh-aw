@@ -1,48 +1,54 @@
-# Workflow Health — 2026-05-11T05:45Z
+# Workflow Health — 2026-05-12T05:39Z
 
-Score: 62/100 (↑ +1). 218 workflows. Run: §25652578492
+Score: 64/100 (↑ +2). 219 workflows. Run: §25715699041
 
 ## KEY FINDINGS
 
 ### Compilation Status
-- 218/218 lock files present ✅ (no change)
+- 219/219 lock files present ✅ (1 new workflow added since last run)
 - 0 missing lock files ✅
 - Compile validation unavailable (gh aw extension not in PATH)
 
-### Recent Run Observations (last ~100 runs)
-- 1 failure: Daily Fact About gh-aw (push event — parse validation failure, 15+ consecutive today)
-- 78 action_required: PR-review cluster (Q, Scout, Archie, cloclo, Grumpy, Security Review, PR Nitpick, PR Code Quality) — expected skip behavior
-- 8 skipped: Deployment Incident Monitor (zombie pattern continues)
-- 10 success: CI, Issue Monster, Safe Output Health Monitor + others
-- PR #31411 OPEN: systemic `on.labels` push-time parse failure fix (waiting for merge)
-- PR #31418 OPEN: engine.max-runs to top-level migration
+### POSITIVES SINCE LAST RUN
+- PR #31411 (on.labels push-time fix) MERGED ✅ 2026-05-11T10:55Z
+- PR #31418 (engine.max-runs migration) MERGED ✅
+- APM issue #30252 CLOSED ✅ (P0 resolved)
+
+### Active Failures (last 100 runs)
+- **daily-fact.lock.yml**: 10+ failures on 2026-05-12 (event=push). Issue #31432 and #31524 open.
+- **Smoke Gemini** (#31565, #31575): `fetch failed` — 100% failure
+- **Smoke Pi** (#31563): failing
+- **Smoke Codex** (#31567): failing
+- **Daily Firewall Logs Collector** (#31620): no safe outputs — agent job bug
+- **Daily Observability Report** (#31607): failing
+- **Design Decision Gate** (#31626): failed
+- **Go Logger Enhancement** (#31628): failed
+- **Step Name Alignment** (#31636): failed
+- **jsweep** (#31637): failed
+- ~74 action_required: PR-review cluster (expected skip behavior)
 
 ### P0 Issues (Active)
-- **APM Unpack** (#30252 OPEN): apm-default.tar.gz exit code 1. Last updated 2026-05-05.
+- None (APM #30252 closed ✅)
 
-### P0 Issues (Resolved since last run)
-- Smoke CI + Gemini (#29666): CLOSED ✅
-- Daily Model Inventory Checker (#30043): CLOSED ✅
-- config.models (#30307): CLOSED ✅
-
-### P1 Issues (Active — escalated this run)
-- **Daily Fact About gh-aw**: 15+ consecutive failures today (push-time parse validation). Was P2 watch, escalated to P1. No issue filed yet — create issue.
+### P1 Issues (Active)
+- **Daily Fact About gh-aw** (#31432, #31524): push-time parse failures continue post-PR#31411 merge. Still failing 2026-05-12.
+- **Smoke Gemini** (#31575): 100% failure — `fetch failed` to Gemini.
 - **MCP gateway session timeout** (#23153 OPEN): Long-running workflows at risk.
 - **Performance Regression** (#30180): 82.1% slower.
 
 ### P2 Issues (Watch)
-- **PR-review cluster** (Q, cloclo, Archie, Scout, Grumpy etc.): ~78 action_required in last 100 runs. Highest waste item. Trigger gate fix needed.
-- **Deployment Incident Monitor**: zombie pattern, 8 skips in last 100 runs.
-- **PR #31411 (open)**: on.labels push-time failures systemic fix waiting for merge.
-- **Doc Build - Deploy**: action_required persistent.
+- **PR-review cluster**: ~74 action_required in 100 runs. Waste issue.
+- **Firewall reporting**: #31607, #31620 — no safe outputs in agent job.
+- **Multiple workflow failures**: Design Decision Gate, Go Logger Enhancement, Step Name Alignment, jsweep — need investigation.
+- Node.js 20 deprecation deadline Sep 16, 2026.
 
 ### Actions Taken This Run
 - Updated shared memory files
 - Added comment to dashboard issue #29109
-- Created issue for Daily Fact About gh-aw P1 escalation
 
 ### Trends
-- Score: 62/100 (↑ from 61)
-- 3 P0 issues resolved (Smoke CI/Gemini, Model Inventory, config.models)
-- 218 workflows stable
-- PR #31411 and #31418 pending merge — watch for regressions
+- Score: 64/100 (↑ +2 from 62)
+- P0 count: 0 (was 1 — APM resolved) ✅
+- 219 workflows (was 218 — 1 new workflow)
+- PRs #31411, #31418 merged — compilation regressions not seen
+- Smoke tests failing across multiple engines (Pi, Gemini, Codex)
