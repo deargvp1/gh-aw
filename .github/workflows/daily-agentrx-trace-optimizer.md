@@ -13,6 +13,7 @@ strict: true
 network:
   allowed: [defaults, python, github]
 tools:
+  agentic-workflows: true
   bash: true
 safe-outputs:
   mentions: false
@@ -50,10 +51,13 @@ Focus on:
 
 ## Data and Tooling Requirements
 
-1. Prefer local telemetry first:
+1. Start with `tools.agentic-workflows` MCP tools to download and analyze recent runs:
+   - Use `status` to list workflows/runs.
+   - Use `logs` to download parsed logs for recent runs.
+   - Use `audit` for selected failing or high-latency runs.
+2. Only after collecting run data with MCP tools, use local telemetry artifacts when available:
    - `/tmp/gh-aw/otel.jsonl`
    - `/tmp/gh-aw/copilot-otel.jsonl`
-2. If local telemetry is missing, fetch recent runs/log metadata with available tools and derive a trace dataset.
 3. Use Python in `/tmp/agentrx` to avoid polluting the repository.
 4. Install AgentRx from GitHub:
    - `python -m venv /tmp/agentrx/.venv`
@@ -65,7 +69,7 @@ Focus on:
 
 ### 1) Build AgentRx input trajectory
 
-Create `/tmp/agentrx/trajectory.json` from recent telemetry by mapping spans to ordered workflow steps. Include:
+Create `/tmp/agentrx/trajectory.json` from MCP-downloaded run data and telemetry by mapping spans to ordered workflow steps. Include:
 - step index
 - span name
 - workflow/run identifiers (`github.workflow_ref`, `github.run_id`, trace ID)
