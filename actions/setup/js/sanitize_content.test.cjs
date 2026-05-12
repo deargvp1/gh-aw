@@ -754,6 +754,46 @@ describe("sanitize_content.cjs", () => {
       const result = sanitizeContent('<div onclick="bad()">content</div>');
       expect(result).toBe('(div onclick="bad()")content(/div)');
     });
+
+    it("should strip data-* attribute with double-quoted value from allowed tag", () => {
+      const result = sanitizeContent('<span data-x="INJECT">text</span>');
+      expect(result).toBe("<span>text</span>");
+    });
+
+    it("should strip data-* attribute with single-quoted value from allowed tag", () => {
+      const result = sanitizeContent("<span data-x='INJECT'>text</span>");
+      expect(result).toBe("<span>text</span>");
+    });
+
+    it("should strip data-* attribute with unquoted value from allowed tag", () => {
+      const result = sanitizeContent("<span data-x=INJECT>text</span>");
+      expect(result).toBe("<span>text</span>");
+    });
+
+    it("should strip bare data-* attribute (no value) from allowed tag", () => {
+      const result = sanitizeContent("<details data-hidden>content</details>");
+      expect(result).toBe("<details>content</details>");
+    });
+
+    it("should strip multiple data-* attributes from a single tag", () => {
+      const result = sanitizeContent('<span data-a="foo" data-b="bar">text</span>');
+      expect(result).toBe("<span>text</span>");
+    });
+
+    it("should strip data-* attributes alongside other dangerous attributes", () => {
+      const result = sanitizeContent('<span onclick="bad()" data-x="INJECT" style="evil">text</span>');
+      expect(result).toBe("<span>text</span>");
+    });
+
+    it("should strip data-* attribute while preserving safe attributes", () => {
+      const result = sanitizeContent('<span title="safe" data-x="INJECT">text</span>');
+      expect(result).toBe('<span title="safe">text</span>');
+    });
+
+    it("should strip data-* attribute case-insensitively", () => {
+      const result = sanitizeContent('<span DATA-X="INJECT">text</span>');
+      expect(result).toBe("<span>text</span>");
+    });
   });
 
   describe("XML/HTML tag conversion: code-region awareness", () => {

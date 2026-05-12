@@ -673,9 +673,15 @@ function convertXmlTags(s) {
 
   /**
    * Strips dangerous HTML attributes from an allowed tag's content string.
-   * Removes on* event handler attributes (e.g. onclick, ontoggle) and style
-   * attributes in all quoting forms (double-quoted, single-quoted, unquoted, bare).
+   * Removes on* event handler attributes (e.g. onclick, ontoggle), style
+   * attributes, and data-* custom attributes in all quoting forms
+   * (double-quoted, single-quoted, unquoted, bare).
    * Safe attributes such as title, class, open, lang, id, etc. are preserved.
+   *
+   * data-* attributes are stripped because they are invisible to human reviewers
+   * of rendered markdown (they produce no visible output) yet are delivered
+   * verbatim to the agent — making them a hidden injection channel equivalent
+   * to HTML comments or zero-width-space splits.
    *
    * Note: `\s+` (requiring at least one whitespace before the attribute name) is
    * intentional — HTML attributes are always separated from the tag name and from
@@ -686,13 +692,13 @@ function convertXmlTags(s) {
    * @returns {string} Tag content with dangerous attributes removed
    */
   function stripDangerousAttributes(tagContent) {
-    // Match: one-or-more whitespace-or-slash + (on* | style) + optional =value
+    // Match: one-or-more whitespace-or-slash + (on* | style | data-*) + optional =value
     // Value forms: "...", '...', or unquoted (no whitespace / > / quote chars), or bare (no =)
     // The unquoted form excludes >, whitespace, and all quote characters (', ", `) so it
     // cannot consume the closing > of the tag or straddle other attribute values.
     // Using [\s/]+ (instead of \s+) also strips dangerous attributes that are immediately
     // preceded by a "/" with no space — e.g. the malformed <img/onerror=alert(1) src=x>.
-    return tagContent.replace(/[\s/]+(?:on\w+|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>"'`]*))?/gi, "");
+    return tagContent.replace(/[\s/]+(?:on\w+|style|data-[a-z0-9_-]+)(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>"'`]*))?/gi, "");
   }
 
   // Convert opening tags: <tag> or <tag attr="value"> to (tag) or (tag attr="value")
@@ -705,7 +711,7 @@ function convertXmlTags(s) {
     if (tagNameMatch) {
       const tagName = tagNameMatch[1].toLowerCase();
       if (allowedTags.includes(tagName)) {
-        // Strip dangerous attributes (on* event handlers and style) before preserving
+        // Strip dangerous attributes (on* event handlers, style, data-*) before preserving
         const sanitizedContent = stripDangerousAttributes(tagContent);
         return `<${sanitizedContent}>`;
       }
