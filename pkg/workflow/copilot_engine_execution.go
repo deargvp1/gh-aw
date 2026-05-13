@@ -24,6 +24,7 @@ package workflow
 import (
 	"fmt"
 	"maps"
+	"net"
 	"strconv"
 	"strings"
 	"time"
@@ -446,6 +447,13 @@ touch %s
 	// Similarly, AWF_REFLECT_ENABLED tells the harness to skip the /reflect preflight
 	// when the api-proxy is not available.
 	if sandboxEnabled {
+		copilotProxyURL := "http://" + net.JoinHostPort(constants.AWFAPIProxyContainerIP, strconv.Itoa(constants.CopilotLLMGatewayPort)) + "/"
+		if _, exists := env["COPILOT_API_URL"]; !exists {
+			env["COPILOT_API_URL"] = copilotProxyURL
+		}
+		if _, exists := env["GITHUB_COPILOT_BASE_URL"]; !exists {
+			env["GITHUB_COPILOT_BASE_URL"] = copilotProxyURL
+		}
 		env["COPILOT_API_KEY"] = constants.CopilotBYOKDummyAPIKey
 		env["AWF_REFLECT_ENABLED"] = "1"
 	}

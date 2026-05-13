@@ -5,6 +5,7 @@ package workflow
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -1853,6 +1854,13 @@ func TestCopilotEngineSetsDummyAPIKey(t *testing.T) {
 		if !strings.Contains(stepContent, expected) {
 			t.Errorf("Expected COPILOT_API_KEY to be set when AWF sandbox is enabled, got:\n%s", stepContent)
 		}
+		expectedProxyURL := "http://" + constants.AWFAPIProxyContainerIP + ":" + strconv.Itoa(constants.CopilotLLMGatewayPort) + "/"
+		if !strings.Contains(stepContent, "COPILOT_API_URL: "+expectedProxyURL) {
+			t.Errorf("Expected COPILOT_API_URL to target AWF Copilot proxy in sandbox mode, got:\n%s", stepContent)
+		}
+		if !strings.Contains(stepContent, "GITHUB_COPILOT_BASE_URL: "+expectedProxyURL) {
+			t.Errorf("Expected GITHUB_COPILOT_BASE_URL to target AWF Copilot proxy in sandbox mode, got:\n%s", stepContent)
+		}
 		if !strings.Contains(stepContent, "AWF_REFLECT_ENABLED: 1") {
 			t.Errorf("Expected AWF_REFLECT_ENABLED to be set when AWF sandbox is enabled, got:\n%s", stepContent)
 		}
@@ -1875,6 +1883,12 @@ func TestCopilotEngineSetsDummyAPIKey(t *testing.T) {
 		stepContent := strings.Join([]string(steps[0]), "\n")
 		if strings.Contains(stepContent, "COPILOT_API_KEY") {
 			t.Errorf("Expected COPILOT_API_KEY to be absent when sandbox.agent: false, got:\n%s", stepContent)
+		}
+		if strings.Contains(stepContent, "COPILOT_API_URL") {
+			t.Errorf("Expected COPILOT_API_URL to be absent when sandbox.agent: false, got:\n%s", stepContent)
+		}
+		if strings.Contains(stepContent, "GITHUB_COPILOT_BASE_URL") {
+			t.Errorf("Expected GITHUB_COPILOT_BASE_URL to be absent when sandbox.agent: false, got:\n%s", stepContent)
 		}
 		if strings.Contains(stepContent, "AWF_REFLECT_ENABLED") {
 			t.Errorf("Expected AWF_REFLECT_ENABLED to be absent when sandbox.agent: false, got:\n%s", stepContent)
