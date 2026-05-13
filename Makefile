@@ -774,12 +774,11 @@ agent-finish: deps-dev fmt lint build build-wasm test-all fix recompile dependab
 	@echo "Agent finished tasks successfully."
 
 # Lightweight pre-PR gate — run before every report_progress / create_pull_request call.
-# Targets < 30 seconds: build (~2s) + fmt (~1s) + test-unit (~25s).
-# This catches compile errors, formatting violations, and common unit-test regressions
-# before the PR is opened, without waiting for the full agent-finish suite.
+# Includes formatting + lint validation to prevent lint-fix PR churn:
+# build + fmt + lint + test-unit.
 .PHONY: agent-report-progress
-agent-report-progress: build fmt test-unit
-	@echo "Pre-PR validation passed. Safe to call report_progress."
+agent-report-progress: build fmt lint test-unit
+	@echo "Pre-PR validation passed (zero lint errors). Safe to call report_progress."
 
 # Extended pre-PR gate with lock-file-only linting.
 .PHONY: agent-report-progress-lint
@@ -861,7 +860,7 @@ help:
 	@echo "  clean-docs       - Clean documentation artifacts (dist, node_modules, .astro)"
 
 	@echo "  agent-finish            - Complete validation sequence (build, test, fix, recompile, fmt, lint, security-scan)"
-	@echo "  agent-report-progress   - Lightweight pre-PR gate: build + fmt + test-unit (<30s)"
+	@echo "  agent-report-progress   - Lightweight pre-PR gate: build + fmt + lint + test-unit"
 	@echo "  agent-report-progress-lint - Pre-PR gate + gh aw lint lock-file check"
 	@echo "  sbom             - Generate SBOM in SPDX and CycloneDX formats (requires syft)"
 	@echo "  help             - Show this help message"
