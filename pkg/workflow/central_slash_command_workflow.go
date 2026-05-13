@@ -157,7 +157,7 @@ func collectCentralLabelCommandRoutes(workflowDataList []*WorkflowData, mergedEv
 			continue
 		}
 		// Label-command routes participate in centralized dispatch when either:
-		//   1) label_command.strategy is explicitly decentralized, or
+		//   1) label_command.strategy is decentralized, or
 		//   2) slash_command.strategy is centralized (label checks compile against aw_context).
 		if !wd.LabelCommandDecentralized && !wd.CommandCentralized {
 			continue

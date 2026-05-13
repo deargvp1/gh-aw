@@ -394,6 +394,7 @@ func ensureWorkflowDispatchItemNumberInput(eventsMap map[string]any) bool {
 
 	dispatchMap, ok := dispatchAny.(map[string]any)
 	if !ok {
+		toolsLog.Print("Skipping workflow_dispatch item_number injection: workflow_dispatch is not a map")
 		return false
 	}
 
@@ -404,6 +405,7 @@ func ensureWorkflowDispatchItemNumberInput(eventsMap map[string]any) bool {
 	}
 	inputsMap, ok := inputsAny.(map[string]any)
 	if !ok {
+		toolsLog.Print("Skipping workflow_dispatch item_number injection: workflow_dispatch.inputs is not a map")
 		return false
 	}
 
