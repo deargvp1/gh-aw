@@ -199,8 +199,8 @@ func TestBuildLabelCommandCondition(t *testing.T) {
 	}
 }
 
-func TestBuildCentralizedLabelCommandCondition(t *testing.T) {
-	condition, err := buildCentralizedLabelCommandCondition([]string{"cloclo"}, []string{"issues"})
+func TestBuildDispatchLabelCommandCondition(t *testing.T) {
+	condition, err := buildDispatchLabelCommandCondition([]string{"cloclo"}, []string{"issues"})
 	require.NoError(t, err)
 	rendered := condition.Render()
 	assert.NotContains(t, rendered, "github.event_name")
@@ -604,7 +604,8 @@ Run CI diagnostics.
 	require.NoError(t, err)
 	lockStr := string(lockContent)
 
-	require.Contains(t, lockStr, "\"on\":\n  pull_request:\n    types: [opened]\n  workflow_dispatch:")
+	require.Contains(t, lockStr, "pull_request:\n    types:\n    - opened")
+	require.Contains(t, lockStr, "workflow_dispatch:")
 	require.NotContains(t, lockStr, "pull_request:\n    types: [labeled]")
 	require.Contains(t, lockStr, "fromJSON(github.event.inputs.aw_context || '{}').event_type == 'pull_request'")
 	require.Contains(t, lockStr, "fromJSON(github.event.inputs.aw_context || '{}').trigger_label == 'ci-doctor'")

@@ -191,4 +191,34 @@ describe("route_slash_command", () => {
     expect(awContext.trigger_label).toBe("ci-doctor");
     expect(awContext.desired_ai_reaction).toBe("eyes");
   });
+
+  it("skips labeled events when label name is missing", async () => {
+    globals.context.eventName = "issues";
+    globals.context.payload = { action: "labeled", issue: { number: 1 }, label: {} };
+    process.env.GH_AW_LABEL_ROUTING = JSON.stringify({
+      smoke: [{ workflow: "smoke-copilot", events: ["issues"] }],
+    });
+
+    await main();
+
+    expect(dispatchCalls).toHaveLength(0);
+    expect(globals.core.info).toHaveBeenCalledWith(expect.stringContaining("missing label name"));
+  });
+
+  it("dispatches all matching routes for a decentralized label", async () => {
+    globals.context.eventName = "issues";
+    globals.context.payload = { action: "labeled", issue: { number: 1 }, label: { name: "smoke" } };
+    process.env.GH_AW_LABEL_ROUTING = JSON.stringify({
+      smoke: [
+        { workflow: "smoke-copilot", events: ["issues"] },
+        { workflow: "ci-doctor", events: ["issues"] },
+      ],
+    });
+
+    await main();
+
+    expect(dispatchCalls).toHaveLength(2);
+    expect(dispatchCalls[0].workflow_id).toBe("smoke-copilot.lock.yml");
+    expect(dispatchCalls[1].workflow_id).toBe("ci-doctor.lock.yml");
+  });
 });

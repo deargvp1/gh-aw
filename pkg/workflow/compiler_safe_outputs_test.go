@@ -12,19 +12,19 @@ import (
 // TestParseOnSection tests command, reaction, and stop-after parsing from frontmatter
 func TestParseOnSection(t *testing.T) {
 	tests := []struct {
-		name                string
-		frontmatter         map[string]any
-		workflowData        *WorkflowData
-		markdownPath        string
-		expectedError       bool
-		expectedCommand     []string
-		expectedReaction    string
-		expectedLockAgent   bool
-		expectedOn          string
-		expectedCentralized bool
+		name                       string
+		frontmatter                map[string]any
+		workflowData               *WorkflowData
+		markdownPath               string
+		expectedError              bool
+		expectedCommand            []string
+		expectedReaction           string
+		expectedLockAgent          bool
+		expectedOn                 string
+		expectedCentralized        bool
 		expectedLabelDecentralized bool
-		checkCommandEvents  bool
-		expectedOtherEvents map[string]any
+		checkCommandEvents         bool
+		expectedOtherEvents        map[string]any
 	}{
 		{
 			name: "slash_command trigger with default command from filename",
@@ -164,11 +164,11 @@ func TestParseOnSection(t *testing.T) {
 					},
 				},
 			},
-			workflowData:                 &WorkflowData{LabelCommandDecentralized: true},
-			markdownPath:                 "/path/to/test.md",
-			expectedError:                false,
-			expectedReaction:             "eyes",
-			expectedLabelDecentralized:   true,
+			workflowData:               &WorkflowData{LabelCommandDecentralized: true},
+			markdownPath:               "/path/to/test.md",
+			expectedError:              false,
+			expectedReaction:           "eyes",
+			expectedLabelDecentralized: true,
 		},
 		{
 			name: "slash_command conflicts with issues",
