@@ -4,6 +4,7 @@ description: Generates a daily "Agent of the Day" blog entry with varied narrati
 on:
   schedule: daily on weekdays
   workflow_dispatch:
+  skip-if-match: 'is:pr is:open in:title "Agent of the Day – "'
 permissions:
   contents: read
   actions: read
@@ -54,7 +55,6 @@ safe-outputs:
     labels: [blog]
     reviewers: [copilot]
     draft: false
-    skip-if-match: 'is:pr is:open in:title "Agent of the Day – "'
   upload-asset:
     max: 3
     allowed-exts: [.png, .jpg, .jpeg, .svg]
