@@ -80,10 +80,12 @@ pre-agent-steps:
       TOTAL=0
       EVAL_JSONL="/tmp/gh-aw/outcome-evaluations.jsonl"
       > "$EVAL_JSONL"
+      EVALUATED_IDS_FILE="${SEEN_FILE}.evaluated"
+      echo '[]' > "$EVALUATED_IDS_FILE"
 
       for RUN_ID in $(echo "$RUNS" | jq -r '.[].databaseId'); do
         # Skip runs already evaluated in a previous collection pass
-        if jq -e ". | index($RUN_ID)" "$SEEN_FILE" > /dev/null 2>&1; then
+        if jq -e --argjson id "$RUN_ID" '. | index($id)' "$SEEN_FILE" > /dev/null 2>&1; then
           continue
         fi
 
@@ -198,6 +200,10 @@ pre-agent-steps:
         jq -n --arg wf "$WF" --argjson items "$ITEMS" --argjson run_id "$RUN_ID" \
           '{workflow: $wf, run_id: $run_id, items: $items}' \
           > "/tmp/gh-aw/outcomes/run-${RUN_ID}.json"
+
+        # Track this run as successfully evaluated
+        jq --argjson id "$RUN_ID" '. + [$id]' "$EVALUATED_IDS_FILE" > "${EVALUATED_IDS_FILE}.tmp" \
+          && mv "${EVALUATED_IDS_FILE}.tmp" "$EVALUATED_IDS_FILE"
       done
 
       # Compute fleet summary
@@ -236,9 +242,9 @@ pre-agent-steps:
 
       # Update seen-runs cache so subsequent passes skip these runs.
       # Keep only the last 500 run IDs to prevent unbounded growth.
-      EVALUATED_IDS=$(echo "$RUNS" | jq '[.[].databaseId]')
-      jq -s '.[0] + .[1] | unique | .[-500:]' "$SEEN_FILE" <(echo "$EVALUATED_IDS") > "${SEEN_FILE}.tmp" \
+      jq -s '.[0] + .[1] | unique | .[-500:]' "$SEEN_FILE" "$EVALUATED_IDS_FILE" > "${SEEN_FILE}.tmp" \
         && mv "${SEEN_FILE}.tmp" "$SEEN_FILE"
+      rm -f "$EVALUATED_IDS_FILE"
 
       echo "✓ Checked $CHECKED runs, $TOTAL outcomes"
       echo "  Accepted: $ACCEPTED, Rejected: $REJECTED, Ignored: $IGNORED, Pending: $PENDING"
