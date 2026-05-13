@@ -62,9 +62,6 @@ This workflow has a skip-roles configuration.
 		// Verify skip-roles is commented out in the frontmatter
 		assert.Contains(t, lockContentStr, "# skip-roles:", "Expected skip-roles to be commented out in lock file")
 
-		preActivationSection := extractJobSection(lockContentStr, "pre_activation")
-		assert.Contains(t, preActivationSection, "github.event.issue.author_association", "Expected pre_activation if: to gate issues by author_association")
-		assert.Contains(t, preActivationSection, `fromJSON('["OWNER","MEMBER","COLLABORATOR"]')`, "Expected pre_activation if: to use native author_association mapping")
 	})
 
 	t.Run("skip_roles_with_single_role", func(t *testing.T) {
@@ -173,22 +170,21 @@ This workflow has both roles and skip-roles.
 		assert.Contains(t, lockContentStr, "steps.check_skip_roles.outputs.skip_roles_ok", "Expected skip-roles check in activated output")
 	})
 
-	t.Run("skip_roles_job_if_supports_multiple_event_payloads", func(t *testing.T) {
+	t.Run("skip_roles_with_multiple_events_keeps_runtime_check", func(t *testing.T) {
 		workflowContent := `---
 on:
+  roles: all
   issues:
     types: [opened]
   issue_comment:
     types: [created]
-  pull_request:
-    types: [opened]
   skip-roles: [admin, maintainer, write, triage]
 engine: copilot
 ---
 
 # Skip Roles Multi Event Workflow
 
-This workflow uses skip-roles across issues, comments, and pull requests.
+This workflow uses skip-roles across multiple events.
 `
 		workflowFile := filepath.Join(tmpDir, "skip-roles-multi-event.md")
 		err := os.WriteFile(workflowFile, []byte(workflowContent), 0644)
@@ -201,43 +197,10 @@ This workflow uses skip-roles across issues, comments, and pull requests.
 		lockContent, err := os.ReadFile(lockFile)
 		require.NoError(t, err, "Failed to read lock file")
 
-		preActivationSection := extractJobSection(string(lockContent), "pre_activation")
-		assert.Contains(t, preActivationSection, "github.event.issue.author_association", "Expected issues author_association guard in pre_activation if:")
-		assert.Contains(t, preActivationSection, "github.event.comment.author_association", "Expected issue_comment author_association guard in pre_activation if:")
-		assert.Contains(t, preActivationSection, "github.event.pull_request.author_association", "Expected pull_request author_association guard in pre_activation if:")
-		assert.Contains(t, preActivationSection, `fromJSON('["OWNER","MEMBER","COLLABORATOR"]')`, "Expected only natively mappable skip-roles in pre_activation if:")
-		assert.Contains(t, preActivationSection, `GH_AW_SKIP_ROLES: "admin,maintainer,write,triage"`, "Expected runtime skip-roles defense-in-depth to keep triage")
-	})
-
-	t.Run("skip_roles_with_runtime_only_role_keeps_runtime_check_without_static_if", func(t *testing.T) {
-		workflowContent := `---
-on:
-  roles: all
-  issue_comment:
-    types: [created]
-  skip-roles: [triage]
-engine: copilot
----
-
-# Skip Roles Runtime Only
-
-This workflow keeps triage as a runtime-only skip role.
-`
-		workflowFile := filepath.Join(tmpDir, "skip-roles-runtime-only.md")
-		err := os.WriteFile(workflowFile, []byte(workflowContent), 0644)
-		require.NoError(t, err, "Failed to write workflow file")
-
-		err = compiler.CompileWorkflow(workflowFile)
-		require.NoError(t, err, "Compilation failed")
-
-		lockFile := stringutil.MarkdownToLockFile(workflowFile)
-		lockContent, err := os.ReadFile(lockFile)
-		require.NoError(t, err, "Failed to read lock file")
-
 		lockContentStr := string(lockContent)
 		preActivationSection := extractJobSection(lockContentStr, "pre_activation")
-		assert.Contains(t, lockContentStr, `GH_AW_SKIP_ROLES: "triage"`, "Expected runtime skip-roles check to remain for triage")
-		assert.NotContains(t, preActivationSection, "\n    if:", "Expected no pre_activation if: when skip-roles only contains runtime-only roles")
+		assert.Contains(t, lockContentStr, `GH_AW_SKIP_ROLES: "admin,maintainer,write,triage"`, "Expected runtime skip-roles check to keep all configured roles")
+		assert.NotContains(t, preActivationSection, "\n    if:", "Expected no pre_activation if: for permission-based skip-roles")
 	})
 }
 
