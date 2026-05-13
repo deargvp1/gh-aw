@@ -606,6 +606,7 @@ Run CI diagnostics.
 
 	require.Contains(t, lockStr, "pull_request:\n    types:\n    - opened")
 	require.Contains(t, lockStr, "workflow_dispatch:")
+	require.Contains(t, lockStr, "item_number:")
 	require.NotContains(t, lockStr, "pull_request:\n    types: [labeled]")
 	require.Contains(t, lockStr, "fromJSON(github.event.inputs.aw_context || '{}').event_type == 'pull_request'")
 	require.Contains(t, lockStr, "fromJSON(github.event.inputs.aw_context || '{}').trigger_label == 'ci-doctor'")

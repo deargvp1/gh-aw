@@ -73,6 +73,13 @@ func TestGenerateCentralSlashCommandWorkflow_GeneratesWorkflow(t *testing.T) {
 	require.Equal(t, "dev", metadata.Compiler)
 	require.Equal(t, []string{"cloclo", "triage"}, metadata.Commands)
 	require.Equal(t, []string{"ci-doctor", "cloclo", "triage-issue", "triage-pr"}, metadata.Workflows)
+	require.Contains(t, text, "# Routing summary (sorted):")
+	require.Contains(t, text, "#   slash commands:")
+	require.Contains(t, text, "#     /cloclo -> cloclo [discussion_comment] reaction=heart")
+	require.Contains(t, text, "#     /triage -> triage-issue [issue_comment,issues] reaction=eyes")
+	require.Contains(t, text, "#     /triage -> triage-pr [pull_request,pull_request_comment] reaction=rocket")
+	require.Contains(t, text, "#   labels:")
+	require.Contains(t, text, "#     ci-doctor -> ci-doctor [pull_request] reaction=eyes")
 
 	require.Contains(t, text, "name: \"Agentic Commands\"")
 	require.NotContains(t, text, "Compiler version:")
@@ -138,6 +145,30 @@ func TestGenerateCentralSlashCommandWorkflow_GeneratesForDecentralizedLabelsOnly
 	require.Contains(t, text, `"ci-doctor":[{"workflow":"ci-doctor","events":["pull_request"]}]`)
 	require.Contains(t, text, "pull_request:")
 	require.Contains(t, text, "types: [labeled]")
+	require.Contains(t, text, "#   slash commands:")
+	require.Contains(t, text, "#     (none)")
+	require.Contains(t, text, "#   labels:")
+	require.Contains(t, text, "#     ci-doctor -> ci-doctor [pull_request]")
+}
+
+func TestCollectCentralLabelCommandRoutes_IncludesSlashCentralizedLabelCommands(t *testing.T) {
+	data := []*WorkflowData{
+		{
+			WorkflowID:         "triage",
+			Command:            []string{"triage"},
+			CommandEvents:      []string{"issue_comment"},
+			CommandCentralized: true,
+			LabelCommand:       []string{"triage"},
+			LabelCommandEvents: []string{"issues"},
+			AIReaction:         "eyes",
+		},
+	}
+
+	_, labelRoutesByCommand, mergedEvents := collectCentralCommandRoutes(data)
+	require.Equal(t, []slashCommandRoute{
+		{Workflow: "triage", Events: []string{"issues"}, AIReaction: "eyes"},
+	}, labelRoutesByCommand["triage"])
+	require.ElementsMatch(t, []string{"labeled"}, typeSetKeys(mergedEvents["issues"]))
 }
 
 func TestRemoveIfExists(t *testing.T) {

@@ -201,8 +201,10 @@ func (c *Compiler) applyDefaults(data *WorkflowData, markdownPath string) error 
 				if len(data.LabelCommandOtherEvents) > 0 {
 					maps.Copy(labelEventsMap, data.LabelCommandOtherEvents)
 				}
-				if _, hasWorkflowDispatch := labelEventsMap["workflow_dispatch"]; !hasWorkflowDispatch {
-					labelEventsMap["workflow_dispatch"] = nil
+				if ensureWorkflowDispatchItemNumberInput(labelEventsMap) {
+					// Keep workflow_dispatch + item_number in decentralized mode so manual runs
+					// retain the same fallback/concurrency behavior as inline label_command mode.
+					data.HasDispatchItemNumber = true
 				}
 			} else {
 				// Generate events: issues, pull_request, discussion with types: [labeled]
@@ -213,23 +215,12 @@ func (c *Compiler) applyDefaults(data *WorkflowData, markdownPath string) error 
 					}
 				}
 
-				// Add workflow_dispatch with item_number input for manual testing.
-				// Not required so the workflow can be triggered without providing a value;
-				// the activation job falls back to the event payload when item_number is omitted.
-				labelEventsMap["workflow_dispatch"] = map[string]any{
-					"inputs": map[string]any{
-						"item_number": map[string]any{
-							"description": "The number of the issue, pull request, or discussion",
-							"required":    false,
-							"default":     "",
-							"type":        "string",
-						},
-					},
+				if ensureWorkflowDispatchItemNumberInput(labelEventsMap) {
+					// Signal that this workflow has a dispatch item_number input so that
+					// applyWorkflowDispatchFallbacks and concurrency key building add the
+					// necessary inputs.item_number fallbacks for manual workflow_dispatch runs.
+					data.HasDispatchItemNumber = true
 				}
-				// Signal that this workflow has a dispatch item_number input so that
-				// applyWorkflowDispatchFallbacks and concurrency key building add the
-				// necessary inputs.item_number fallbacks for manual workflow_dispatch runs.
-				data.HasDispatchItemNumber = true
 
 				// Merge other events (if any) — this handles the no-clash requirement:
 				// if the user also has e.g. "issues: {types: [labeled], names: [bug]}" as a
@@ -383,6 +374,48 @@ func (c *Compiler) applyDefaults(data *WorkflowData, markdownPath string) error 
 	}
 
 	return nil
+}
+
+func ensureWorkflowDispatchItemNumberInput(eventsMap map[string]any) bool {
+	dispatchAny, hasDispatch := eventsMap["workflow_dispatch"]
+	if !hasDispatch || dispatchAny == nil {
+		eventsMap["workflow_dispatch"] = map[string]any{
+			"inputs": map[string]any{
+				"item_number": map[string]any{
+					"description": "The number of the issue, pull request, or discussion",
+					"required":    false,
+					"default":     "",
+					"type":        "string",
+				},
+			},
+		}
+		return true
+	}
+
+	dispatchMap, ok := dispatchAny.(map[string]any)
+	if !ok {
+		return false
+	}
+
+	inputsAny, hasInputs := dispatchMap["inputs"]
+	if !hasInputs || inputsAny == nil {
+		dispatchMap["inputs"] = map[string]any{}
+		inputsAny = dispatchMap["inputs"]
+	}
+	inputsMap, ok := inputsAny.(map[string]any)
+	if !ok {
+		return false
+	}
+
+	if _, hasItemNumber := inputsMap["item_number"]; !hasItemNumber {
+		inputsMap["item_number"] = map[string]any{
+			"description": "The number of the issue, pull request, or discussion",
+			"required":    false,
+			"default":     "",
+			"type":        "string",
+		}
+	}
+	return true
 }
 
 // mergeToolsAndMCPServers merges tools, mcp-servers, and included tools

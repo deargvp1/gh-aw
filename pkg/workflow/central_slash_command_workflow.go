@@ -153,7 +153,13 @@ func collectCentralLabelCommandRoutes(workflowDataList []*WorkflowData, mergedEv
 	routesByLabel := make(map[string][]slashCommandRoute)
 
 	for _, wd := range workflowDataList {
-		if wd == nil || !wd.LabelCommandDecentralized || len(wd.LabelCommand) == 0 {
+		if wd == nil || len(wd.LabelCommand) == 0 {
+			continue
+		}
+		// Label-command routes participate in centralized dispatch when either:
+		//   1) label_command.strategy is explicitly decentralized, or
+		//   2) slash_command.strategy is centralized (label checks compile against aw_context).
+		if !wd.LabelCommandDecentralized && !wd.CommandCentralized {
 			continue
 		}
 
@@ -262,6 +268,7 @@ func buildCentralSlashCommandWorkflowYAML(slashRoutesByCommand map[string][]slas
 	b.WriteString("# gh-aw-commands: ")
 	b.Write(commandsMetadata)
 	b.WriteString("\n")
+	writeCentralRouteSummaryComments(&b, slashRoutesByCommand, labelRoutesByCommand)
 	b.WriteString(header)
 	b.WriteString(`name: "Agentic Commands"
 
@@ -299,6 +306,59 @@ jobs:
             await main();
 `)
 	return b.String(), nil
+}
+
+func writeCentralRouteSummaryComments(b *strings.Builder, slashRoutesByCommand map[string][]slashCommandRoute, labelRoutesByCommand map[string][]slashCommandRoute) {
+	b.WriteString("# Routing summary (sorted):\n")
+	b.WriteString("#   slash commands:\n")
+	writeCentralRouteTypeSummary(b, slashRoutesByCommand, "/")
+	b.WriteString("#   labels:\n")
+	writeCentralRouteTypeSummary(b, labelRoutesByCommand, "")
+}
+
+func writeCentralRouteTypeSummary(b *strings.Builder, routesByTrigger map[string][]slashCommandRoute, prefix string) {
+	if len(routesByTrigger) == 0 {
+		b.WriteString("#     (none)\n")
+		return
+	}
+
+	triggers := make([]string, 0, len(routesByTrigger))
+	for trigger := range routesByTrigger {
+		triggers = append(triggers, trigger)
+	}
+	sort.Strings(triggers)
+
+	for _, trigger := range triggers {
+		routes := slices.Clone(routesByTrigger[trigger])
+		sort.Slice(routes, func(i, j int) bool {
+			left := routes[i]
+			right := routes[j]
+			if left.Workflow != right.Workflow {
+				return left.Workflow < right.Workflow
+			}
+			leftEvents := strings.Join(left.Events, ",")
+			rightEvents := strings.Join(right.Events, ",")
+			if leftEvents != rightEvents {
+				return leftEvents < rightEvents
+			}
+			return left.AIReaction < right.AIReaction
+		})
+		for _, route := range routes {
+			b.WriteString("#     ")
+			b.WriteString(prefix)
+			b.WriteString(trigger)
+			b.WriteString(" -> ")
+			b.WriteString(route.Workflow)
+			b.WriteString(" [")
+			b.WriteString(strings.Join(route.Events, ","))
+			b.WriteString("]")
+			if route.AIReaction != "" {
+				b.WriteString(" reaction=")
+				b.WriteString(route.AIReaction)
+			}
+			b.WriteString("\n")
+		}
+	}
 }
 
 func writeCentralSlashRoutePermissions(b *strings.Builder, mergedEvents map[string]map[string]bool) {
