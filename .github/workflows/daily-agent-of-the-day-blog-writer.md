@@ -4,7 +4,7 @@ description: Generates a daily "Agent of the Day" blog entry with varied narrati
 on:
   schedule: daily on weekdays
   workflow_dispatch:
-  skip-if-match: 'is:pr is:open in:title "Agent of the Day – "'
+  skip-if-match: 'is:pr is:open label:blog in:title "Agent of the Day"'
 permissions:
   contents: read
   actions: read
@@ -152,6 +152,7 @@ Body requirements:
 - Include explicit links to referenced issue(s) and PR(s).
 - If image URL exists, embed it with markdown image syntax.
 - Close with a short call to action pointing to `https://github.com/${{ github.repository }}`.
+- Respect metadata limits before opening the PR: `seoDescription` <= 160 chars and `linkedPostText` <= 80 chars.
 
 ### 6) Open PR
 
