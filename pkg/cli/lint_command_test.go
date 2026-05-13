@@ -28,8 +28,10 @@ func TestNewLintCommand(t *testing.T) {
 		"lint command should include built-in ignore for gh-aw workflow context extensions")
 	assert.Contains(t, defaultGhAwActionlintIgnorePatterns, `unexpected key "queue" for "concurrency" section`,
 		"lint command should include built-in ignore for queue concurrency key not yet in actionlint")
-	assert.Contains(t, defaultGhAwActionlintIgnorePatterns, `property "(activation|activated|artifact_prefix)" is not defined in object type`,
-		"lint command should include built-in ignore for gh-aw context properties not modeled by actionlint")
+	assert.Contains(t, defaultGhAwActionlintIgnorePatterns, `property "(activation|activated)" is not defined in object type`,
+		"lint command should include built-in ignore for gh-aw activation context properties not modeled by actionlint")
+	assert.Contains(t, defaultGhAwActionlintIgnorePatterns, `property "artifact_prefix" is not defined in object type`,
+		"lint command should include built-in ignore for gh-aw artifact context properties not modeled by actionlint")
 }
 
 func TestResolveLockFilesForLint(t *testing.T) {

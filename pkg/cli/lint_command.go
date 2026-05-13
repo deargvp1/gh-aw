@@ -24,8 +24,10 @@ var defaultGhAwActionlintIgnorePatterns = []string{
 	`property "workflow_(repository|sha|ref|file_path)" is not defined in object type`,
 	// GitHub is rolling out queue under concurrency before actionlint support.
 	`unexpected key "queue" for "concurrency" section`,
-	// gh-aw injects additional context properties in generated workflows.
-	`property "(activation|activated|artifact_prefix)" is not defined in object type`,
+	// gh-aw injects additional activation context properties in generated workflows.
+	`property "(activation|activated)" is not defined in object type`,
+	// gh-aw injects additional artifact context properties in generated workflows.
+	`property "artifact_prefix" is not defined in object type`,
 }
 
 // NewLintCommand creates the lint command.
