@@ -575,3 +575,37 @@ Deploy the application because label "deploy" was added.
 	assert.Contains(t, lockStr, "remove_trigger_label",
 		"compiled workflow should contain remove_trigger_label step when remove_label is not specified (default true)")
 }
+
+func TestLabelCommandWorkflowCompileDecentralizedStrategy(t *testing.T) {
+	tempDir := t.TempDir()
+	workflowContent := `---
+name: Label Command Decentralized
+on:
+  label_command:
+    name: ci-doctor
+    events: [pull_request]
+    strategy: decentralized
+  pull_request:
+    types: [opened]
+engine: copilot
+---
+
+Run CI diagnostics.
+`
+
+	workflowPath := filepath.Join(tempDir, "label-command-decentralized.md")
+	require.NoError(t, os.WriteFile(workflowPath, []byte(workflowContent), 0644))
+
+	compiler := NewCompiler()
+	require.NoError(t, compiler.CompileWorkflow(workflowPath))
+
+	lockFilePath := stringutil.MarkdownToLockFile(workflowPath)
+	lockContent, err := os.ReadFile(lockFilePath)
+	require.NoError(t, err)
+	lockStr := string(lockContent)
+
+	require.Contains(t, lockStr, "\"on\":\n  pull_request:\n    types: [opened]\n  workflow_dispatch:")
+	require.NotContains(t, lockStr, "pull_request:\n    types: [labeled]")
+	require.Contains(t, lockStr, "fromJSON(github.event.inputs.aw_context || '{}').event_type == 'pull_request'")
+	require.Contains(t, lockStr, "fromJSON(github.event.inputs.aw_context || '{}').trigger_label == 'ci-doctor'")
+}

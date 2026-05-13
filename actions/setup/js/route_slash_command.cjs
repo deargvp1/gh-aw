@@ -177,11 +177,59 @@ async function addImmediateReaction(reaction) {
 }
 
 async function main() {
-  core.info("Starting centralized slash command routing.");
+  core.info("Starting centralized command routing.");
   core.info(`Incoming event name: '${context.eventName}'.`);
 
-  const routeMap = JSON.parse(process.env.GH_AW_SLASH_ROUTING || "{}");
-  core.info(`Configured centralized commands: ${Object.keys(routeMap).length}.`);
+  const slashRouteMap = JSON.parse(process.env.GH_AW_SLASH_ROUTING || "{}");
+  const labelRouteMap = JSON.parse(process.env.GH_AW_LABEL_ROUTING || "{}");
+  core.info(`Configured centralized slash commands: ${Object.keys(slashRouteMap).length}.`);
+  core.info(`Configured decentralized label commands: ${Object.keys(labelRouteMap).length}.`);
+
+  const identifier = eventIdentifier();
+  const { buildAwContext } = require("./aw_context.cjs");
+  const ref = resolveDispatchRef();
+
+  if (context.payload?.action === "labeled") {
+    const labelName = context.payload?.label?.name ?? "";
+    if (!labelName) {
+      core.info("Labeled event missing label name; skipping dispatch.");
+      return;
+    }
+    const configuredRoutes = labelRouteMap[labelName] ?? [];
+    core.info(`Configured routes for label '${labelName}': ${configuredRoutes.length}.`);
+    const routes = configuredRoutes.filter(route => Array.isArray(route.events) && route.events.includes(identifier));
+    if (routes.length === 0) {
+      core.info(`No decentralized label routes matched label '${labelName}' for event '${identifier}'.`);
+      return;
+    }
+    core.info(`Matched routes for label '${labelName}' on '${identifier}': ${routes.map(route => route.workflow).join(", ")}.`);
+    const immediateReaction = resolveImmediateReaction(routes);
+    if (immediateReaction) {
+      core.info(`Adding immediate '${immediateReaction}' reaction for label '${labelName}'.`);
+      await addImmediateReaction(immediateReaction);
+    }
+    for (const route of routes) {
+      const routeReaction = normalizeReaction(route?.ai_reaction);
+      const awContext = {
+        ...buildAwContext(),
+        command_name: "",
+        ...(routeReaction ? { desired_ai_reaction: routeReaction } : {}),
+      };
+      core.info(`Dispatching workflow '${route.workflow}.lock.yml' for label '${labelName}'.`);
+      await github.rest.actions.createWorkflowDispatch({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        workflow_id: `${route.workflow}.lock.yml`,
+        ref,
+        inputs: {
+          aw_context: JSON.stringify(awContext),
+        },
+      });
+      core.info(`Dispatched '${route.workflow}' for label '${labelName}'`);
+    }
+    core.info(`Completed decentralized label routing for '${labelName}'.`);
+    return;
+  }
 
   const text = resolveBodyText();
   core.info(`Resolved payload text length: ${String(text).length}.`);
@@ -193,9 +241,8 @@ async function main() {
   }
 
   const commandName = firstWord.slice(1);
-  const identifier = eventIdentifier();
   core.info(`Resolved command '/${commandName}' for event identifier '${identifier}'.`);
-  const configuredRoutes = routeMap[commandName] ?? [];
+  const configuredRoutes = slashRouteMap[commandName] ?? [];
   core.info(`Configured routes for '/${commandName}': ${configuredRoutes.length}.`);
   const routes = configuredRoutes.filter(route => Array.isArray(route.events) && route.events.includes(identifier));
   if (routes.length === 0) {
@@ -209,9 +256,6 @@ async function main() {
     await addImmediateReaction(immediateReaction);
   }
 
-  const { buildAwContext } = require("./aw_context.cjs");
-
-  const ref = resolveDispatchRef();
   core.info(`Dispatch ref resolved to '${ref}'.`);
   for (const route of routes) {
     const routeReaction = normalizeReaction(route?.ai_reaction);

@@ -196,59 +196,68 @@ func (c *Compiler) applyDefaults(data *WorkflowData, markdownPath string) error 
 			toolsLog.Print("Workflow is label-command trigger, configuring label events")
 
 			// Build the label-command events map
-			// Generate events: issues, pull_request, discussion with types: [labeled]
-			filteredEvents := FilterLabelCommandEvents(data.LabelCommandEvents)
 			labelEventsMap := make(map[string]any)
-			for _, eventName := range filteredEvents {
-				labelEventsMap[eventName] = map[string]any{
-					"types": []any{"labeled"},
+			if data.LabelCommandDecentralized {
+				if len(data.LabelCommandOtherEvents) > 0 {
+					maps.Copy(labelEventsMap, data.LabelCommandOtherEvents)
 				}
-			}
+				if _, hasWorkflowDispatch := labelEventsMap["workflow_dispatch"]; !hasWorkflowDispatch {
+					labelEventsMap["workflow_dispatch"] = nil
+				}
+			} else {
+				// Generate events: issues, pull_request, discussion with types: [labeled]
+				filteredEvents := FilterLabelCommandEvents(data.LabelCommandEvents)
+				for _, eventName := range filteredEvents {
+					labelEventsMap[eventName] = map[string]any{
+						"types": []any{"labeled"},
+					}
+				}
 
-			// Add workflow_dispatch with item_number input for manual testing.
-			// Not required so the workflow can be triggered without providing a value;
-			// the activation job falls back to the event payload when item_number is omitted.
-			labelEventsMap["workflow_dispatch"] = map[string]any{
-				"inputs": map[string]any{
-					"item_number": map[string]any{
-						"description": "The number of the issue, pull request, or discussion",
-						"required":    false,
-						"default":     "",
-						"type":        "string",
+				// Add workflow_dispatch with item_number input for manual testing.
+				// Not required so the workflow can be triggered without providing a value;
+				// the activation job falls back to the event payload when item_number is omitted.
+				labelEventsMap["workflow_dispatch"] = map[string]any{
+					"inputs": map[string]any{
+						"item_number": map[string]any{
+							"description": "The number of the issue, pull request, or discussion",
+							"required":    false,
+							"default":     "",
+							"type":        "string",
+						},
 					},
-				},
-			}
-			// Signal that this workflow has a dispatch item_number input so that
-			// applyWorkflowDispatchFallbacks and concurrency key building add the
-			// necessary inputs.item_number fallbacks for manual workflow_dispatch runs.
-			data.HasDispatchItemNumber = true
+				}
+				// Signal that this workflow has a dispatch item_number input so that
+				// applyWorkflowDispatchFallbacks and concurrency key building add the
+				// necessary inputs.item_number fallbacks for manual workflow_dispatch runs.
+				data.HasDispatchItemNumber = true
 
-			// Merge other events (if any) — this handles the no-clash requirement:
-			// if the user also has e.g. "issues: {types: [labeled], names: [bug]}" as a
-			// regular label trigger alongside label_command, merge the "types" arrays
-			// rather than generating a duplicate "issues:" block or silently dropping config.
-			if len(data.LabelCommandOtherEvents) > 0 {
-				for eventKey, eventVal := range data.LabelCommandOtherEvents {
-					if existing, exists := labelEventsMap[eventKey]; exists {
-						// Merge types arrays from user config into the label_command-generated entry.
-						existingMap, _ := existing.(map[string]any)
-						userMap, _ := eventVal.(map[string]any)
-						if existingMap != nil && userMap != nil {
-							existingTypes, _ := existingMap["types"].([]any)
-							userTypes, _ := userMap["types"].([]any)
-							merged := make([]any, 0, len(existingTypes)+len(userTypes))
-							merged = append(merged, existingTypes...)
-							merged = append(merged, userTypes...)
-							existingMap["types"] = merged
-							// Other fields (names, branches, etc.) from the user config are preserved.
-							for k, v := range userMap {
-								if k != "types" {
-									existingMap[k] = v
+				// Merge other events (if any) — this handles the no-clash requirement:
+				// if the user also has e.g. "issues: {types: [labeled], names: [bug]}" as a
+				// regular label trigger alongside label_command, merge the "types" arrays
+				// rather than generating a duplicate "issues:" block or silently dropping config.
+				if len(data.LabelCommandOtherEvents) > 0 {
+					for eventKey, eventVal := range data.LabelCommandOtherEvents {
+						if existing, exists := labelEventsMap[eventKey]; exists {
+							// Merge types arrays from user config into the label_command-generated entry.
+							existingMap, _ := existing.(map[string]any)
+							userMap, _ := eventVal.(map[string]any)
+							if existingMap != nil && userMap != nil {
+								existingTypes, _ := existingMap["types"].([]any)
+								userTypes, _ := userMap["types"].([]any)
+								merged := make([]any, 0, len(existingTypes)+len(userTypes))
+								merged = append(merged, existingTypes...)
+								merged = append(merged, userTypes...)
+								existingMap["types"] = merged
+								// Other fields (names, branches, etc.) from the user config are preserved.
+								for k, v := range userMap {
+									if k != "types" {
+										existingMap[k] = v
+									}
 								}
 							}
+						} else {
+							labelEventsMap[eventKey] = eventVal
 						}
-					} else {
-						labelEventsMap[eventKey] = eventVal
 					}
 				}
 			}
@@ -272,6 +281,12 @@ func (c *Compiler) applyDefaults(data *WorkflowData, markdownPath string) error 
 			}
 
 			if data.If == "" {
+				if data.LabelCommandDecentralized {
+					labelConditionTree, err = buildCentralizedLabelCommandCondition(data.LabelCommand, data.LabelCommandEvents)
+					if err != nil {
+						return fmt.Errorf("failed to build decentralized label-command condition: %w", err)
+					}
+				}
 				data.If = RenderCondition(labelConditionTree)
 			}
 		} else {

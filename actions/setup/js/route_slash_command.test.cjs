@@ -53,6 +53,7 @@ describe("route_slash_command", () => {
     process.env.GH_AW_SLASH_ROUTING = JSON.stringify({
       archie: [{ workflow: "archie", events: ["issue_comment", "pull_request_comment"], ai_reaction: "eyes" }],
     });
+    process.env.GH_AW_LABEL_ROUTING = JSON.stringify({});
     process.env.GITHUB_WORKSPACE = `${process.cwd()}`;
   });
 
@@ -64,6 +65,7 @@ describe("route_slash_command", () => {
     globals.io = savedGlobals.io;
     globals.getOctokit = savedGlobals.getOctokit;
     delete process.env.GH_AW_SLASH_ROUTING;
+    delete process.env.GH_AW_LABEL_ROUTING;
     delete process.env.GITHUB_WORKSPACE;
     delete process.env.GITHUB_REF;
     delete process.env.GITHUB_HEAD_REF;
@@ -166,5 +168,27 @@ describe("route_slash_command", () => {
     expect(globals.github.graphql).toHaveBeenCalledTimes(2);
     expect(globals.github.graphql.mock.calls[0][1]).toEqual({ owner: "github", repo: "gh-aw", num: 3 });
     expect(globals.github.graphql.mock.calls[1][1]).toEqual({ subjectId: "D_node", content: "EYES" });
+  });
+
+  it("dispatches matching decentralized label routes for labeled events", async () => {
+    globals.context.eventName = "pull_request";
+    globals.context.payload = {
+      action: "labeled",
+      label: { name: "ci-doctor" },
+      pull_request: { number: 23 },
+    };
+    process.env.GH_AW_LABEL_ROUTING = JSON.stringify({
+      "ci-doctor": [{ workflow: "ci-doctor", events: ["pull_request"], ai_reaction: "eyes" }],
+    });
+
+    await main();
+
+    expect(dispatchCalls).toHaveLength(1);
+    expect(dispatchCalls[0].workflow_id).toBe("ci-doctor.lock.yml");
+    expect(reactionCalls).toHaveLength(1);
+    const awContext = JSON.parse(dispatchCalls[0].inputs.aw_context);
+    expect(awContext.command_name).toBe("");
+    expect(awContext.trigger_label).toBe("ci-doctor");
+    expect(awContext.desired_ai_reaction).toBe("eyes");
   });
 });

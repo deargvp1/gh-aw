@@ -47,6 +47,13 @@ func TestGenerateCentralSlashCommandWorkflow_GeneratesWorkflow(t *testing.T) {
 			CommandCentralized: true,
 			AIReaction:         "heart",
 		},
+		{
+			WorkflowID:                "ci-doctor",
+			LabelCommand:              []string{"ci-doctor"},
+			LabelCommandEvents:        []string{"pull_request"},
+			LabelCommandDecentralized: true,
+			AIReaction:                "eyes",
+		},
 	}
 
 	require.NoError(t, GenerateCentralSlashCommandWorkflow(data, tmpDir))
@@ -65,7 +72,7 @@ func TestGenerateCentralSlashCommandWorkflow_GeneratesWorkflow(t *testing.T) {
 	require.Equal(t, "v1", metadata.SchemaVersion)
 	require.Equal(t, "dev", metadata.Compiler)
 	require.Equal(t, []string{"cloclo", "triage"}, metadata.Commands)
-	require.Equal(t, []string{"cloclo", "triage-issue", "triage-pr"}, metadata.Workflows)
+	require.Equal(t, []string{"ci-doctor", "cloclo", "triage-issue", "triage-pr"}, metadata.Workflows)
 
 	require.Contains(t, text, "name: \"Agentic Commands\"")
 	require.NotContains(t, text, "Compiler version:")
@@ -81,6 +88,8 @@ func TestGenerateCentralSlashCommandWorkflow_GeneratesWorkflow(t *testing.T) {
 	require.Contains(t, text, "discussion_comment:")
 	require.Contains(t, text, `"triage":[{"workflow":"triage-issue","events":["issue_comment","issues"],"ai_reaction":"eyes"},{"workflow":"triage-pr","events":["pull_request","pull_request_comment"],"ai_reaction":"rocket"}]`)
 	require.Contains(t, text, `"cloclo":[{"workflow":"cloclo","events":["discussion_comment"],"ai_reaction":"heart"}]`)
+	require.Contains(t, text, `"ci-doctor":[{"workflow":"ci-doctor","events":["pull_request"],"ai_reaction":"eyes"}]`)
+	require.Contains(t, text, "GH_AW_LABEL_ROUTING")
 	require.Contains(t, text, `require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs')`)
 	require.Contains(t, text, `setupGlobals(core, github, context, exec, io, getOctokit);`)
 	require.Contains(t, text, `require('${{ runner.temp }}/gh-aw/actions/route_slash_command.cjs')`)
@@ -108,6 +117,27 @@ func TestGenerateCentralSlashCommandWorkflow_DeletesWhenUnused(t *testing.T) {
 	_, err := os.Stat(generatedPath)
 	require.Error(t, err)
 	require.True(t, os.IsNotExist(err))
+}
+
+func TestGenerateCentralSlashCommandWorkflow_GeneratesForDecentralizedLabelsOnly(t *testing.T) {
+	tmpDir := testutil.TempDir(t, "central-label-workflow-test")
+	data := []*WorkflowData{
+		{
+			WorkflowID:                "ci-doctor",
+			LabelCommand:              []string{"ci-doctor"},
+			LabelCommandEvents:        []string{"pull_request"},
+			LabelCommandDecentralized: true,
+		},
+	}
+
+	require.NoError(t, GenerateCentralSlashCommandWorkflow(data, tmpDir))
+	content, err := os.ReadFile(filepath.Join(tmpDir, centralSlashCommandWorkflowFilename))
+	require.NoError(t, err)
+	text := string(content)
+	require.Contains(t, text, "GH_AW_LABEL_ROUTING")
+	require.Contains(t, text, `"ci-doctor":[{"workflow":"ci-doctor","events":["pull_request"]}]`)
+	require.Contains(t, text, "pull_request:")
+	require.Contains(t, text, "types: [labeled]")
 }
 
 func TestRemoveIfExists(t *testing.T) {
@@ -261,12 +291,12 @@ func TestBuildCommandsHeaderMetadata_UsesReleaseVersionOnlyForReleaseBuilds(t *t
 
 	SetVersion("abc1234")
 	SetIsRelease(false)
-	metadata := buildCommandsHeaderMetadata(routesByCommand)
+	metadata := buildCommandsHeaderMetadata(routesByCommand, nil)
 	require.Equal(t, "dev", metadata.Compiler)
 
 	SetVersion("v1.2.3")
 	SetIsRelease(true)
-	metadata = buildCommandsHeaderMetadata(routesByCommand)
+	metadata = buildCommandsHeaderMetadata(routesByCommand, nil)
 	require.Equal(t, "v1.2.3", metadata.Compiler)
 }
 
