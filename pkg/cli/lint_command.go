@@ -18,7 +18,7 @@ var lintCommandLog = logger.New("cli:lint_command")
 var defaultGhAwActionlintIgnorePatterns = []string{
 	// gh-aw extends GitHub Actions permissions with copilot-requests.
 	`unknown permission scope "copilot-requests"`,
-	// GitHub is rolling out additional permissions scopes before actionlint support.
+	// GitHub is rolling out an additional permissions scope before actionlint support.
 	`unknown permission scope "vulnerability-alerts"`,
 	// gh-aw exposes additional job.workflow_* context properties.
 	`property "workflow_(repository|sha|ref|file_path)" is not defined in object type`,
