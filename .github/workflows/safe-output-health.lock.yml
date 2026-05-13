@@ -434,11 +434,6 @@ jobs:
           tags: localhost/gh-aw:dev
           build-args: |
             BINARY=dist/gh-aw-linux-amd64
-      - name: Build and install gh-aw CLI from source
-        run: |
-          gh extension remove gh-aw || true
-          gh extension install .
-          gh aw version
       - name: Create gh-aw temp directory
         run: bash "${RUNNER_TEMP}/gh-aw/actions/create_gh_aw_tmp_dir.sh"
       - name: Configure gh CLI for GitHub Enterprise

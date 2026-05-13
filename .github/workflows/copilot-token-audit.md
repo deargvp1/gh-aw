@@ -61,7 +61,7 @@ steps:
       # it hits an API rate limit partway through, the JSON written so far is
       # still valid and should be processed by the agent.
       LOGS_EXIT=0
-      ./gh-aw logs \
+      gh aw logs \
         --engine copilot \
         --start-date -1d \
         --json \
@@ -72,7 +72,7 @@ steps:
         TOTAL=$(jq '.runs | length' /tmp/gh-aw/token-audit/copilot-logs.json)
         echo "✅ Downloaded $TOTAL Copilot workflow runs (last 24 hours)"
         if [ "$LOGS_EXIT" -ne 0 ]; then
-          echo "⚠️ ./gh-aw logs exited with code $LOGS_EXIT (partial results — likely API rate limit)"
+          echo "⚠️ gh aw logs exited with code $LOGS_EXIT (partial results — likely API rate limit)"
         fi
       else
         echo "❌ No log data downloaded (exit code $LOGS_EXIT)"

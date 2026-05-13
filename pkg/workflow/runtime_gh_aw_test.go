@@ -73,18 +73,6 @@ func TestDetectRuntimeFromCommand_GhAw(t *testing.T) {
 		require.True(t, ok)
 		assert.Equal(t, "dev-build-sha", req.Version)
 	})
-
-	t.Run("./gh-aw direct invocation triggers runtime", func(t *testing.T) {
-		SetVersion("v9.9.9")
-		SetIsRelease(true)
-
-		requirements := make(map[string]*RuntimeRequirement)
-		detectRuntimeFromCommand("./gh-aw logs --engine copilot --start-date -1d --json", requirements)
-
-		req, ok := requirements["gh-aw"]
-		require.True(t, ok)
-		assert.Equal(t, "v9.9.9", req.Version)
-	})
 }
 
 func TestGetDomainsFromRuntimes_GhAw(t *testing.T) {
