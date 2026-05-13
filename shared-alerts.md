@@ -57,3 +57,22 @@
 - **Daily Fact still failing** post-PR#31411 merge (#31432, #31524 still open)
 - **Quality/Effectiveness plateau**: Day 11 flat at Q:74/E:71 — structural bottleneck suspected (PR-review cluster waste dragging averages)
 - **PR-review cluster waste escalated**: ~272 wasted run-attempts/day confirmed — highest waste in ecosystem; trigger gate fix is highest-ROI action
+
+---
+## Update — 2026-05-13T05:45Z (Workflow Health Manager)
+
+### NEW (since May 12)
+- **CI integration test failure**: Fix failing "Integration: Workflow Misc Part 2" (#31860) — CGO failing 3/4 runs. New regression.
+- **Semantic Function Refactoring** (#31827): new agentic failure
+- **Daily Security Red Team Agent** (#31817): new failure
+- **Scout** (#31811): failed
+- **Daily Cache Strategy Analyzer** (#31773): new failure
+- **4 new workflows added** (219→223): no compilation issues
+
+### RESOLVED
+- Daily Firewall Logs Collector: auto-close ran ✅
+- Smoke Copilot dispatch_workflow: auto-close ran ✅
+
+### WATCH
+- CI failures trending up (scheduled CI + CGO): possible integration test regression around #31860
+- Deep-report triage issue #31729: 18 stale [aw]-failed issues — recommend bulk close
