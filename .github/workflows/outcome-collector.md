@@ -81,7 +81,12 @@ pre-agent-steps:
       NOOP=0
       EVAL_JSONL="/tmp/gh-aw/outcome-evaluations.jsonl"
       > "$EVAL_JSONL"
-      EVALUATED_IDS_FILE="${SEEN_FILE}.evaluated"
+      mkdir -p /tmp/gh-aw/outcome-collector
+      EVALUATED_IDS_FILE="$(mktemp /tmp/gh-aw/outcome-collector/evaluated-runs.XXXXXX.json)"
+      cleanup() {
+        rm -f "$EVALUATED_IDS_FILE"
+      }
+      trap cleanup EXIT TERM INT
       echo '[]' > "$EVALUATED_IDS_FILE"
 
       for RUN_ID in $(echo "$RUNS" | jq -r '.[].databaseId'); do
