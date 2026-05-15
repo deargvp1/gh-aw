@@ -151,7 +151,8 @@ export default defineConfig({
 		'/guides/telemetry/': '/gh-aw/reference/open-telemetry/',
 		'/guides/getting-started-mcp/': '/gh-aw/guides/mcps/',
 		'/patterns/data-ops/': '/gh-aw/patterns/deterministic-ops/',
-		'/patterns/expert-ops/': '/gh-aw/patterns/agentic-ops/',
+		'/patterns/expert-ops/': '/gh-aw/patterns/monitor-ops/',
+		'/patterns/agentic-ops/': '/gh-aw/patterns/monitor-ops/',
 		'/patterns/task-ops/': '/gh-aw/patterns/research-plan-assign-ops/',
 		'/examples/comment-triggered/': '/gh-aw/patterns/chat-ops/',
 		'/examples/issue-pr-events/': '/gh-aw/patterns/issue-ops/',
@@ -163,6 +164,8 @@ export default defineConfig({
 		'/examples/project-tracking/': '/gh-aw/patterns/project-ops/',
 		'/guides/audit-with-agents/': '/gh-aw/reference/audit/',
 		'/guides/ephemerals/': '/gh-aw/reference/ephemerals/',
+		'/guides/memoryops/': '/gh-aw/guides/memory-ops/',
+		'/guides/serena/': '/gh-aw/reference/serena/',
 
 		'/reference/awf-reflect/': '/gh-aw/experimental/awf-reflect/',
 
@@ -312,7 +315,6 @@ export default defineConfig({
 				{
 					label: 'Design Patterns',
 					items: [
-						{ label: 'AgenticOps', link: '/patterns/agentic-ops/' },
 						{ label: 'BatchOps', link: '/patterns/batch-ops/' },
 						{ label: 'CentralRepoOps', link: '/patterns/central-repo-ops/' },
 						{ label: 'ChatOps', link: '/patterns/chat-ops/' },
@@ -321,7 +323,8 @@ export default defineConfig({
 						{ label: 'DispatchOps', link: '/patterns/dispatch-ops/' },
 						{ label: 'IssueOps', link: '/patterns/issue-ops/' },
 						{ label: 'LabelOps', link: '/patterns/label-ops/' },
-						{ label: 'MemoryOps', link: '/guides/memoryops/' },
+						{ label: 'MemoryOps', link: '/guides/memory-ops/' },
+						{ label: 'MonitorOps', link: '/patterns/monitor-ops/' },
 						{ label: 'MultiRepoOps', link: '/patterns/multi-repo-ops/' },
 						{ label: 'Orchestration', link: '/patterns/orchestration/' },
 						{ label: 'ProjectOps', link: '/patterns/project-ops/' },
@@ -335,6 +338,7 @@ export default defineConfig({
 					label: 'Practices',
 					items: [
 						{ label: 'A/B Experiments', link: '/guides/experiments/' },
+					{ label: 'A/B Experiments (Spec)', link: '/reference/experiments-specification/' },
 						{ label: 'Maintaining Repositories', link: '/practices/maintaining-repos/' },
 						{ label: 'Organization Practices', link: '/practices/organization-practices/' },
 						{ label: 'Safe Rollout', link: '/practices/safe-rollout/' },
@@ -424,8 +428,7 @@ export default defineConfig({
 						{ label: 'Monitoring with Projects', link: '/experimental/monitoring-with-projects/' },
 						{ label: 'TrialOps', link: '/experimental/trial-ops/' },
 						{ label: 'WASM Compilation', link: '/reference/wasm-compilation/' },
-						{ label: 'Experiments (Spec)', link: '/reference/experiments-specification/' },
-						{ label: 'Serena', link: '/guides/serena/' },
+
 					],
 				},
 				{ label: 'Agent Factory', link: '/agent-factory-status/' },
