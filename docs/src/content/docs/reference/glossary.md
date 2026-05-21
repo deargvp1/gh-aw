@@ -845,7 +845,7 @@ Interactive automation triggered by slash commands (`/review`, `/deploy`) in iss
 
 ### DailyOps
 
-Scheduled workflows for incremental daily improvements, automating progress toward large goals through small, manageable changes on weekday schedules. See [DailyOps](/gh-aw/patterns/daily-ops/).
+Scheduled workflows for incremental daily improvements, automating progress toward large goals through small, manageable changes on weekday schedules.
 
 ### DataOps
 

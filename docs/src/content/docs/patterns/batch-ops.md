@@ -7,7 +7,13 @@ sidebar:
 
 BatchOps is a pattern for processing large volumes of work items efficiently. Instead of iterating sequentially through hundreds of items in a single workflow run, BatchOps splits work into chunks, parallelizes where possible, handles partial failures gracefully, and aggregates results into a consolidated report.
 
-## When to Use BatchOps vs Sequential Processing
+```mermaid
+flowchart LR
+    trigger([Trigger]) --> workers[Parallel batch workers]
+    workers --> agg[Aggregate results]
+```
+
+## When to Use BatchOps
 
 | Scenario | Recommendation |
 |----------|----------------|
@@ -21,6 +27,15 @@ BatchOps is a pattern for processing large volumes of work items efficiently. In
 ## Batch Strategy 1: Chunked Processing
 
 Split work into fixed-size pages using `GITHUB_RUN_NUMBER`. Each run processes one page, picking up the next slice on the next scheduled run. Items must have a stable sort key (creation date, issue number) so pagination is deterministic.
+
+```mermaid
+flowchart LR
+    run([Run N]) --> fetch[Fetch page N]
+    fetch --> agent[AI processes batch]
+    agent --> next([Run N+1, next page])
+```
+
+Example workflow:
 
 ```aw wrap
 ---
@@ -66,6 +81,15 @@ This run covers offset ${{ steps.compute-page.outputs.page_offset }} with page s
 
 Use GitHub Actions matrix to run multiple batch workers in parallel, each responsible for a non-overlapping shard. Use `fail-fast: false` so one shard failure doesn't cancel the others. Each shard gets its own token and API rate limit quota.
 
+```mermaid
+flowchart LR
+    trigger([Trigger]) --> s0[Shard 0]
+    trigger --> s1[Shard 1]
+    trigger --> s2[Shard 2]
+```
+
+Example workflow:
+
 ```aw wrap
 ---
 on:
@@ -105,6 +129,15 @@ Process only issues where `(issue_number % ${{ inputs.total_shards }}) == ${{ ma
 ## Batch Strategy 3: Rate-Limit-Aware Batching
 
 Throttle API calls by processing items in small sub-batches with explicit pauses. Slower than unbounded processing but dramatically reduces rate-limit errors. Use [Rate Limiting Controls](/gh-aw/reference/rate-limiting-controls/) for built-in throttling.
+
+```mermaid
+flowchart LR
+    trigger([Trigger]) --> batch[Process sub-batch]
+    batch --> pause[Pause between batches]
+    pause --> report[Report totals]
+```
+
+Example workflow:
 
 ```aw wrap
 ---
@@ -146,6 +179,15 @@ Process all open issues in sub-batches of ${{ inputs.batch_size }}, pausing ${{ 
 ## Batch Strategy 4: Result Aggregation
 
 Collect results from multiple batch workers or runs and aggregate them into a single summary issue. Use [cache-memory](/gh-aw/reference/cache-memory/) to store intermediate results when runs span multiple days.
+
+```mermaid
+flowchart LR
+    runs[Past batch runs] --> cache[cache-memory]
+    cache --> agent[AI agent]
+    agent --> issue[Update tracking issue]
+```
+
+Example workflow:
 
 ```aw wrap
 ---
@@ -257,7 +299,7 @@ Migrate all issues with the label `bug` to use `type:bug`. List all issues (open
 Add a final comment with totals and a search link to verify no `bug` labels remain.
 ```
 
-## Related Pages
+## Related Documentation
 
 - [WorkQueueOps](/gh-aw/patterns/workqueue-ops/) — Sequential queue processing with issue checklists, sub-issues, cache-memory, and Discussions
 - [ResearchPlanAssignOps](/gh-aw/patterns/research-plan-assign-ops/) — Research → Plan → Assign for developer-supervised work

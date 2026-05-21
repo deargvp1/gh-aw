@@ -6,7 +6,7 @@ sidebar:
   badge: { text: 'Hybrid', variant: 'caution' }
 ---
 
-GitHub Agentic Workflows combine deterministic computation with AI reasoning, enabling data preprocessing, custom trigger filtering, and post-processing patterns. This includes the **DataOps** sub-pattern where shell commands in `steps:` reliably collect and prepare data — fast, cacheable, and reproducible — then the AI agent reads the results and generates insights. Use this for data aggregation, report generation, trend analysis, auditing, and any hybrid pipeline.
+GitHub Agentic Workflows combine deterministic computation with AI reasoning, enabling data preprocessing, custom trigger filtering, and post-processing patterns. This includes the **DataOps** sub-pattern where shell commands in [`steps:`](/gh-aw/reference/workflow-structure/) reliably collect and prepare data — fast, cacheable, and reproducible — then the AI agent reads the results and generates insights. Use this for data aggregation, report generation, trend analysis, auditing, and any hybrid pipeline.
 
 ## When to Use
 
@@ -16,24 +16,10 @@ Combine deterministic steps with AI agents to precompute data, filter triggers, 
 
 Define deterministic jobs in frontmatter alongside agentic execution:
 
-```text
-┌────────────────────────┐
-│  Deterministic Jobs    │
-│  - Data fetching       │
-│  - Preprocessing       │
-└───────────┬────────────┘
-            │ artifacts/outputs
-            ▼
-┌────────────────────────┐
-│   Agent Job (AI)       │
-│   - Reasons & decides  │
-└───────────┬────────────┘
-            │ safe outputs
-            ▼
-┌────────────────────────┐
-│  Safe Output Jobs      │
-│  - GitHub API calls    │
-└────────────────────────┘
+```mermaid
+flowchart TD
+    det[Deterministic steps] -- artifacts --> agent[AI agent]
+    agent -- safe-outputs --> so[Safe output jobs]
 ```
 
 ## Precomputation Example
@@ -43,7 +29,7 @@ Define deterministic jobs in frontmatter alongside agentic execution:
 on:
   push:
     tags: ['v*.*.*']
-engine: copilot
+
 safe-outputs:
   update-release:
 
@@ -68,7 +54,7 @@ Files in `/tmp/gh-aw/agent/` are automatically uploaded as artifacts and availab
 ---
 on:
   schedule: daily
-engine: claude
+
 safe-outputs:
   create-discussion:
 
@@ -110,7 +96,7 @@ on:
         LABELS: ${{ toJSON(github.event.issue.labels.*.name) }}
       run: echo "$LABELS" | grep -q '"bug"'
       # exits 0 (outcome: success) if the label is found, 1 (outcome: failure) if not
-engine: copilot
+
 safe-outputs:
   add-comment:
 
@@ -169,7 +155,7 @@ Use a separate `jobs:` entry when filtering requires heavy tooling (checkout, co
 on:
   issues:
     types: [opened]
-engine: copilot
+
 safe-outputs:
   add-comment:
 
@@ -208,7 +194,7 @@ For conditions that can be expressed directly with GitHub Actions context, use `
 on:
   pull_request:
     types: [opened, synchronize]
-engine: copilot
+
 if: github.event.pull_request.draft == false
 ---
 ```
@@ -224,7 +210,6 @@ on:
     types: [opened]
   # Skip if a duplicate issue already exists (GitHub search query syntax)
   skip-if-match: 'is:issue is:open label:duplicate'
-engine: copilot
 ---
 ```
 
@@ -235,7 +220,6 @@ engine: copilot
 on:
   pull_request:
     types: [opened]
-engine: copilot
 
 safe-outputs:
   jobs:
@@ -261,9 +245,10 @@ Define reusable guidance in shared files and import them:
 ---
 on:
   schedule: daily
-engine: copilot
+
 imports:
   - shared/reporting.md
+
 safe-outputs:
   create-discussion:
 ---
@@ -306,7 +291,6 @@ permissions:
   contents: read
   pull-requests: read
 
-engine: copilot
 strict: true
 
 network:
@@ -483,10 +467,10 @@ Return a JSON object: `{"number": <issue number>, "summary": "<sentence>"}`.
 
 ## Related Documentation
 
-- [Pre-Activation Steps](/gh-aw/reference/triggers/#pre-activation-steps-onsteps) - Inline step injection into the pre-activation job
-- [Pre-Activation Permissions](/gh-aw/reference/triggers/#pre-activation-permissions-onpermissions) - Grant additional scopes for `on.steps:` API calls
-- [Custom Safe Outputs](/gh-aw/reference/custom-safe-outputs/) - Custom post-processing jobs
-- [Frontmatter Reference](/gh-aw/reference/frontmatter/) - Configuration options
-- [Compilation Process](/gh-aw/reference/compilation-process/) - How jobs are orchestrated
-- [Imports](/gh-aw/reference/imports/) - Sharing configurations across workflows
-- [Templating](/gh-aw/reference/templating/) - Using GitHub Actions expressions
+- [Pre-Activation Steps](/gh-aw/reference/triggers/#pre-activation-steps-onsteps) — Inline step injection into the pre-activation job
+- [Pre-Activation Permissions](/gh-aw/reference/triggers/#pre-activation-permissions-onpermissions) — Grant additional scopes for `on.steps:` API calls
+- [Custom Safe Outputs](/gh-aw/reference/custom-safe-outputs/) — Custom post-processing jobs
+- [Frontmatter Reference](/gh-aw/reference/frontmatter/) — Configuration options
+- [Compilation Process](/gh-aw/reference/compilation-process/) — How jobs are orchestrated
+- [Imports](/gh-aw/reference/imports/) — Sharing configurations across workflows
+- [Templating](/gh-aw/reference/templating/) — Using GitHub Actions expressions
