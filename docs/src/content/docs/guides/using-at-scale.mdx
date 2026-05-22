@@ -45,10 +45,15 @@ Agentic workflows run inside GitHub Actions and can make outbound network reques
 
 ## Working Across Multiple Repositories
 
-GitHub Agentic Workflows has multiple features for coordinating work across repositories. The main design patterns are:
+GitHub Agentic Workflows has multiple features and design patterns for coordinating work across repositories. Key technical references:
 
-- [CentralRepoOps](/gh-aw/patterns/central-repo-ops/) — a particular pattern to use a **central control repo** to dispatch org-wide rollouts or aggregate issues from component repositories
-- [MultiRepoOps](/gh-aw/patterns/multi-repo-ops/) — other multi-repo design patterns including using a **side repo** to target your main codebase (keeping automation infrastructure separate), or **propagate changes** from a one repo to another.
+- [Cross-Repository Safe Outputs](/gh-aw/reference/cross-repository/) — writing issues, PRs, and comments to external repositories via `target-repo`; reading from private repositories with `allowed-repos`
+- [Authentication](/gh-aw/reference/auth/) — PATs and GitHub Apps for cross-repository access; GitHub Apps are preferred for automatic token rotation and fine-grained scoping
+- [GitHub Tools](/gh-aw/reference/github-tools/) — GitHub API toolsets available to the agent across repositories
+- [OrchestratorOps](/gh-aw/patterns/orchestrator-ops/) — dispatching parallel worker workflows for large-scale multi-repo operations
+- [MultiRepoOps](/gh-aw/patterns/multi-repo-ops/) — multi-repo design patterns 
+
+A particularly important design pattern for multi-repo operations is [CentralRepoOps](/gh-aw/patterns/central-repo-ops/), where a central control repository dispatches work to target repositories or aggregates issues from component repositories. See the [CentralRepoOps pattern](/gh-aw/patterns/central-repo-ops/) for detailed examples and templates.
 
 ## Safe Rollout
 
@@ -78,6 +83,10 @@ GitHub Agentic Workflows can be configured to emit [OpenTelemetry](/gh-aw/refere
 ## GitHub Enterprise Server and Cloud
 
 For deployments on GitHub Enterprise Server or GitHub Enterprise Cloud with data residency, see the [Enterprise Configuration reference](/gh-aw/reference/enterprise-configuration/) for runner configuration, token scoping, and endpoint customization. If you are using GitHub Enterprise Cloud with data residency (`*.ghe.com`), see [Debugging GHE Cloud with Data Residency](/gh-aw/troubleshooting/debug-ghe/) for step-by-step setup and common issues.
+
+## Self-Hosted Runners
+
+Organizations that need to run agentic workflows on their own infrastructure — for network isolation, compliance, or cost reasons — can use self-hosted runners. See the [Self-Hosted Runners guide](/gh-aw/guides/self-hosted-runners/) for configuration requirements, ARC/Kubernetes setup, and GHES-specific considerations. Runners must be Linux with Docker support; use the `runs-on:` frontmatter field to target them.
 
 ## A/B Experiments
 
